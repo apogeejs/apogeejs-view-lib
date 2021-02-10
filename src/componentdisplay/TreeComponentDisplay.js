@@ -1,6 +1,6 @@
-import {TreeEntry,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
-import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
-import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
+import {TreeEntry,getIconOverlay} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
+import {addComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
 
 /** This component represents a json table object. */
 export default class TreeComponentDisplay {

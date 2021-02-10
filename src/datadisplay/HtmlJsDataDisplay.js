@@ -1,8 +1,8 @@
-import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import DataDisplay from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
+import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from

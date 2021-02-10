@@ -1,9 +1,9 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form

@@ -1,6 +1,6 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods

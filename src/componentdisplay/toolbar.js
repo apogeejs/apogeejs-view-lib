@@ -1,4 +1,4 @@
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 /** This namespace provides methods to create a standard save bar and other toolbars. */
 

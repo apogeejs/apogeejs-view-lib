@@ -1,8 +1,8 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
 export default class JsonPlusTableComponentView extends ComponentView {
 

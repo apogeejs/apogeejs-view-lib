@@ -1,4 +1,4 @@
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
 let dataDisplayHelper = {};
 export {dataDisplayHelper as default}

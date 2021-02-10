@@ -1,10 +1,10 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
-import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import HtmlJsDataDisplay from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will

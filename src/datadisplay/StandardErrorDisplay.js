@@ -1,5 +1,5 @@
-import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import DataDisplay from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 /** Standard Error display.
  * 

@@ -1,4 +1,4 @@
-import {showConfigurableDialog} from "/apogeeui/apogeeUiLib.js";
+import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 //=====================================
 // UI Entry Point

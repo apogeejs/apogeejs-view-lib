@@ -1,7 +1,7 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {validateTableName} from "/apogeejs-model-lib/src/apogeeModelLib.js"; 
 
-import {showConfigurableDialog} from "/apogeeui/apogeeUiLib.js";
+import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 //=====================================
 // UI Entry Point

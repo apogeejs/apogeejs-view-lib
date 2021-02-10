@@ -1,5 +1,5 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {addComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
 
 //=====================================
 // UI Entry Point

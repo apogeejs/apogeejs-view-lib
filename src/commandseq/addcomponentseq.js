@@ -1,11 +1,11 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {validateTableName} from "/apogeejs-model-lib/src/apogeeModelLib.js"; 
 
-import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponentseq.js";
-import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
-import {showConfigurableDialog} from "/apogeeui/apogeeUiLib.js";
-import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
-import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
+import {getPropertiesDialogLayout} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
+import {Component,componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
+import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import {showSelectComponentDialog} from "/apogeejs-view-lib/src/dialogs/SelectControlDialog.js";
+import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 //=====================================
 // UI Entry Point

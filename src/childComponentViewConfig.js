@@ -1,12 +1,12 @@
-import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
-import FunctionComponentView from "/apogeeview/componentviews/FunctionComponentView.js";
-import DynamicFormView from "/apogeeview/componentviews/DynamicFormView.js";
-import FormDataComponentView from "/apogeeview/componentviews/FormDataComponentView.js";
-import CustomComponentView from "/apogeeview/componentviews/CustomComponentView.js";
-import CustomDataComponentView from "/apogeeview/componentviews/CustomDataComponentView.js";
-import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
+import JsonTableComponentView from "/apogeejs-view-lib/src/componentviews/JsonTableComponentView.js";
+import FunctionComponentView from "/apogeejs-view-lib/src/componentviews/FunctionComponentView.js";
+import DynamicFormView from "/apogeejs-view-lib/src/componentviews/DynamicFormView.js";
+import FormDataComponentView from "/apogeejs-view-lib/src/componentviews/FormDataComponentView.js";
+import CustomComponentView from "/apogeejs-view-lib/src/componentviews/CustomComponentView.js";
+import CustomDataComponentView from "/apogeejs-view-lib/src/componentviews/CustomDataComponentView.js";
+import ErrorComponentView from "/apogeejs-view-lib/src/componentviews/ErrorComponentView.js";
 
-import {registerComponentView,setErrorComponentView} from "/apogeeview/componentViewInfo.js";
+import {registerComponentView,setErrorComponentView} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 //registration of the child component views
 
@@ -21,11 +21,11 @@ registerComponentView(CustomDataComponentView);
 setErrorComponentView(ErrorComponentView);
 
 //JSON PLUS COMPONENT
-import ActionFormComponentView from "/apogeeview/componentviews/ActionFormComponentView.js";
+import ActionFormComponentView from "/apogeejs-view-lib/src/componentviews/ActionFormComponentView.js";
 registerComponentView(ActionFormComponentView);
-import DataFormComponentView from "/apogeeview/componentviews/DataFormComponentView.js";
+import DataFormComponentView from "/apogeejs-view-lib/src/componentviews/DataFormComponentView.js";
 registerComponentView(DataFormComponentView);
 
 //JSON PLUS COMPONENT
-import JsonPlusTableComponentView from "/apogeeview/componentviews/JsonPlusTableComponentView.js";
+import JsonPlusTableComponentView from "/apogeejs-view-lib/src/componentviews/JsonPlusTableComponentView.js";
 registerComponentView(JsonPlusTableComponentView);

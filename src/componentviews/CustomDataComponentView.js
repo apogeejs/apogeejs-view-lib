@@ -1,11 +1,11 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import HtmlJsDataDisplay from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
+import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 
 /** This attempt has a single form edit page which returns an object. */

@@ -1,9 +1,9 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
-import {bannerConstants} from "/apogeeui/apogeeUiLib.js";
-import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
-import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
-import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisplay.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {uiutil,TreeEntry} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import {bannerConstants} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import {updateComponent} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
+import {deleteComponent} from "/apogeejs-view-lib/src/commandseq/deletecomponentseq.js";
+import TreeComponentDisplay from "/apogeejs-view-lib/src/componentdisplay/TreeComponentDisplay.js";
 
 /** This is the base functionality for a component. */
 export default class ComponentView {

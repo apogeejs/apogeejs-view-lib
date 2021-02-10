@@ -1,9 +1,9 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import HandsonGridEditor from "/apogeeview/datadisplay/HandsonGridEditor.js";
-import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import HandsonGridEditor from "/apogeejs-view-lib/src/datadisplay/HandsonGridEditor.js";
+import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 export default class JsonTableComponentView extends ComponentView {
 

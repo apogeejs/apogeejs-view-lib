@@ -1,5 +1,5 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {showConfigurableDialog} from "/apogeeui/apogeeUiLib.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 const DIALOG_LAYOUT_TITLE_LINE = {
     "type": "heading",

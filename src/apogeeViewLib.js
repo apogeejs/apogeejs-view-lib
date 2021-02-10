@@ -1,28 +1,28 @@
 
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
-import ace from "/ext/ace/ace_1.4.3/ace.es.js";
+import ace from "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js";
 
-export {default as ComponentView} from "/apogeeview/componentdisplay/ComponentView.js";
+export {default as ComponentView} from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 
-export {default as FormInputBaseComponentView} from "/apogeeview/componentviews/FormInputBaseComponentView.js";
+export {default as FormInputBaseComponentView} from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
 
-export {default as AceTextEditor} from "/apogeeview/datadisplay/AceTextEditor.js";
-export {default as ConfigurableFormEditor} from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
-export {default as DataDisplay} from "/apogeeview/datadisplay/DataDisplay.js";
-export {default as dataDisplayHelper} from "/apogeeview/datadisplay/dataDisplayHelper.js";
-export {default as DATA_DISPLAY_CONSTANTS} from "/apogeeview/datadisplay/dataDisplayConstants.js";
-export {default as ErrorDisplay} from "/apogeeview/datadisplay/ErrorDisplay.js";
-export {default as HandsonGridEditor} from "/apogeeview/datadisplay/HandsonGridEditor.js";
-export {default as HtmlJsDataDisplay} from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
-export {default as StandardErrorDisplay} from "/apogeeview/datadisplay/StandardErrorDisplay.js";
+export {default as AceTextEditor} from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+export {default as ConfigurableFormEditor} from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
+export {default as DataDisplay} from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
+export {default as dataDisplayHelper} from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+export {default as DATA_DISPLAY_CONSTANTS} from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+export {default as ErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/ErrorDisplay.js";
+export {default as HandsonGridEditor} from "/apogeejs-view-lib/src/datadisplay/HandsonGridEditor.js";
+export {default as HtmlJsDataDisplay} from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
+export {default as StandardErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 
-export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
+export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
-export {default as UiCommandMessenger} from "/apogeeview/commandseq/UiCommandMessenger.js";
+export {default as UiCommandMessenger} from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 
 //import the default child component views
-import "/apogeeview/childComponentViewConfig.js";
+import "/apogeejs-view-lib/src/childComponentViewConfig.js";
 
 /** This function initializes the resources paths. Thuis covers the following paths
  * - "resources" folder - where the resource images are held

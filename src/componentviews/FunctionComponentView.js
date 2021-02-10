@@ -1,7 +1,7 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 
 /** This component represents a table object. */
 export default class FunctionComponentView extends ComponentView {

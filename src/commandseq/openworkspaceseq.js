@@ -1,4 +1,4 @@
-import {closeWorkspace} from "/apogeeview/commandseq/closeworkspaceseq.js";
+import {closeWorkspace} from "/apogeejs-view-lib/src/commandseq/closeworkspaceseq.js";
 
 //=====================================
 // UI Entry Point

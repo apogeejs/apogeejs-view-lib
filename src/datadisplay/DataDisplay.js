@@ -1,4 +1,4 @@
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 
 /** This is the base class for data displays, which show individual edit/display fields for a component. For example, a standard JSON
  * data component has three data displays, for the component value, the function body and the supplemental code.
