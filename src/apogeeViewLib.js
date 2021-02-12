@@ -16,10 +16,19 @@ export {default as ErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/ErrorD
 export {default as HandsonGridEditor} from "/apogeejs-view-lib/src/datadisplay/HandsonGridEditor.js";
 export {default as HtmlJsDataDisplay} from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
 export {default as StandardErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+export {getSaveBar} from "/apogeejs-view-lib/src/componentdisplay/toolbar.js";
 
 export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 export {default as UiCommandMessenger} from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+
+export {closeWorkspace} from "/apogeejs-view-lib/src/commandseq/closeworkspaceseq.js";
+export {createWorkspace} from "/apogeejs-view-lib/src/commandseq/createworkspaceseq.js";
+export {openWorkspace} from "/apogeejs-view-lib/src/commandseq/openworkspaceseq.js";
+export {saveWorkspace} from "/apogeejs-view-lib/src/commandseq/saveworkspaceseq.js";
+export {updateWorkspaceProperties} from "/apogeejs-view-lib/src/commandseq/updateworkspaceseq.js";
+export {addComponent, addAdditionalComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
+export {addLink, updateLink, removeLink} from "/apogeejs-view-lib/src/commandseq/updatelinkseq.js";
 
 //import the default child component views
 import "/apogeejs-view-lib/src/childComponentViewConfig.js";
