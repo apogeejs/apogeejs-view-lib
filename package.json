@@ -17,7 +17,7 @@
         "apogeejs-model-lib": "^2.0.0",
         "apogeejs-app-lib": "^2.0.0",
         "apogeejs-ui-lib": "^2.0.0",
-        "ace": "1.4.3",
+        "ace-builds": "1.4.3",
         "handsontable": "6.2.0"
     }
 }
