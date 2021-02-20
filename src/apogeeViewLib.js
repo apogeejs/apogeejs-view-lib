@@ -30,6 +30,8 @@ export {updateWorkspaceProperties} from "/apogeejs-view-lib/src/commandseq/updat
 export {addComponent, addAdditionalComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
 export {addLink, updateLink, removeLink} from "/apogeejs-view-lib/src/commandseq/updatelinkseq.js";
 
+export {default as ace} from "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js";
+
 //import the default child component views
 import "/apogeejs-view-lib/src/childComponentViewConfig.js";
 

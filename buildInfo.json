@@ -1,6 +1,5 @@
 {
     "repoName": "apogeejs-view-lib",
-    "isProductionRelease": false,
 
     "makeEsModule": true,
     "esModuleFileName": "apogeeViewLib.js",
