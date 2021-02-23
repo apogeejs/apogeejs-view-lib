@@ -677,7 +677,7 @@ ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
 ComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER = 0;
 
 ComponentView.DEFAULT_CELL_ICON = "/icons3/genericCellIcon.png";
-ComponentView.DEFAULT_CELL_ICON = "/icons3/pageIcon.png";
+ComponentView.DEFAULT_PAGE_ICON = "/icons3/pageIcon.png";
 
 ComponentView.MENU_ITEM_OPEN = 0x01;
 

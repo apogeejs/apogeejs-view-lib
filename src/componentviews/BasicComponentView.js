@@ -90,7 +90,7 @@ BasicComponentView.hasTabEntry = false;
 BasicComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
-BasicComponentView.ICON_RES_PATH = "/componentIcons/genericControl.png";
+BasicComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
 
 
 
