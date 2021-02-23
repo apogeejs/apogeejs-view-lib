@@ -139,7 +139,8 @@ export default class ComponentView {
                     resPath = ComponentView.DEFAULT_CELL_ICON;
                 }
             }
-            return uiutil.getResourcePath(resPath);
+            //cell/page icons are in the app domain/repo
+            return uiutil.getResourcePath(resPath,"app");
         }
     }
 
