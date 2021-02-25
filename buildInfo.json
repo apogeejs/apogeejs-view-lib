@@ -1,19 +1,32 @@
 {
     "repoName": "apogeejs-view-lib",
 
-    "makeEsModule": true,
-    "esModuleFileName": "apogeeViewLib.js",
-    "esFilesToCopyUrls": [
-        "/apogeejs-view-lib/versionInfo.json"
-    ],
-    "esExternalLibs": [
-        "/apogeejs-base-lib/src/apogeeBaseLib.js",
-        "/apogeejs-util-lib/src/apogeeUtilLib.js",
-        "/apogeejs-model-lib/src/apogeeModelLib.js",
-        "/apogeejs-app-lib/src/apogeeAppLib.js",
-        "/apogeejs-ui-lib/src/apogeeUiLib.js"
-    ],
-    "esExternalLibRemapping": {},
-
-    "makeNpmModule": false
+    "esModule": {
+        "taskList": [
+            {
+                "type": "copyFileList",
+                "srcFileUrlList": [
+                    "/apogeejs-view-lib/versionInfo.json"
+                ]
+            },
+            {
+                "type": "copyFileList",
+                "srcFileUrlList": [
+                    "/apogeejs-view-lib/style/**/*"
+                ],
+                "childFolder": "style"
+            },
+            {
+                "type": "packageLib",
+                "esModuleFileName": "apogeeViewLib.js",
+                "externalLibs": [
+                    "/apogeejs-base-lib/src/apogeeBaseLib.js",
+                    "/apogeejs-util-lib/src/apogeeUtilLib.js",
+                    "/apogeejs-model-lib/src/apogeeModelLib.js",
+                    "/apogeejs-app-lib/src/apogeeAppLib.js",
+                    "/apogeejs-ui-lib/src/apogeeUiLib.js"
+                ]
+            }
+        ]
+    }
 }
