@@ -3,7 +3,7 @@ import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDispl
 let dataDisplayHelper = {};
 export {dataDisplayHelper as default}
 
-const FORMAT_STRING = "\t";
+const MIME_TYPE_JSON = "application/json"
 
 
 /** This function creates the data display data source  for the data of the given member. The
@@ -51,7 +51,9 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,membe
     }
 }
 
-/** This function creates editor callbacks or member data where the editor takes text format. */
+/** This function creates editor callbacks or member data where the editor takes text format. 
+ * This data source sets error valueData (a substitue value) when the user tries to save an improperly 
+ * formatted JSON. */
 dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName,doReadOnly) {
 
     //this is used internally to lookup the data member used here
@@ -75,22 +77,44 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
             let member = _getDataMember();
             let wrappedData = dataDisplayHelper.getEmptyWrappedData();
             if(member.getState() != apogeeutil.STATE_NORMAL) {
-                wrappedData.hideDisplay = true;
-                wrappedData.data = apogeeutil.INVALID_VALUE;
                 switch(member.getState()) {
                     case apogeeutil.STATE_ERROR: 
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                        wrappedData.message = "Error in value: " + member.getErrorMsg();
+                        //check if there is valueData on the error object
+                        let error = member.getError();
+                        if((error)&&(error.valueData)) {
+                            //there is a substitute value
+                            //only process json, which is what we expect this to hold
+                            if(error.valueData.nominalType == MIME_TYPE_JSON) {
+                                if(error.valueData.stringified) {
+                                    wrappedData.data = error.valueData.value;
+                                }
+                                else {
+                                    wrappedData.data = JSON.stringify(error.valueData.value);
+                                }
+                            }
+                        }
+                        //if no value was set, which is most times
+                        if(wrappedData.data === undefined) {
+                            //normal error with not substitue value
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                            wrappedData.message = "Error in value: " + member.getErrorMsg();
+                            wrappedData.hideDisplay = true;
+                            wrappedData.data = apogeeutil.INVALID_VALUE;
+                        }
                         break;
 
                     case apogeeutil.STATE_PENDING:
                         wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
                         wrappedData.message = "Value pending!";
+                        wrappedData.hideDisplay = true;
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
                         break;
 
                     case apogeeutil.STATE_INVALID:
                         wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
                         wrappedData.message = "Value invalid!";
+                        wrappedData.hideDisplay = true;
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
                         break;
 
                     default:
@@ -134,10 +158,14 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                     }
                     catch(error) {
                         if(error.stack) console.error(error.stack);
-                        
-                        //parsing error
-                        apogeeUserAlert("There was an error parsing the JSON input: " +  error.message);
-                        return false;
+
+                        //save the badf input as an error value
+                        error.valueData = {
+                            value: text,
+                            nominalType: MIME_TYPE_JSON,
+                            stringified: true
+                        };
+                        data = error;
                     }
                 }
 
