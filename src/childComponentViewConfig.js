@@ -4,6 +4,7 @@ import DynamicFormView from "/apogeejs-view-lib/src/componentviews/DynamicFormVi
 import FormDataComponentView from "/apogeejs-view-lib/src/componentviews/FormDataComponentView.js";
 import CustomComponentView from "/apogeejs-view-lib/src/componentviews/CustomComponentView.js";
 import CustomDataComponentView from "/apogeejs-view-lib/src/componentviews/CustomDataComponentView.js";
+import WebRequestComponentView from "/apogeejs-view-lib/src/componentviews/WebRequestComponentView.js";
 import ErrorComponentView from "/apogeejs-view-lib/src/componentviews/ErrorComponentView.js";
 
 import {registerComponentView,setErrorComponentView} from "/apogeejs-view-lib/src/componentViewInfo.js";
@@ -17,6 +18,7 @@ registerComponentView(DynamicFormView);
 registerComponentView(FormDataComponentView);
 registerComponentView(CustomComponentView);
 registerComponentView(CustomDataComponentView);
+registerComponentView(WebRequestComponentView);
 
 setErrorComponentView(ErrorComponentView);
 
