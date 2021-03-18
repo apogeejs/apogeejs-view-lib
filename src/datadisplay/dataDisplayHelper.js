@@ -4,6 +4,7 @@ let dataDisplayHelper = {};
 export {dataDisplayHelper as default}
 
 const MIME_TYPE_JSON = "application/json"
+const SPACING_FORMAT_STRING = "\t";
 
 
 /** This function creates the data display data source  for the data of the given member. The
@@ -89,7 +90,7 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                                     wrappedData.data = error.valueData.value;
                                 }
                                 else {
-                                    wrappedData.data = JSON.stringify(error.valueData.value);
+                                    wrappedData.data = JSON.stringify(error.valueData.value,null,SPACING_FORMAT_STRING);
                                 }
                             }
                         }
@@ -132,7 +133,7 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                     textData = "undefined";
                 }
                 else {
-                    textData = JSON.stringify(data);
+                    textData = JSON.stringify(data,null,SPACING_FORMAT_STRING);
                 }
                 wrappedData.data = textData;
             }
