@@ -70,97 +70,104 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
                     },
                     {
                         type: "radioButtonGroup",
-                        entries: [["Text","value"],["Reference","simple"]],
+                        entries: [["Value","value"],["Reference","simple"]],
                         value: "value",
                         key: "urlType"
                     }
                 ]
             },
             {
-                type: "dropdown",
-                label: "Method: ",
-                entries: ["GET","POST","PUT","DELETE"],
-                key: "method"
-            },
-            {
-                type: "horizontalLayout",
+                type: "showHideLayout",
+                heading: "Options",
+                closed: true,
                 formData: [
                     {
-                        type: "textarea",
-                        label: "Body: ",
-                        rows: 4,
-                        cols: 75,
-                        key: "body",
+                        type: "dropdown",
+                        label: "Method: ",
+                        entries: ["GET","POST","PUT","DELETE"],
+                        key: "method"
+                    },
+                    {
+                        type: "horizontalLayout",
+                        formData: [
+                            {
+                                type: "textarea",
+                                label: "Body: ",
+                                rows: 4,
+                                cols: 75,
+                                key: "body",
+                                meta: {
+                                    expression: "choice",
+                                    expressionChoiceKey: "bodyType",
+                                }
+                            },
+                            {
+                                type: "radioButtonGroup",
+                                entries: [["Value","value"],["Reference","simple"]],
+                                value: "value",
+                                key: "bodyType"
+                            }
+                        ]
+                    },
+                    {
+                        type: "list",
+                        label: "Headers: ",
+                        entryType: {
+                            layout: {
+                                type: "panel",
+                                formData: [
+                                    {
+                                        "type": "horizontalLayout",
+                                        "formData": [
+                                            {
+                                                type: "textField",
+                                                size: 30,
+                                                key: "headerKey"
+                                            },
+                                            {
+                                                type: "textField",
+                                                size: 30,
+                                                key: "headerValue",
+                                                meta: {
+                                                    expression: "choice",
+                                                    expressionChoiceKey: "headerValueType",
+                                                }
+                                            },
+                                            {
+                                                type: "radioButtonGroup",
+                                                entries: [["Value","value"],["Reference","simple"]],
+                                                value: "value",
+                                                key: "headerValueType"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                key: "key",
+                                meta: {
+                                    expression: "object"
+                                }
+                            }
+                        },
+                        key: "headers",
                         meta: {
-                            expression: "choice",
-                            expressionChoiceKey: "bodyType",
+                            expression: "array"
                         }
                     },
                     {
                         type: "radioButtonGroup",
-                        entries: [["Text","value"],["Reference","simple"]],
-                        value: "value",
-                        key: "bodyType"
+                        label: "Output Format: ",
+                        entries: [["Match Mime Type","mime"],["Text","text"],["JSON","json"]],
+                        value: "mime",
+                        key: "outputFormat"
+                    },
+                    {
+                        type: "radioButtonGroup",
+                        label: "On Error Response: ",
+                        entries: [["Cell Error","error"],["No Cell Error","noError"]],
+                        value: "error",
+                        key: "onError"
                     }
                 ]
-            },
-            {
-                type: "list",
-                label: "Headers: ",
-                entryType: {
-                    layout: {
-                        type: "panel",
-                        formData: [
-                            {
-                                "type": "horizontalLayout",
-                                "formData": [
-                                    {
-                                        type: "textField",
-                                        size: 30,
-                                        key: "headerKey"
-                                    },
-                                    {
-                                        type: "textField",
-                                        size: 30,
-                                        key: "headerValue",
-                                        meta: {
-                                            expression: "choice",
-                                            expressionChoiceKey: "headerValueType",
-                                        }
-                                    },
-                                    {
-                                        type: "radioButtonGroup",
-                                        entries: [["Text","value"],["Reference","simple"]],
-                                        value: "value",
-                                        key: "headerValueType"
-                                    }
-                                ]
-                            }
-                        ],
-                        key: "key",
-                        meta: {
-                            expression: "object"
-                        }
-                    }
-                },
-                key: "headers",
-                meta: {
-                    expression: "array"
-                }
-            },
-            {
-                type: "radioButtonGroup",
-                label: "Output Format: ",
-                entries: [["Match Mime Type","mime"],["Text","text"],["JSON","json"]],
-                value: "mime",
-                key: "outputFormat"
-            },
-            {
-                type: "radioButtonGroup",
-                label: "On Error Response: ",
-                entries: [["Cell Error","error"],["No Cell Error","noError"]],
-                value: "error",
-                key: "onError"
             }
         ]
     }
