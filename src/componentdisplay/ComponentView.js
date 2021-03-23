@@ -685,7 +685,7 @@ ComponentView.MENU_ITEM_OPEN = 0x01;
 /** this is the name for the info data view, a standard data view for components. */
 ComponentView.VIEW_INFO = "Info";
 
-ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "Info", isActive: true, isTransient: true, isInfoView: true}
+ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "Error Info", isActive: true, isTransient: true, isInfoView: true}
 //ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "<span style='background-color: rgba(255,0,0,.7); color: white; border:2px solid rgba(255,0,0,.7);'>Info</span>", isActive: true, isTransient: true, isInfoView: true}
 //ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "<span style='color: red;'>Info</span>", isActive: true, isTransient: true, isInfoView: true}
 
