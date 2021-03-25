@@ -28,5 +28,64 @@
                 ]
             }
         ]
+    },
+    "npmModule": {
+        "taskList": [
+            {
+                "type": "copyAndReplace",
+                "srcFileUrl": "/apogeejs-view-lib/package.json",
+                "replacementList": [
+                    {
+                        "marker": "[RELEASE_VERSION]",
+                        "lib": "this",
+                        "type": "version"
+                    },
+                    {
+                        "marker": "[APOGEE_UTIL_DEP_VERSION]",
+                        "lib": "apogeejs-util-lib",
+                        "type": "npmVersion"
+                    },
+                    {
+                        "marker": "[APOGEE_BASE_DEP_VERSION]",
+                        "lib": "apogeejs-base-lib",
+                        "type": "npmVersion"
+                    },
+                    {
+                        "marker": "[APOGEE_MODEL_DEP_VERSION]",
+                        "lib": "apogeejs-model-lib",
+                        "type": "npmVersion"
+                    },
+                    {
+                        "marker": "[APOGEE_APP_DEP_VERSION]",
+                        "lib": "apogeejs-app-lib",
+                        "type": "npmVersion"
+                    },
+                    {
+                        "marker": "[APOGEE_UI_DEP_VERSION]",
+                        "lib": "apogeejs-ui-lib",
+                        "type": "npmVersion"
+                    }
+                ]
+            },
+            {
+                "type": "packageLib",
+                "esModuleFileName": "apogeeViewLib.js",
+                "npmModuleFileName": "apogeejs-view-lib.js",
+                "externalLibs": [
+                    "/apogeejs-base-lib/src/apogeeBaseLib.js",
+                    "/apogeejs-util-lib/src/apogeeUtilLib.js",
+                    "/apogeejs-model-lib/src/apogeeModelLib.js",
+                    "/apogeejs-app-lib/src/apogeeAppLib.js",
+                    "/apogeejs-ui-lib/src/apogeeUiLib.js"
+                ],
+                "externalLibMapping": {
+                    "/apogeejs-base-lib/src/apogeeBaseLib.js": "apogeejs-base-lib",
+                    "/apogeejs-util-lib/src/apogeeUtilLib.js": "apogeejs-util-lib",
+                    "/apogeejs-model-lib/src/apogeeModelLib.js": "apogeejs-model-lib",
+                    "/apogeejs-app-lib/src/apogeeAppLib.js": "apogeejs-app-lib",
+                    "/apogeejs-ui-lib/src/apogeeUiLib.js": "apogeejs-ui-lib"
+                }
+            }
+        ]
     }
 }

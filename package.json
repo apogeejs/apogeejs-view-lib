@@ -1,0 +1,21 @@
+{
+    "DEV_RELEASE": true,
+    "name": "apogeejs-view-lib",
+    "version": "[RELEASE_VERSION]",
+    "description": "This is the bundled code for the apogeejs ide application.",
+    "homepage": "https://www.apogeejs.com",
+    "license": "MIT",
+    "author": "Dave Sutter",
+    "main": "./src/apogeejs-view-lib.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sutter-dave/apogeejs-view-lib.git"
+    },
+    "dependencies": {
+        "apogeejs-util-lib": "[APOGEE_UTIL_DEP_VERSION]",
+        "apogeejs-base-lib": "[APOGEE_BASE_DEP_VERSION]",
+        "apogeejs-model-lib": "[APOGEE_MODEL_DEP_VERSION]",
+        "apogeejs-app-lib": "[APOGEE_APP_DEP_VERSION]",
+        "apogeejs-ui-lib": "[APOGEE_UI_DEP_VERSION]"
+    }
+}
