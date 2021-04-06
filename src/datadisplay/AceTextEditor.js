@@ -2,7 +2,7 @@ import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import DataDisplay from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
-import ace from "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js";
+import ace from "/apogeejs-releases/releases/ext/ace/v1.4.3/ace.es.js";
 
 /** Editor that uses the Ace text editor.
  * 
