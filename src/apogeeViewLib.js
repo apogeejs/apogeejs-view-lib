@@ -1,7 +1,7 @@
 
 import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
-import ace from "/apogeejs-releases/releases/ext/ace/v1.4.3/ace.es.js";
+import ace from "/apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js";
 
 export {default as ComponentView} from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 
@@ -30,7 +30,7 @@ export {updateWorkspaceProperties} from "/apogeejs-view-lib/src/commandseq/updat
 export {addComponent, addAdditionalComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
 export {addLink, updateLink, removeLink} from "/apogeejs-view-lib/src/commandseq/updatelinkseq.js";
 
-export {default as ace} from "/apogeejs-releases/releases/ext/ace/v1.4.3/ace.es.js";
+export {default as ace} from "/apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js";
 
 //import the default child component views
 import "/apogeejs-view-lib/src/childComponentViewConfig.js";
