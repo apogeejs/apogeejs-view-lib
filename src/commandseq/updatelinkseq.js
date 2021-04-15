@@ -24,17 +24,8 @@ const DIALOG_LAYOUT_NICKNAME_LINE = {
 /** This method adds a link to the workspace. */
 export function addLink(app,displayInfo) {
         
-    //create the dialog layout 
-    var titleLine = {};
-    titleLine.type = "heading";
-    titleLine.text = displayInfo.ADD_ENTRY_TEXT;
-    titleLine.level = 3;
-
-    var dialogLayout = {};
-    dialogLayout.layout = [];
-    dialogLayout.layout.push(titleLine);
-    dialogLayout.layout.push(DIALOG_LAYOUT_URL_LINE);
-    dialogLayout.layout.push(DIALOG_LAYOUT_NICKNAME_LINE);
+    let initialData = {entryType: displayInfo.REFERENCE_TYPE};
+    var dialogLayout = getDialogLayout(displayInfo,initialData);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -48,9 +39,7 @@ export function addLink(app,displayInfo) {
         //create command json
         var commandData = {};
         commandData.type = "addLink";
-        commandData.entryType = displayInfo.REFERENCE_TYPE;
-        commandData.url = newValues.url;
-        commandData.nickname = newValues.nickname;
+        commandData.data = newValues;
 
         //run command
         app.executeCommand(commandData);
@@ -66,27 +55,8 @@ export function addLink(app,displayInfo) {
 /** This method updates a link in the workspace. */
 export function updateLink(app,referenceEntry,displayInfo) {
         
-    var initialValues = {};
-    initialValues.url = referenceEntry.getUrl();
-    initialValues.nickname = referenceEntry.getNickname();
-    if(initialValues.nickname == initialValues.url) initialValues.nickname = "";
-
-    //create the dialog layout
-    var titleLine = {};
-    titleLine.type = "heading";
-    titleLine.text = displayInfo.UPDATE_ENTRY_TEXT;
-    titleLine.level = 3;
-
-    var urlLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_URL_LINE);
-    urlLine.value = initialValues.url;
-    var nicknameLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_NICKNAME_LINE);
-    nicknameLine.value = initialValues.nickname;
-
-    var dialogLayout = {};
-    dialogLayout.layout = [];
-    dialogLayout.layout.push(titleLine);
-    dialogLayout.layout.push(urlLine);
-    dialogLayout.layout.push(nicknameLine);
+    let initialData = referenceEntry.getData();
+    var dialogLayout = getDialogLayout(displayInfo,initialData);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -97,24 +67,18 @@ export function updateLink(app,referenceEntry,displayInfo) {
             return false;
         }
 
-        //run command
-        var commandData = {};
-        var dataChanged = false;
-        commandData.type = "updateLink";
-        commandData.entryType = displayInfo.REFERENCE_TYPE;
-        commandData.oldUrl = initialValues.url;
-        if(initialValues.url != newValues.url) {
-            commandData.newUrl = newValues.url;
-            dataChanged = true;
-        }
-        if(initialValues.nickname != newValues.nickname) {
-            commandData.newNickname = newValues.nickname;
-            dataChanged = true;
+        //ceck for no change
+        if(apogeeutil.jsonEquals(initialData,newValues)) {
+            return;
         }
 
-        if(dataChanged) {
-            app.executeCommand(commandData);
-        }
+        //run command
+        var commandData = {};
+        commandData.type = "updateLink";
+        commandData.data = newValues;
+        commandData.initialUrl = initialData.url;
+
+        app.executeCommand(commandData);
             
         //return true to close the dialog
         return true;
@@ -140,6 +104,32 @@ export function removeLink(app,referenceEntry,displayInfo) {
     //verify the delete
     let deleteMsg = "Are you sure you want to delete this link?"
     apogeeUserConfirm(deleteMsg,"Delete","Cancel",doAction,cancelAction);
+}
+
+function getDialogLayout(displayInfo,initialData) { 
+    var titleLine = {};
+    titleLine.type = "heading";
+    titleLine.text = displayInfo.DISPLAY_NAME;
+    titleLine.level = 3;
+
+    var typeLine = {};
+    typeLine.type = "invisible";
+    typeLine.key = "entryType";
+
+    var dialogLayout = {};
+    dialogLayout.layout = [];
+    dialogLayout.layout.push(titleLine);
+    dialogLayout.layout.push(typeLine);
+    dialogLayout.layout.push(...displayInfo.FORM_BODY);
+
+    //set initial values
+    dialogLayout.layout.forEach(line => {
+        if((line.key)&&(initialData[line.key] !== undefined)) {
+            line.value = initialData[line.key];
+        }
+    })
+
+    return dialogLayout;
 }
 
 

@@ -18,7 +18,7 @@ export {default as HtmlJsDataDisplay} from "/apogeejs-view-lib/src/datadisplay/H
 export {default as StandardErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 export {getSaveBar} from "/apogeejs-view-lib/src/componentdisplay/toolbar.js";
 
-export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeejs-view-lib/src/componentViewInfo.js";
+export {registerComponentView,unregisterComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 export {default as UiCommandMessenger} from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 
