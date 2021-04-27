@@ -458,7 +458,7 @@ dataDisplayHelper.readWrappedData = function(getDataFunction,errorPrefix) {
     catch(error) {
         //hide dispay and show error message
         messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-        message = errorPrefix + error.toString();
+        message = errorPrefix + error.message ? error.message : error ? error.toString() : "Unknown";
         removeView = false;
         hideDisplay = true;
         data = apogeeutil.INVALID_VALUE;
@@ -526,7 +526,7 @@ dataDisplayHelper.readWrappedDisplayData = function(getDataFunction,errorPrefix)
     catch(error) {
         //hide dispay and show error message
         messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-        message = errorPrefix + error.toString();
+        message = errorPrefix + error.message ? error.message : error ? error.toString() : "Unknown";
         displayInvalid = true;
         data = apogeeutil.INVALID_VALUE;
 

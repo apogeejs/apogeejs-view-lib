@@ -61,11 +61,13 @@ function openWorkspace(appViewInterface,app,componentClass,workspaceText,fileMet
         
 		var workspaceImportDialogFunction = () => addComponent(appViewInterface,app,initialProperties,serializedMemberJson,serializedComponentsJson);
         
-        var linkLoadError = function(errorMsg) {
+        var linkLoadError = function(error) {
+            let errorMsg = error.message ? error.message : error ? error.toString() : "Unknown";
             apogeeUserAlert("Error loading links: " + errorMsg);
         }
         
-        var workspaceImportError2 = function(errorMsg) {
+        var workspaceImportError2 = function(error) {
+            let errorMsg = error.message ? error.message : error ? error.toString() : "Unknown";
             apogeeUserAlert(errorMsg);
         }
         

@@ -604,7 +604,7 @@ export default class ComponentView {
                     if(errorInfoList) memberData.errorInfoList = errorInfoList;
                 }
                 else {
-                    memberData.msg = memberError.toString();
+                    memberData.msg = memberError.message ? memberError.message : memberError.toString();
                     if(memberError.errorInfoList) memberData.errorInfoList = memberError.errorInfoList;
                     saveError = true;
                 }

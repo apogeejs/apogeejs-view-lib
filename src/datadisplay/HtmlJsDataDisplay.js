@@ -156,7 +156,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                         }
 
 
-                        let errorMsg = errorPrefix + error.toString();
+                        let errorMsg = errorPrefix + error.message ? error.message : error ? error.toString() : "Unknown";
                         displayContainer.setHideDisplay(true);
                         displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
                         //set display invalid because this is part of creating the display
@@ -206,7 +206,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 }
                 catch(error) {
                     //hide dispay and show error message
-                    let errorMsg = "Error in setData in display: " + error.toString();
+                    let errorMsg = "Error in setData in display: " + error.message ? error.message : error ? error.toString() : "Unknown";
                     displayContainer.setHideDisplay(true);
                     displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
                     //note - do not set display invalid here because this is part of data loading, not display loading
@@ -267,7 +267,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                     resource.init.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
-                    let errorMsg = "Error in init of display: " + error.toString();
+                    let errorMsg = "Error in init of display: " + error.message ? error.message : error ? error.toString() : "Unknown";
                     displayContainer.setHideDisplay(true);
                     displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
                     //set display invalid because this is part of creating the display
@@ -281,7 +281,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             displayValid = true;
         }
         catch(error) {
-            let errorMsg = "Error loading display: " + error.toString();
+            let errorMsg = "Error loading display: " + error.message ? error.message : error ? error.toString() : "Unknown";
             displayContainer.setHideDisplay(true);
             displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
 
