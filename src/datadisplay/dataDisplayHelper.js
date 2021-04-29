@@ -154,20 +154,8 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                     data = undefined;
                 }
                 else {
-                    try {
-                        data = JSON.parse(text);
-                    }
-                    catch(error) {
-                        if(error.stack) console.error(error.stack);
-
-                        //save the badf input as an error value
-                        error.valueData = {
-                            value: text,
-                            nominalType: MIME_TYPE_JSON,
-                            stringified: true
-                        };
-                        data = error;
-                    }
+                    //this call adds spogee specific error information if the parse fails
+                    data = apogeeutil.apogeeJsonParse(jsonString);
                 }
 
                 var commandData = {};

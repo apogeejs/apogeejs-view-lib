@@ -156,7 +156,7 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
                     {
                         type: "radioButtonGroup",
                         label: "Output Format: ",
-                        entries: [["Match Mime Type","mime"],["Text","text"],["JSON","json"]],
+                        entries: [["Match Mime Type","mime"],["Text (Override Mime Type)","text"],["JSON (Override Mime Type)","json"]],
                         value: "mime",
                         key: "outputFormat"
                     },
@@ -186,17 +186,32 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
             },
     
             getData: () => {
-                //Here we return just the meta data
-                //convert it to text if it is in json format
+                //Here we return just the body, converted to text if needed
                 let dataMember = this.getComponent().getField("member.data");
                 let wrappedData = this._getWrappedData(dataMember);
                 if(wrappedData.data !== apogeeutil.INVALID_VALUE) {
-                    let body = wrappedData.data.body;
-                    if(typeof body == "object") {
-                        wrappedData.data = JSON.stringify(body);
+                    let bodyAndMeta = wrappedData.data;
+                    if(!bodyAndMeta) {
+                        wrappedData.data = "";
+                    }
+                    else if(bodyAndMeta.body === undefined) {
+                        //just display an empty body
+                        wrappedData.data = "";
                     }
                     else {
-                        wrappedData.data = body;
+                        if(typeof bodyAndMeta.body == "string") {
+                            wrappedData.data = bodyAndMeta.body;      
+                        }
+                        else {
+                            wrappedData.data = JSON.stringify(bodyAndMeta.body);
+                        }
+                    }
+
+                    //if there is a body error, display it, along with the laoded body value
+                    if(bodyAndMeta.bodyError) {
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                        wrappedData.message = "Error loading response body: " + bodyAndMeta.bodyError;
+                        wrappedData.hideDisplay = false; 
                     }
                 }
                 return wrappedData;
@@ -217,8 +232,14 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
                 //Here we return just the meta data, as text
                 let dataMember = this.getComponent().getField("member.data");
                 let wrappedData = this._getWrappedData(dataMember);
-                if(wrappedData.data !== apogeeutil.INVALID_VALUE) {
-                    wrappedData.data = JSON.stringify(wrappedData.data.meta);
+                let bodyAndMeta = wrappedData.data;
+                if(bodyAndMeta !== apogeeutil.INVALID_VALUE) {
+                    if((!bodyAndMeta)||(!bodyAndMeta.meta)) {
+                        wrappedData.data = "";
+                    }
+                    else {
+                        wrappedData.data = JSON.stringify(bodyAndMeta.meta);
+                    }
                 }
                 return wrappedData;
             }
@@ -295,7 +316,7 @@ WebRequestComponentView.VIEW_BODY = "Body";
 WebRequestComponentView.VIEW_MODES = [
     FormInputBaseComponentView.VIEW_INFO_MODE_ENTRY,
     {name: WebRequestComponentView.VIEW_META, label: "Response Info", isActive: false},
-    {name: WebRequestComponentView.VIEW_BODY, label: "Response Body", isActive: false},
+    {name: WebRequestComponentView.VIEW_BODY, label: "Response Body", isActive: true},
     FormInputBaseComponentView.INPUT_VIEW_MODE_INFO
 ];
 
