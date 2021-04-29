@@ -110,6 +110,28 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
                         ]
                     },
                     {
+                        type: "horizontalLayout",
+                        formData: [
+                            {
+                                type: "dropdown",
+                                label: "Content Type: ",
+                                entries: [
+                                    ["<none>","none"],
+                                    ["JSON (application/json)","application/json"],
+                                    ["Plain Text (text/plain)","text/plain"],
+                                    ["CSV (text/csv)","text/csv"],
+                                    ["XML (application/xml)","application/xml"],
+                                    ["Form Encoded (multipart/form-data)", "multipart/form-data"],
+                                    ["Form Encoded (application/x-www-form-urlencoded)","application/x-www-form-urlencoded"],
+                                    ["<other>","other"]
+                                ],
+                                value: "none",
+                                key: "contentType",
+                                hint: "For a content type not listed here, choose 'other' and enter the content type manually under headers"
+                            }
+                        ]
+                    },
+                    {
                         type: "list",
                         label: "Headers: ",
                         entryType: {
@@ -156,7 +178,7 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
                     {
                         type: "radioButtonGroup",
                         label: "Output Format: ",
-                        entries: [["Match Mime Type","mime"],["Text (Override Mime Type)","text"],["JSON (Override Mime Type)","json"]],
+                        entries: [["Match Response Mime Type","mime"],["Text (Override Mime Type)","text"],["JSON (Override Mime Type)","json"]],
                         value: "mime",
                         key: "outputFormat"
                     },
