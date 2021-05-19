@@ -155,7 +155,7 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                 }
                 else {
                     //this call adds spogee specific error information if the parse fails
-                    data = apogeeutil.apogeeJsonParse(jsonString);
+                    data = apogeeutil.apogeeJsonParse(text);
                 }
 
                 var commandData = {};
