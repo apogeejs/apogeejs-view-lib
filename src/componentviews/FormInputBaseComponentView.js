@@ -1,7 +1,7 @@
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
-import { getFormResultFunctionBody } from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import { FormResultFunctionGenerator } from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
@@ -57,25 +57,37 @@ export default class FormInputBaseComponentView extends ComponentView {
             //return true indicates the submit is completed
             return true;
         }
-        
-        //get the function body
-        let functionBody = getFormResultFunctionBody(formData,formMeta);
 
-        //set the code
+        //set the form data value
         var dataMember = this.getComponent().getField("member.formData");
-        var resultMember = this.getComponent().getField("member.formResult");
 
         var dataCommand = {};
         dataCommand.type = "saveMemberData";
         dataCommand.memberId = dataMember.getId();
         dataCommand.data = formData;
 
+        //set the form result value, either using the compiled function or the plain form value as is appropriate
+        let functionGenerator = new FormResultFunctionGenerator();
+        functionGenerator.setInput(formData,formMeta);
+        
+        var resultMember = this.getComponent().getField("member.formResult");
         var resultCommand = {};
-        resultCommand.type = "saveMemberCode";
-        resultCommand.memberId = resultMember.getId();
-        resultCommand.argList = [];
-        resultCommand.functionBody = functionBody;
-        resultCommand.supplementalCode = "";
+
+        if(functionGenerator.getHasExpressions()) {
+            //save compiled form code
+            let functionBody = functionGenerator.getFunctionBody(formData,formMeta);
+            resultCommand.type = "saveMemberCode";
+            resultCommand.memberId = resultMember.getId();
+            resultCommand.argList = [];
+            resultCommand.functionBody = functionBody;
+            resultCommand.supplementalCode = "";
+        }
+        else {
+            //save plain form value
+            resultCommand.type = "saveMemberData";
+            resultCommand.memberId = resultMember.getId();
+            resultCommand.data = formData;
+        }
 
         let command = {
             type: "compoundCommand",
