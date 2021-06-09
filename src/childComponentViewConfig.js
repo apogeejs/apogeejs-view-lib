@@ -28,6 +28,9 @@ registerComponentView(ActionFormComponentView);
 import DataFormComponentView from "/apogeejs-view-lib/src/componentviews/DataFormComponentView.js";
 registerComponentView(DataFormComponentView);
 
+import MakerDataFormComponentView from "/apogeejs-view-lib/src/componentviews/MakerDataFormComponentView.js";
+registerComponentView(MakerDataFormComponentView);
+
 //JSON PLUS COMPONENT
 import JsonPlusTableComponentView from "/apogeejs-view-lib/src/componentviews/JsonPlusTableComponentView.js";
 registerComponentView(JsonPlusTableComponentView);

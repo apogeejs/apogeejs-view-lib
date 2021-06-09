@@ -1,0 +1,134 @@
+//These are in lieue of the import statements
+import FormInputBaseComponentView from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
+import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
+import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
+import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+
+/** This is a graphing component using ChartJS. It consists of a single data table that is set to
+ * hold the generated chart data. The input is configured with a form, which gives multiple options
+ * for how to set the data. */
+export default class MakerDataFormComponentView extends FormInputBaseComponentView {
+
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
+    };
+
+    //=================================
+    // Implementation Methods
+    //=================================
+
+    /**  This method retrieves the table edit settings for this component instance
+     * @protected */
+     getTableEditSettings() {
+        return MakerDataFormComponentView.TABLE_EDIT_SETTINGS;
+    }
+
+    /** This method should be implemented to retrieve a data display of the give type. 
+     * @protected. */
+    getDataDisplay(displayContainer,viewType) {
+        let dataDisplaySource;
+        switch(viewType) {
+
+            case MakerDataFormComponentView.VIEW_FORM:
+                dataDisplaySource = this._getOutputFormDataSource();
+                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
+
+            case FormInputBaseComponentView.VIEW_INPUT:
+                return this.getFormDataDisplay(displayContainer);
+
+            case FormInputBaseComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
+
+            case MakerDataFormComponentView.VIEW_VALUE:
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(this.getApp(),this,"member.value");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
+
+            default:
+                console.error("unrecognized view element: " + viewType);
+                return null;
+        }
+    }
+
+    /** This method returns the form layout.
+     * @protected. */
+    getFormLayout() {
+        return ConfigurablePanel.getFormMakerLayout();
+    }
+
+    //==========================
+    // Private Methods
+    //==========================
+
+    /** This is the data source for the input form data display */
+    _getOutputFormDataSource() {
+        return {
+            doUpdate: () => {
+                //the form data is stored in the "value" member
+                let reloadData = this.getComponent().isMemberDataUpdated("member.value");;
+                //form layout depends on data field
+                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.data");
+                return {reloadData,reloadDataDisplay};
+            }, 
+            getDisplayData: () => {
+                let formMember = this.getComponent().getField("member.data");
+                return dataDisplayHelper.getStandardWrappedMemberData(formMember);
+            },
+            getData: () => {
+                let valueMember = this.getComponent().getField("member.value");
+                return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
+            },
+            getEditOk: () => true,
+            saveData: (formValue) => {
+                let component = this.getComponent();
+                let memberId = component.getMemberId();
+                let commandMessenger = new UiCommandMessenger(this,memberId);
+                commandMessenger.dataCommand("value",formValue);
+                return true;
+            }
+        }
+    }
+
+}
+
+//======================================
+// Static properties
+//======================================
+
+
+//===================================
+// View Definitions Constants (referenced internally)
+//==================================
+
+MakerDataFormComponentView.VIEW_FORM = "Form";
+MakerDataFormComponentView.VIEW_VALUE = "Value";
+
+MakerDataFormComponentView.VIEW_MODES = [
+    {name: MakerDataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
+    FormInputBaseComponentView.INPUT_VIEW_MODE_INFO,
+    {name: MakerDataFormComponentView.VIEW_VALUE, label: "Value", isActive: false}
+];
+
+MakerDataFormComponentView.TABLE_EDIT_SETTINGS = {
+    "viewModes": MakerDataFormComponentView.VIEW_MODES
+}
+
+
+//===============================
+// Required External Settings
+//===============================
+
+/** This is the component name with which this view is associated. */
+MakerDataFormComponentView.componentName = "apogeeapp.MakerDataFormCell";
+
+/** If true, this indicates the component has a tab entry */
+MakerDataFormComponentView.hasTabEntry = false;
+/** If true, this indicates the component has an entry appearing on the parent tab */
+MakerDataFormComponentView.hasChildEntry = true;
+
+/** This is the icon url for the component. */
+MakerDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+
