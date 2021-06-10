@@ -112,11 +112,6 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
                 return {reloadData,reloadDataDisplay};
             },
 
-            getDisplayData: () => {
-                let formMember = this.getComponent().getField("member.data");
-                return dataDisplayHelper.getStandardWrappedMemberData(formMember);
-            },
-
             getDisplayData: () => {       
                 let wrappedData = dataDisplayHelper.getEmptyWrappedData();
 
