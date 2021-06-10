@@ -43,6 +43,10 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
+            case MakerDataFormComponentView.VIEW_ON_SAVE_CODE:
+                dataDisplaySource = this.getValidatorDataDisplaySource(this.getApp());
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
             case MakerDataFormComponentView.VIEW_VALUE:
                 dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(this.getApp(),this,"member.value");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
@@ -64,31 +68,151 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
     //==========================
 
     /** This is the data source for the input form data display */
+    // _getOutputFormDataSource() {
+    //     return {
+    //         doUpdate: () => {
+    //             //the form data is stored in the "value" member
+    //             let reloadData = this.getComponent().isMemberDataUpdated("member.value");
+    //             //form layout depends on data field
+    //             let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.data");
+    //             return {reloadData,reloadDataDisplay};
+    //         }, 
+    //         getDisplayData: () => {
+    //             let formMember = this.getComponent().getField("member.data");
+    //             return dataDisplayHelper.getStandardWrappedMemberData(formMember);
+    //         },
+    //         getData: () => {
+    //             let valueMember = this.getComponent().getField("member.value");
+    //             return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
+    //         },
+    //         getEditOk: () => true,
+    //         saveData: (formValue) => {
+    //             let component = this.getComponent();
+    //             let memberId = component.getMemberId();
+    //             let commandMessenger = new UiCommandMessenger(this,memberId);
+    //             commandMessenger.dataCommand("value",formValue);
+    //             return true;
+    //         }
+    //     }
+    // }
+
+    
     _getOutputFormDataSource() {
+        //load this when the form is updated, to be used when form submitted
+        //we will update the form if this value changes
+        let isDataValidFunction;
+
         return {
+            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
             doUpdate: () => {
-                //the form data is stored in the "value" member
-                let reloadData = this.getComponent().isMemberDataUpdated("member.value");;
-                //form layout depends on data field
-                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.data");
+                //return value is whether or not the data display needs to be udpated
+                let component = this.getComponent();
+                let reloadData = component.isMemberDataUpdated("member.value");
+                let reloadDataDisplay = component.isFieldUpdated("validatorCode") || component.isMemberFieldUpdated("member.data","data");
                 return {reloadData,reloadDataDisplay};
-            }, 
+            },
+
             getDisplayData: () => {
                 let formMember = this.getComponent().getField("member.data");
                 return dataDisplayHelper.getStandardWrappedMemberData(formMember);
             },
+
+            getDisplayData: () => {       
+                let wrappedData = dataDisplayHelper.getEmptyWrappedData();
+
+                //get the layout function
+                let component = this.getComponent();
+                let {validatorFunction,errorMessage} = component.createValidatorFunction();
+                if(errorMessage) {
+                    wrappedData.displayInvalid = true;
+                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                    wrappedData.message = errorMessage;
+                    return wrappedData;
+                }
+
+                //load the layout
+                let formMember = this.getComponent().getField("member.data");
+                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(formMember);
+                if(abnormalWrappedData) {
+                    return abnormalWrappedData;
+                }
+
+                //save this for use on submit
+                isDataValidFunction = validatorFunction;
+
+                return inputData;
+            },
+
             getData: () => {
                 let valueMember = this.getComponent().getField("member.value");
                 return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
             },
+
             getEditOk: () => true,
+
             saveData: (formValue) => {
                 let component = this.getComponent();
-                let memberId = component.getMemberId();
-                let commandMessenger = new UiCommandMessenger(this,memberId);
-                commandMessenger.dataCommand("value",formValue);
-                return true;
+                //below this data is valid only for normal state input. That should be ok since this is save.
+                let formLayout = component.getField("member.data").getData();
+
+                try {
+                    let isValidResult = isDataValidFunction(formValue,formLayout);
+                    if(isValidResult === true) {
+                        //save data
+                        let memberId = component.getMemberId();
+                        let commandMessenger = new UiCommandMessenger(this,memberId);
+                        commandMessenger.dataCommand("value",formValue);
+                        return true;
+                    }
+                    else {
+                        //isValidResult should be the error message. Check to make sure if it is string, 
+                        //since the user may return false. (If so, give a generic error message)
+                        let msg = ((typeof isValidResult) == "string") ? isValidResult : "Invalid form value!";
+                        apogeeUserAlert(msg);
+                        return false;
+                    }
+                }
+                catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    apogeeUserAlert("Error validating input: " + error.toString());
+                }
             }
+        }
+    }
+
+    getValidatorDataDisplaySource(app) {
+        return {
+
+            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
+            doUpdate: () => {
+                //return value is whether or not the data display needs to be udpated
+                let reloadData = this.getComponent().isFieldUpdated("validatorCode");
+                let reloadDataDisplay = false;
+                return {reloadData,reloadDataDisplay};
+            },
+
+            getData: () => {
+                return this.getComponent().getField("validatorCode");
+            },
+
+            getEditOk: () => {
+                return true;
+            },
+
+            saveData: (targetLayoutCode) => {
+                let component = this.getComponent();
+
+                var command = {};
+                command.type = "makerDataFormUpdateCommand";
+                command.memberId = component.getMemberId();
+                command.field = "validator";
+                command.initialValue = component.getField("validatorCode");
+                command.targetValue = targetLayoutCode;
+
+                app.executeCommand(command);
+                return true; 
+            }
+
         }
     }
 
@@ -105,10 +229,12 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
 
 MakerDataFormComponentView.VIEW_FORM = "Form";
 MakerDataFormComponentView.VIEW_VALUE = "Value";
+MakerDataFormComponentView.VIEW_ON_SAVE_CODE = "On Save"
 
 MakerDataFormComponentView.VIEW_MODES = [
     {name: MakerDataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
     FormInputBaseComponentView.INPUT_VIEW_MODE_INFO,
+    {name: MakerDataFormComponentView.VIEW_ON_SAVE_CODE, label: "isValid(formValue,formLayout)", isActive: false},
     {name: MakerDataFormComponentView.VIEW_VALUE, label: "Value", isActive: false}
 ];
 
