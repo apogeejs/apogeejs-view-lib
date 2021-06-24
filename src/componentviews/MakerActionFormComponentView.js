@@ -60,7 +60,8 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
     /** This method returns the form layout.
      * @protected. */
     getFormLayout() {
-        return ConfigurablePanel.getFormMakerLayout();
+let flags = {"inputExpressions": true}
+        return ConfigurablePanel.getFormMakerLayout(flags);
     }
 
     //==========================
