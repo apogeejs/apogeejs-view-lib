@@ -60,7 +60,10 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
     /** This method returns the form layout.
      * @protected. */
     getFormLayout() {
-let flags = {"inputExpressions": true}
+        let flags = {
+            "inputExpressions": true,
+            "submit": true
+        }
         return ConfigurablePanel.getFormMakerLayout(flags);
     }
 
@@ -172,24 +175,44 @@ let flags = {"inputExpressions": true}
     }
 
     _getFullLayout(inputLayout) {
-        let {onSubmitFunction,onCancelFunction,errorMessage} = this.component.createActionFunctions();
-        let appendEntry;
+        //remove the submit element and make a layout we can write into
+        let fullLayout = [];
+        let inputSubmitConfig;
+        inputLayout.forEach(elementConfig => {
+            if(elementConfig.type == "submit") {
+                inputSubmitConfig = elementConfig;
+            }
+            else {
+                fullLayout.push(elementConfig);
+            }
+        })
+        //find which handlers we need
+        let useSubmit = false;
+        let useCancel = false;
+        if(inputSubmitConfig) {
+            useSubmit = inputSubmitConfig.useSubmit;
+            useCancel = inputSubmitConfig.useCancel;
+        }
+
+        let {onSubmitFunction,onCancelFunction,errorMessage} = this.component.createActionFunctions(useSubmit,useCancel);
         if(errorMessage) {
-            appendEntry = {
+            //add the error message onto the layout
+            fullLayout.push = [{
                 type: "htmlDisplay",
                 html: "errorMessage"
-            }
+            }]
         }
-        else {
+        else if(inputSubmitConfig) {
+            //create the submit config
+            let submitConfig = {};
+            Object.assign(submitConfig,inputSubmitConfig)
             let contextMemberId = this.component.getMember().getParentId();
             let commandMessenger = new UiCommandMessenger(this,contextMemberId);
-            appendEntry = {
-                type: "submit",
-                onSubmit: (formValue,formObject) => onSubmitFunction(commandMessenger,formValue,formObject),
-                onCancel: (formObject) => onCancelFunction(commandMessenger,formObject)
-            }
+            if(useSubmit) submitConfig.onSubmit = (formValue,formObject) => onSubmitFunction(commandMessenger,formValue,formObject);
+            if(useCancel) submitConfig.onCancel = (formObject) => onCancelFunction(commandMessenger,formObject);
+            fullLayout.push(submitConfig);
         }
-        return inputLayout.concat([appendEntry]);
+        return fullLayout;
     }
 
 }
