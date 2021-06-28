@@ -101,7 +101,7 @@ export default class CustomDataComponentView extends ComponentView {
                 dataDisplaySource = this.getUiDataDisplaySource("uiCode");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case ComponentView.VIEW_INFO: 
+            case ComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
@@ -233,7 +233,7 @@ CustomDataComponentView.VIEW_CSS = "CSS";
 CustomDataComponentView.VIEW_UI_CODE = "uiGenerator(mode)";
 
 CustomDataComponentView.VIEW_MODES = [
-    ComponentView.VIEW_INFO_MODE_ENTRY,
+    ComponentView.VIEW_ERROR_MODE_ENTRY,
     {
         name: CustomDataComponentView.VIEW_OUTPUT,
         label: "Display",

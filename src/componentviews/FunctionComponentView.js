@@ -39,7 +39,7 @@ export default class FunctionComponentView extends ComponentView {
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case ComponentView.VIEW_INFO: 
+            case ComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
@@ -57,7 +57,7 @@ FunctionComponentView.VIEW_CODE = "Code";
 FunctionComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 FunctionComponentView.VIEW_MODES = [
-    ComponentView.VIEW_INFO_MODE_ENTRY,
+    ComponentView.VIEW_ERROR_MODE_ENTRY,
     {
         name: FunctionComponentView.VIEW_CODE,
         label: "Code",

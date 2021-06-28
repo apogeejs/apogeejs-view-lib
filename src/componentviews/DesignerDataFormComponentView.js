@@ -10,7 +10,7 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
-export default class MakerDataFormComponentView extends FormInputBaseComponentView {
+export default class DesignerDataFormComponentView extends FormInputBaseComponentView {
 
     constructor(appViewInterface,component) {
         super(appViewInterface,component);
@@ -23,7 +23,7 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
      getTableEditSettings() {
-        return MakerDataFormComponentView.TABLE_EDIT_SETTINGS;
+        return DesignerDataFormComponentView.TABLE_EDIT_SETTINGS;
     }
 
     /** This method should be implemented to retrieve a data display of the give type. 
@@ -32,22 +32,22 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
         let dataDisplaySource;
         switch(viewType) {
 
-            case MakerDataFormComponentView.VIEW_FORM:
+            case DesignerDataFormComponentView.VIEW_FORM:
                 dataDisplaySource = this._getOutputFormDataSource();
                 return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 
             case FormInputBaseComponentView.VIEW_INPUT:
                 return this.getFormDataDisplay(displayContainer);
 
-            case FormInputBaseComponentView.VIEW_INFO: 
+            case FormInputBaseComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
-            case MakerDataFormComponentView.VIEW_ON_SAVE_CODE:
+            case DesignerDataFormComponentView.VIEW_ON_SAVE_CODE:
                 dataDisplaySource = this.getValidatorDataDisplaySource(this.getApp());
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case MakerDataFormComponentView.VIEW_VALUE:
+            case DesignerDataFormComponentView.VIEW_VALUE:
                 dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(this.getApp(),this,"member.value");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
@@ -64,7 +64,7 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
             "inputExpressions": true,
             "submit": false
         }
-        return ConfigurablePanel.getFormMakerLayout(flags);
+        return ConfigurablePanel.getFormDesignerLayout(flags);
     }
 
     //==========================
@@ -202,7 +202,7 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "makerDataFormUpdateCommand";
+                command.type = "designerDataFormUpdateCommand";
                 command.memberId = component.getMemberId();
                 command.field = "validator";
                 command.initialValue = component.getField("validatorCode");
@@ -226,19 +226,19 @@ export default class MakerDataFormComponentView extends FormInputBaseComponentVi
 // View Definitions Constants (referenced internally)
 //==================================
 
-MakerDataFormComponentView.VIEW_FORM = "Form";
-MakerDataFormComponentView.VIEW_VALUE = "Value";
-MakerDataFormComponentView.VIEW_ON_SAVE_CODE = "On Save"
+DesignerDataFormComponentView.VIEW_FORM = "Form";
+DesignerDataFormComponentView.VIEW_VALUE = "Value";
+DesignerDataFormComponentView.VIEW_ON_SAVE_CODE = "On Save"
 
-MakerDataFormComponentView.VIEW_MODES = [
-    {name: MakerDataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
-    FormInputBaseComponentView.INPUT_VIEW_MODE_INFO,
-    {name: MakerDataFormComponentView.VIEW_ON_SAVE_CODE, label: "isValid(formValue,formLayout)", isActive: false},
-    {name: MakerDataFormComponentView.VIEW_VALUE, label: "Value", isActive: false}
+DesignerDataFormComponentView.VIEW_MODES = [
+    {name: DesignerDataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
+    FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
+    {name: DesignerDataFormComponentView.VIEW_ON_SAVE_CODE, label: "isValid(formValue,formLayout)", isActive: false},
+    {name: DesignerDataFormComponentView.VIEW_VALUE, label: "Value", isActive: false}
 ];
 
-MakerDataFormComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": MakerDataFormComponentView.VIEW_MODES
+DesignerDataFormComponentView.TABLE_EDIT_SETTINGS = {
+    "viewModes": DesignerDataFormComponentView.VIEW_MODES
 }
 
 
@@ -247,13 +247,13 @@ MakerDataFormComponentView.TABLE_EDIT_SETTINGS = {
 //===============================
 
 /** This is the component name with which this view is associated. */
-MakerDataFormComponentView.componentName = "apogeeapp.MakerDataFormCell";
+DesignerDataFormComponentView.componentName = "apogeeapp.DesignerDataFormCell";
 
 /** If true, this indicates the component has a tab entry */
-MakerDataFormComponentView.hasTabEntry = false;
+DesignerDataFormComponentView.hasTabEntry = false;
 /** If true, this indicates the component has an entry appearing on the parent tab */
-MakerDataFormComponentView.hasChildEntry = true;
+DesignerDataFormComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
-MakerDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+DesignerDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
 

@@ -10,7 +10,7 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class DataFormComponentView extends ComponentView {
+export default class FullDataFormComponentView extends ComponentView {
 
     constructor(appViewInterface,component) {
         super(appViewInterface,component);
@@ -23,7 +23,7 @@ export default class DataFormComponentView extends ComponentView {
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
     getTableEditSettings() {
-        return DataFormComponentView.TABLE_EDIT_SETTINGS;
+        return FullDataFormComponentView.TABLE_EDIT_SETTINGS;
     }
 
     /** This method should be implemented to retrieve a data display of the give type. 
@@ -36,31 +36,31 @@ export default class DataFormComponentView extends ComponentView {
         //create the new view element;
         switch(viewType) {
             
-            case DataFormComponentView.VIEW_FORM:
+            case FullDataFormComponentView.VIEW_FORM:
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 
-            case DataFormComponentView.VIEW_LAYOUT_CODE:
+            case FullDataFormComponentView.VIEW_LAYOUT_CODE:
                 dataDisplaySource = this.getLayoutDataDisplaySource(app);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
-            case DataFormComponentView.VIEW_INPUT_CODE:
+            case FullDataFormComponentView.VIEW_INPUT_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.input");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
-            case DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE:
+            case FullDataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.input");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case DataFormComponentView.VIEW_VALIDATOR_CODE:
+            case FullDataFormComponentView.VIEW_VALIDATOR_CODE:
                 dataDisplaySource = this.getValidatorDataDisplaySource(app);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case DataFormComponentView.VIEW_FORM_VALUE:
+            case FullDataFormComponentView.VIEW_FORM_VALUE:
                 dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.value");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
-            case ComponentView.VIEW_INFO: 
+            case ComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
@@ -187,7 +187,7 @@ export default class DataFormComponentView extends ComponentView {
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "dataFormUpdateCommand";
+                command.type = "fullDataFormUpdateCommand";
                 command.memberId = component.getMemberId();
                 command.field = "layout";
                 command.initialValue = component.getField("layoutCode");
@@ -223,7 +223,7 @@ export default class DataFormComponentView extends ComponentView {
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "dataFormUpdateCommand";
+                command.type = "fullDataFormUpdateCommand";
                 command.memberId = component.getMemberId();
                 command.field = "validator";
                 command.initialValue = component.getField("validatorCode");
@@ -237,17 +237,17 @@ export default class DataFormComponentView extends ComponentView {
     }
 }
 
-DataFormComponentView.VIEW_FORM = "form";
-DataFormComponentView.VIEW_LAYOUT_CODE = "layout";
-DataFormComponentView.VIEW_INPUT_CODE = "input";
-DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE = "inputPrivate";
-DataFormComponentView.VIEW_VALIDATOR_CODE = "validator";
-DataFormComponentView.VIEW_FORM_VALUE = "value";
+FullDataFormComponentView.VIEW_FORM = "form";
+FullDataFormComponentView.VIEW_LAYOUT_CODE = "layout";
+FullDataFormComponentView.VIEW_INPUT_CODE = "input";
+FullDataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE = "inputPrivate";
+FullDataFormComponentView.VIEW_VALIDATOR_CODE = "validator";
+FullDataFormComponentView.VIEW_FORM_VALUE = "value";
 
-DataFormComponentView.VIEW_MODES = [
-    ComponentView.VIEW_INFO_MODE_ENTRY,
+FullDataFormComponentView.VIEW_MODES = [
+    ComponentView.VIEW_ERROR_MODE_ENTRY,
     {
-        name: DataFormComponentView.VIEW_FORM,
+        name: FullDataFormComponentView.VIEW_FORM,
         label: "Form",
         sourceLayer: "model",
         sourceType: "data",
@@ -255,7 +255,7 @@ DataFormComponentView.VIEW_MODES = [
         isActive: true
     },
     {
-        name: DataFormComponentView.VIEW_LAYOUT_CODE,
+        name: FullDataFormComponentView.VIEW_LAYOUT_CODE,
         label: "Layout Code",
         sourceLayer: "app",
         sourceType: "function", 
@@ -264,7 +264,7 @@ DataFormComponentView.VIEW_MODES = [
         //description: "This is a test of the description!"
     },
     {
-        name: DataFormComponentView.VIEW_VALIDATOR_CODE,
+        name: FullDataFormComponentView.VIEW_VALIDATOR_CODE,
         label: "Validator Code",
         sourceLayer: "app",
         sourceType: "function", 
@@ -272,7 +272,7 @@ DataFormComponentView.VIEW_MODES = [
         isActive: false
     },
     {
-        name: DataFormComponentView.VIEW_INPUT_CODE,
+        name: FullDataFormComponentView.VIEW_INPUT_CODE,
         label: "Input Data Code",
         sourceLayer: "model",
         sourceType: "function", 
@@ -280,7 +280,7 @@ DataFormComponentView.VIEW_MODES = [
         isActive: false
     },
     {
-        name: DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE,
+        name: FullDataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE,
         label: "Input Data Private",
         sourceLayer: "model", 
         sourceType: "private code",
@@ -288,7 +288,7 @@ DataFormComponentView.VIEW_MODES = [
         isActive: false
     },
     {
-        name: DataFormComponentView.VIEW_FORM_VALUE,
+        name: FullDataFormComponentView.VIEW_FORM_VALUE,
         label: "Value",
         sourceLayer: "model",
         sourceType: "data",
@@ -297,18 +297,18 @@ DataFormComponentView.VIEW_MODES = [
     }
 ];
 
-DataFormComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": DataFormComponentView.VIEW_MODES
+FullDataFormComponentView.TABLE_EDIT_SETTINGS = {
+    "viewModes": FullDataFormComponentView.VIEW_MODES
 }
 
 //======================================
 // This is the control generator, to register the control
 //======================================
 
-DataFormComponentView.componentName = "apogeeapp.NewDataFormCell";
-DataFormComponentView.hasTabEntry = false;
-DataFormComponentView.hasChildEntry = true;
-DataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+FullDataFormComponentView.componentName = "apogeeapp.FullDataFormCell";
+FullDataFormComponentView.hasTabEntry = false;
+FullDataFormComponentView.hasChildEntry = true;
+FullDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
 
 
 

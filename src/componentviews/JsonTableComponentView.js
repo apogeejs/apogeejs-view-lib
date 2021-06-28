@@ -58,7 +58,7 @@ export default class JsonTableComponentView extends ComponentView {
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case ComponentView.VIEW_INFO: 
+            case ComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
@@ -110,7 +110,7 @@ JsonTableComponentView.VIEW_CODE = "Formula";
 JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
-    ComponentView.VIEW_INFO_MODE_ENTRY,
+    ComponentView.VIEW_ERROR_MODE_ENTRY,
     {
         name: JsonTableComponentView.VIEW_DATA,
         label: "Data",

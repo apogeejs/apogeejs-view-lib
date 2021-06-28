@@ -41,7 +41,7 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
             case WebRequestComponentView.VIEW_INPUT:
                 return this.getFormDataDisplay(displayContainer);
 
-            case FormInputBaseComponentView.VIEW_INFO: 
+            case FormInputBaseComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
@@ -336,10 +336,10 @@ WebRequestComponentView.VIEW_META = "Meta";
 WebRequestComponentView.VIEW_BODY = "Body";
 
 WebRequestComponentView.VIEW_MODES = [
-    FormInputBaseComponentView.VIEW_INFO_MODE_ENTRY,
+    FormInputBaseComponentView.VIEW_ERROR_MODE_ENTRY,
     {name: WebRequestComponentView.VIEW_META, label: "Response Info", isActive: false},
     {name: WebRequestComponentView.VIEW_BODY, label: "Response Body", isActive: true},
-    FormInputBaseComponentView.INPUT_VIEW_MODE_INFO
+    FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG
 ];
 
 WebRequestComponentView.TABLE_EDIT_SETTINGS = {

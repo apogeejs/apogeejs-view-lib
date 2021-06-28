@@ -23,15 +23,15 @@ registerComponentView(WebRequestComponentView);
 setErrorComponentView(ErrorComponentView);
 
 //JSON PLUS COMPONENT
-import ActionFormComponentView from "/apogeejs-view-lib/src/componentviews/ActionFormComponentView.js";
-registerComponentView(ActionFormComponentView);
-import DataFormComponentView from "/apogeejs-view-lib/src/componentviews/DataFormComponentView.js";
-registerComponentView(DataFormComponentView);
+import FullActionFormComponentView from "/apogeejs-view-lib/src/componentviews/FullActionFormComponentView.js";
+registerComponentView(FullActionFormComponentView);
+import FullDataFormComponentView from "/apogeejs-view-lib/src/componentviews/FullDataFormComponentView.js";
+registerComponentView(FullDataFormComponentView);
 
-import MakerDataFormComponentView from "/apogeejs-view-lib/src/componentviews/MakerDataFormComponentView.js";
-registerComponentView(MakerDataFormComponentView);
-import MakerActionFormComponentView from "/apogeejs-view-lib/src/componentviews/MakerActionFormComponentView.js";
-registerComponentView(MakerActionFormComponentView);
+import DesignerDataFormComponentView from "/apogeejs-view-lib/src/componentviews/DesignerDataFormComponentView.js";
+registerComponentView(DesignerDataFormComponentView);
+import DesignerActionFormComponentView from "/apogeejs-view-lib/src/componentviews/DesignerActionFormComponentView.js";
+registerComponentView(DesignerActionFormComponentView);
 
 //JSON PLUS COMPONENT
 import JsonPlusTableComponentView from "/apogeejs-view-lib/src/componentviews/JsonPlusTableComponentView.js";

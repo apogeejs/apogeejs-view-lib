@@ -106,4 +106,19 @@ export default class FormInputBaseComponentView extends ComponentView {
 //This is the standard formview mode info
 FormInputBaseComponentView.VIEW_INPUT = "Input"
 
-FormInputBaseComponentView.INPUT_VIEW_MODE_INFO = {name: FormInputBaseComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
+FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG = {name: FormInputBaseComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
+//legacy name update - old name
+FormInputBaseComponentView.INPUT_VIEW_MODE_INFO = FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG;
+
+/** This function returns the view mode entry for the Config entry. This includes an option to change the name of the view. */
+FormInputBaseComponentView.getConfigViewModeEntry = function(optionalAlternateLabel) {
+    if(optionalAlternateLabel) {
+        let viewModeInfo = {};
+        Object.assign(viewModeInfo,FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG);
+        viewModeInfo.label = optionalAlternateLabel;
+        return viewModeInfo;
+    }
+    else {
+        return FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG;
+    }
+}

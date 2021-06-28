@@ -10,7 +10,7 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
-export default class MakerActionFormComponentView extends FormInputBaseComponentView {
+export default class DesignerActionFormComponentView extends FormInputBaseComponentView {
 
     constructor(appViewInterface,component) {
         super(appViewInterface,component);
@@ -23,7 +23,7 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
      getTableEditSettings() {
-        return MakerActionFormComponentView.TABLE_EDIT_SETTINGS;
+        return DesignerActionFormComponentView.TABLE_EDIT_SETTINGS;
     }
 
     /** This method should be implemented to retrieve a data display of the give type. 
@@ -32,22 +32,22 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
         let dataDisplaySource;
         switch(viewType) {
 
-            case MakerActionFormComponentView.VIEW_FORM:
+            case DesignerActionFormComponentView.VIEW_FORM:
                 dataDisplaySource = this._getOutputFormDataSource();
                 return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 
             case FormInputBaseComponentView.VIEW_INPUT:
                 return this.getFormDataDisplay(displayContainer);
 
-            case FormInputBaseComponentView.VIEW_INFO: 
+            case FormInputBaseComponentView.VIEW_ERROR: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
-            case MakerActionFormComponentView.VIEW_ON_SAVE_CODE:
+            case DesignerActionFormComponentView.VIEW_ON_SAVE_CODE:
                 dataDisplaySource = this._getOnSubmitDataDisplaySource(this.getApp());
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
-            case MakerActionFormComponentView.VIEW_ON_CANCEL_CODE:
+            case DesignerActionFormComponentView.VIEW_ON_CANCEL_CODE:
                 dataDisplaySource = this._getOnCancelDataDisplaySource(this.getApp());
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
@@ -64,7 +64,7 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
             "inputExpressions": true,
             "submit": true
         }
-        return ConfigurablePanel.getFormMakerLayout(flags);
+        return ConfigurablePanel.getFormDesignerLayout(flags);
     }
 
     //==========================
@@ -91,7 +91,7 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
                     return abnormalWrappedData;
                 }
 
-                //input data is the layout from the form maker
+                //input data is the layout from the form designer
                 let fullLayout = this._getFullLayout(inputData);
                 return fullLayout;
             },
@@ -125,7 +125,7 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "makerActionFormUpdateCommand";
+                command.type = "designerActionFormUpdateCommand";
                 command.memberId = component.getMemberId();
                 command.field = "onSubmit";
                 command.initialValue = component.getField("onSubmitCode");
@@ -161,7 +161,7 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "makerActionFormUpdateCommand";
+                command.type = "designerActionFormUpdateCommand";
                 command.memberId = component.getMemberId();
                 command.field = "onCancel";
                 command.initialValue = component.getField("onCancelCode");
@@ -226,20 +226,20 @@ export default class MakerActionFormComponentView extends FormInputBaseComponent
 // View Definitions Constants (referenced internally)
 //==================================
 
-MakerActionFormComponentView.VIEW_FORM = "Form";
-MakerActionFormComponentView.VIEW_VALUE = "Value";
-MakerActionFormComponentView.VIEW_ON_SAVE_CODE = "On Save";
-MakerActionFormComponentView.VIEW_ON_CANCEL_CODE = "On Cancel"
+DesignerActionFormComponentView.VIEW_FORM = "Form";
+DesignerActionFormComponentView.VIEW_VALUE = "Value";
+DesignerActionFormComponentView.VIEW_ON_SAVE_CODE = "On Save";
+DesignerActionFormComponentView.VIEW_ON_CANCEL_CODE = "On Cancel"
 
-MakerActionFormComponentView.VIEW_MODES = [
-    {name: MakerActionFormComponentView.VIEW_FORM, label: "Form", isActive: true},
-    FormInputBaseComponentView.INPUT_VIEW_MODE_INFO,
-    {name: MakerActionFormComponentView.VIEW_ON_SAVE_CODE, label: "onSubmit(cmdMsngr,formValue,formObject)", isActive: false},
-    {name: MakerActionFormComponentView.VIEW_ON_CANCEL_CODE, label: "onCancel(cmdMsngr,formObject)", isActive: false}
+DesignerActionFormComponentView.VIEW_MODES = [
+    {name: DesignerActionFormComponentView.VIEW_FORM, label: "Form", isActive: true},
+    FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
+    {name: DesignerActionFormComponentView.VIEW_ON_SAVE_CODE, label: "onSubmit(cmdMsngr,formValue,formObject)", isActive: false},
+    {name: DesignerActionFormComponentView.VIEW_ON_CANCEL_CODE, label: "onCancel(cmdMsngr,formObject)", isActive: false}
 ];
 
-MakerActionFormComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": MakerActionFormComponentView.VIEW_MODES
+DesignerActionFormComponentView.TABLE_EDIT_SETTINGS = {
+    "viewModes": DesignerActionFormComponentView.VIEW_MODES
 }
 
 
@@ -248,13 +248,13 @@ MakerActionFormComponentView.TABLE_EDIT_SETTINGS = {
 //===============================
 
 /** This is the component name with which this view is associated. */
-MakerActionFormComponentView.componentName = "apogeeapp.MakerActionFormCell";
+DesignerActionFormComponentView.componentName = "apogeeapp.DesignerActionFormCell";
 
 /** If true, this indicates the component has a tab entry */
-MakerActionFormComponentView.hasTabEntry = false;
+DesignerActionFormComponentView.hasTabEntry = false;
 /** If true, this indicates the component has an entry appearing on the parent tab */
-MakerActionFormComponentView.hasChildEntry = true;
+DesignerActionFormComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
-MakerActionFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+DesignerActionFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
 
