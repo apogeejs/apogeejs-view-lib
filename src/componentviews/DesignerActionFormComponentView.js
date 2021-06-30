@@ -61,7 +61,7 @@ export default class DesignerActionFormComponentView extends FormInputBaseCompon
      * @protected. */
     getFormLayout() {
         let flags = {
-            "inputExpressions": true,
+            "inputExpressions": this.getComponent().getAllowInputExpressions(),
             "submit": true
         }
         return ConfigurablePanel.getFormDesignerLayout(flags);
@@ -257,4 +257,15 @@ DesignerActionFormComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
 DesignerActionFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+
+/** This is configuration for the properties dialog box, the results of which
+ * our code will read in. */
+DesignerActionFormComponentView.propertyDialogLines = [
+    {
+        "type":"checkbox",
+        "label":"Allow Designer Input Expressions: ",
+        "value": true,
+        "key":"allowInputExpressions"
+    }
+];
 

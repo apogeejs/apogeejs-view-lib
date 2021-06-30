@@ -61,7 +61,7 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
      * @protected. */
     getFormLayout() {
         let flags = {
-            "inputExpressions": true,
+            "inputExpressions": this.getComponent().getAllowInputExpressions(),
             "submit": false
         }
         return ConfigurablePanel.getFormDesignerLayout(flags);
@@ -70,37 +70,7 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
     //==========================
     // Private Methods
     //==========================
-
-    /** This is the data source for the input form data display */
-    // _getOutputFormDataSource() {
-    //     return {
-    //         doUpdate: () => {
-    //             //the form data is stored in the "value" member
-    //             let reloadData = this.getComponent().isMemberDataUpdated("member.value");
-    //             //form layout depends on data field
-    //             let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.data");
-    //             return {reloadData,reloadDataDisplay};
-    //         }, 
-    //         getDisplayData: () => {
-    //             let formMember = this.getComponent().getField("member.data");
-    //             return dataDisplayHelper.getStandardWrappedMemberData(formMember);
-    //         },
-    //         getData: () => {
-    //             let valueMember = this.getComponent().getField("member.value");
-    //             return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
-    //         },
-    //         getEditOk: () => true,
-    //         saveData: (formValue) => {
-    //             let component = this.getComponent();
-    //             let memberId = component.getMemberId();
-    //             let commandMessenger = new UiCommandMessenger(this,memberId);
-    //             commandMessenger.dataCommand("value",formValue);
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    
+ 
     _getOutputFormDataSource() {
         //load this when the form is updated, to be used when form submitted
         //we will update the form if this value changes
@@ -256,4 +226,15 @@ DesignerDataFormComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
 DesignerDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+
+/** This is configuration for the properties dialog box, the results of which
+ * our code will read in. */
+DesignerDataFormComponentView.propertyDialogLines = [
+    {
+        "type":"checkbox",
+        "label":"Allow Designer Input Expressions: ",
+        "value": true,
+        "key":"allowInputExpressions"
+    }
+];
 

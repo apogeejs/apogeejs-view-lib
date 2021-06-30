@@ -314,7 +314,7 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     if(initialValues) {
         for(var i = 0; i < lines.length; i++) {
             var line = lines[i];
-            if(line.key) {
+            if((line.key)&&(initialValues[line.key] !== undefined)) {
                 line.value = initialValues[line.key];
             }
         }
