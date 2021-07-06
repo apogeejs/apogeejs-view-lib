@@ -116,6 +116,7 @@ JsonTableComponentView.VIEW_MODES = [
         label: "Data",
         sourceLayer: "model",
         sourceType: "data",
+        suffix: "",
         isActive: true
     },
     {

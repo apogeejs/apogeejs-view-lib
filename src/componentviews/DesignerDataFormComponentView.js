@@ -201,10 +201,28 @@ DesignerDataFormComponentView.VIEW_VALUE = "Value";
 DesignerDataFormComponentView.VIEW_ON_SAVE_CODE = "On Save"
 
 DesignerDataFormComponentView.VIEW_MODES = [
-    {name: DesignerDataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
+    {
+        name: DesignerDataFormComponentView.VIEW_FORM,
+        label: "Form",
+        isActive: true
+    },
     FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-    {name: DesignerDataFormComponentView.VIEW_ON_SAVE_CODE, label: "isValid(formValue,formLayout)", isActive: false},
-    {name: DesignerDataFormComponentView.VIEW_VALUE, label: "Value", isActive: false}
+    {
+        name: DesignerDataFormComponentView.VIEW_ON_SAVE_CODE,
+        label: "isValid",
+        sourceLayer: "app",
+        sourceType: "function", 
+        argList: "formValue,formLayout",
+        isActive: false
+    },
+    {
+        name: DesignerDataFormComponentView.VIEW_VALUE,
+        label: "Value",
+        sourceLayer: "model",
+        sourceType: "data",
+        suffix: ".value", 
+        isActive: false
+    }
 ];
 
 DesignerDataFormComponentView.TABLE_EDIT_SETTINGS = {

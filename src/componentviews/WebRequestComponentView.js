@@ -337,8 +337,22 @@ WebRequestComponentView.VIEW_BODY = "Body";
 
 WebRequestComponentView.VIEW_MODES = [
     FormInputBaseComponentView.VIEW_ERROR_MODE_ENTRY,
-    {name: WebRequestComponentView.VIEW_META, label: "Response Info", isActive: false},
-    {name: WebRequestComponentView.VIEW_BODY, label: "Response Body", isActive: true},
+    {
+        name: WebRequestComponentView.VIEW_META,
+        label: "Response Info",
+        sourceLayer: "model", 
+        sourceType: "data",
+        suffix: ".data.meta",
+        isActive: false
+    },
+    {
+        name: WebRequestComponentView.VIEW_BODY,
+        label: "Response Body",
+        sourceLayer: "model", 
+        sourceType: "data",
+        suffix: ".data.body",
+        isActive: true
+    },
     FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG
 ];
 

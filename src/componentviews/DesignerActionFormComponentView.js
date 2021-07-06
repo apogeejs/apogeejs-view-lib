@@ -232,10 +232,27 @@ DesignerActionFormComponentView.VIEW_ON_SAVE_CODE = "On Save";
 DesignerActionFormComponentView.VIEW_ON_CANCEL_CODE = "On Cancel"
 
 DesignerActionFormComponentView.VIEW_MODES = [
-    {name: DesignerActionFormComponentView.VIEW_FORM, label: "Form", isActive: true},
+    {
+        name: DesignerActionFormComponentView.VIEW_FORM, label: "Form", 
+        isActive: true
+    },
     FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-    {name: DesignerActionFormComponentView.VIEW_ON_SAVE_CODE, label: "onSubmit(cmdMsngr,formValue,formObject)", isActive: false},
-    {name: DesignerActionFormComponentView.VIEW_ON_CANCEL_CODE, label: "onCancel(cmdMsngr,formObject)", isActive: false}
+    {
+        name: DesignerActionFormComponentView.VIEW_ON_SAVE_CODE,
+        label: "onSubmit",
+        sourceLayer: "app",
+        sourceType: "function", 
+        argList: "cmdMsngr,formValue,formObject",
+        isActive: false
+    },
+    {
+        name: DesignerActionFormComponentView.VIEW_ON_CANCEL_CODE,
+        label: "onCancel",
+        sourceLayer: "app",
+        sourceType: "function", 
+        argList: "cmdMsngr,formObject",
+        isActive: false
+    }
 ];
 
 DesignerActionFormComponentView.TABLE_EDIT_SETTINGS = {
