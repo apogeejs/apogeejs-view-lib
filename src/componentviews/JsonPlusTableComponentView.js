@@ -35,11 +35,11 @@ export default class JsonPlusTableComponentView extends ComponentView {
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case JsonPlusTableComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member",DEFAULT_DATA_VALUE);
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             case ComponentView.VIEW_ERROR: 
@@ -169,10 +169,6 @@ function replaceFunctionsInArray(jsonPlus) {
     }
     return copiedJson;
 }
-
-/** This is used as the default data value if we clear the code. It really should be a function of the data view,
- * since in grid mode this is an invalid value. Support for that shold be added. */
-let DEFAULT_DATA_VALUE = "";
 
 //===============================
 // Internal Settings

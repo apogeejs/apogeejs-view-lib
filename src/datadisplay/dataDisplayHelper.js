@@ -175,7 +175,7 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
  * set with this value if the function body and supplemental code are empty. 
  * The optionalDefaultDataValue will be used to clear the function and save the data value if the formula and
  * private code are empty strings. */
-dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,memberFieldName,optionalDefaultDataValue) {
+dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,memberFieldName) {
 
     //this is used internally to lookup the data member used here
     let _getFunctionMember = function() {
@@ -211,7 +211,6 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
             commandData.argList = functionMember.getArgList();
             commandData.functionBody = text;
             commandData.supplementalCode = functionMember.getSupplementalCode();
-            if(optionalDefaultDataValue !== undefined) commandData.clearCodeDataValue = optionalDefaultDataValue;
             
             app.executeCommand(commandData);
             return true;
@@ -219,11 +218,8 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
     }
 }
 
-/** This function creates editor callbacks or the member supplemental code. 
- * The optionalDefaultDataValue will be used to clear the function and save the data value if the formula and
- * private code are empty strings. 
-*/
-dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,memberFieldName,optionalDefaultDataValue) {
+/** This function creates editor callbacks or the member supplemental code. */
+dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,memberFieldName) {
 
     //this is used internally to lookup the data member used here
     let _getFunctionMember = function() {
@@ -259,7 +255,6 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
             commandData.argList = functionMember.getArgList();
             commandData.functionBody = functionMember.getFunctionBody();
             commandData.supplementalCode = text;
-            if(optionalDefaultDataValue !== undefined) commandData.clearCodeDataValue = optionalDefaultDataValue;
             
             app.executeCommand(commandData);
             return true;
