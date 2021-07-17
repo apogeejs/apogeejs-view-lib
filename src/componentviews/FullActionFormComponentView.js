@@ -138,8 +138,9 @@ export default class FullActionFormComponentView extends ComponentView {
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "fullActionFormUpdateCommand";
+                command.type = "updateComponentField";
                 command.memberId = component.getMemberId();
+                command.fieldName = "layoutCode"
                 command.initialValue = component.getField("layoutCode");
                 command.targetValue = targetLayoutCode;
 

@@ -8,7 +8,7 @@ import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-export function updateComponent(componentView) {
+export function updateComponentProperties(componentView) {
 
     var app = componentView.getApp();
     var modelManager = app.getModelManager(); 
@@ -62,7 +62,7 @@ export function updateComponent(componentView) {
         
         if((numMemberProps > 0)||(numComponentProps > 0)) {
             let updateCommand = {};
-            updateCommand.type = "updateComponent";
+            updateCommand.type = "updateComponentProperties";
             updateCommand.memberId = component.getMemberId();
             if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
             if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;

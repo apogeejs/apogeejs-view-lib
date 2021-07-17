@@ -172,9 +172,9 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "designerDataFormUpdateCommand";
+                command.type = "updateComponentField";
                 command.memberId = component.getMemberId();
-                command.field = "validator";
+                command.fieldName = "validatorCode";
                 command.initialValue = component.getField("validatorCode");
                 command.targetValue = targetLayoutCode;
 

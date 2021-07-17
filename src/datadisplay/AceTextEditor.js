@@ -7,7 +7,7 @@ import ace from "/apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js";
 /** Editor that uses the Ace text editor.
  * 
  * @param {type} displayContainer - the display container
- * @param {type} dataSource - {updateComponent,getData,getEditOk,setData}; format for data is text
+ * @param {type} dataSource - {doUpdate,getData,getEditOk,setData}; format for data is text
  * @param {type} aceMode - the display format, such as "ace/mode/json"
  */
 export default class AceTextEditor extends DataDisplay {

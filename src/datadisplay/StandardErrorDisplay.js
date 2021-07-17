@@ -4,7 +4,7 @@ import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 /** Standard Error display.
  * 
  * @param {type} displayContainer - the display container
- * @param {type} dataSource - {updateComponent,getData,getEditOk,setData}; format for data is text
+ * @param {type} dataSource - {doUpdate,getData,getEditOk,setData}; format for data is text
  */
 export default class StandardErrorDisplay extends DataDisplay {
     

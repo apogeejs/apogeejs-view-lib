@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {uiutil,TreeEntry} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import {bannerConstants} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
-import {updateComponent} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
+import {updateComponentProperties} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeejs-view-lib/src/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeejs-view-lib/src/componentdisplay/TreeComponentDisplay.js";
 
@@ -383,7 +383,7 @@ export default class ComponentView {
         //add the standard entries
         var itemInfo = {};
         itemInfo.title = "Edit Properties";
-        itemInfo.callback = () => updateComponent(this);
+        itemInfo.callback = () => updateComponentProperties(this);
         menuItemList.push(itemInfo);
 
         var itemInfo = {};

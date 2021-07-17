@@ -125,9 +125,9 @@ export default class DesignerActionFormComponentView extends FormInputBaseCompon
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "designerActionFormUpdateCommand";
+                command.type = "updateComponentField";
                 command.memberId = component.getMemberId();
-                command.field = "onSubmit";
+                command.fieldName = "onSubmitCode";
                 command.initialValue = component.getField("onSubmitCode");
                 command.targetValue = targetLayoutCode;
 
@@ -161,9 +161,9 @@ export default class DesignerActionFormComponentView extends FormInputBaseCompon
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "designerActionFormUpdateCommand";
+                command.type = "updateComponentField";
                 command.memberId = component.getMemberId();
-                command.field = "onCancel";
+                command.fieldName = "onCancelCode";
                 command.initialValue = component.getField("onCancelCode");
                 command.targetValue = targetLayoutCode;
 

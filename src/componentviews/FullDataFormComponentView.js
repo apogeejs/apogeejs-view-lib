@@ -187,9 +187,9 @@ export default class FullDataFormComponentView extends ComponentView {
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "fullDataFormUpdateCommand";
+                command.type = "updateComponentField";
                 command.memberId = component.getMemberId();
-                command.field = "layout";
+                command.fieldName = "layoutCode";
                 command.initialValue = component.getField("layoutCode");
                 command.targetValue = targetLayoutCode;
 
@@ -219,15 +219,15 @@ export default class FullDataFormComponentView extends ComponentView {
                 return true;
             },
 
-            saveData: (targetLayoutCode) => {
+            saveData: (validatorCode) => {
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "fullDataFormUpdateCommand";
+                command.type = "updateComponentField";
                 command.memberId = component.getMemberId();
-                command.field = "validator";
+                command.fieldName = "validatorCode";
                 command.initialValue = component.getField("validatorCode");
-                command.targetValue = targetLayoutCode;
+                command.targetValue = validatorCode;
 
                 app.executeCommand(command);
                 return true; 
