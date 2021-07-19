@@ -64,7 +64,7 @@ export default class CustomComponentView extends ComponentView {
         switch(viewType) {
             
             case CustomComponentView.VIEW_OUTPUT:
-                displayContainer.setDestroyViewOnInactive(this.getComponent().getDestroyOnInactive());
+                displayContainer.setDestroyViewOnInactive(this.getComponent().getField("destroyOnInactive"));
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
                 return dataDisplay;
@@ -159,8 +159,17 @@ export default class CustomComponentView extends ComponentView {
             
             saveData: (text) => {
                 let app = this.getApp();
-                this.getComponent().doCodeFieldUpdate(app,codeFieldName,text);
-                return true;
+
+                var initialValue = this.getComponent().getField(codeFieldName);
+                var command = {};
+                command.type = "updateComponentField";
+                command.memberId = this.getMemberId();
+                command.fieldName = codeFieldName;
+                command.initialValue = initialValue;
+                command.targetValue = text;
+
+                app.executeCommand(command);
+                return true; 
             }
         }
     }

@@ -138,12 +138,14 @@ function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var memberFolderJson = workspaceJson.workspace.data;
     
     if(componentClass.uniqueName == "apogeeapp.PageFunctionComponent") {
-        //I should probably do this conversion in the folder function code, so it is easier to maintain
-        var memberFolderFunctionJson = componentClass.DEFAULT_MEMBER_JSON;
-        var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
-        internalFolderJson.name = "body";
-        memberFolderFunctionJson.internalFolder = internalFolderJson;
-        return memberFolderFunctionJson;
+        //I want to do the commented out code differently
+        alert("Implementation not working! Fix the code below here");
+        throw new Error("REDO THE CODE BELOW!");
+        // var memberFolderFunctionJson = componentClass.DEFAULT_MEMBER_JSON;
+        // var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
+        // internalFolderJson.name = "body";
+        // memberFolderFunctionJson.internalFolder = internalFolderJson;
+        // return memberFolderFunctionJson;
     }
     else if(componentClass.uniqueName == "apogeeapp.PageComponent") {
         return memberFolderJson;

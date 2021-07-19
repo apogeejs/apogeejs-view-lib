@@ -50,13 +50,13 @@ export function updateComponentProperties(componentView) {
         
         var memberUpdateJson = {};
         if(componentClass.transferMemberProperties) {
-            componentClass.transferMemberProperties(newValues,memberUpdateJson);
+            componentClass.transferMemberProperties(newValues,memberUpdateJson,componentClass);
         }
         var numMemberProps = apogeeutil.jsonObjectLength(memberUpdateJson);
         
         var componentUpdateJson = {};
         if(componentClass.transferComponentProperties) {
-            componentClass.transferComponentProperties(newValues,componentUpdateJson);
+            componentClass.transferComponentProperties(newValues,componentUpdateJson,componentClass);
         }
         var numComponentProps = apogeeutil.jsonObjectLength(componentUpdateJson);
         

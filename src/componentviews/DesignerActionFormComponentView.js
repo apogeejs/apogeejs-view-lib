@@ -12,10 +12,6 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
  * for how to set the data. */
 export default class DesignerActionFormComponentView extends FormInputBaseComponentView {
 
-    constructor(appViewInterface,component) {
-        super(appViewInterface,component);
-    };
-
     //=================================
     // Implementation Methods
     //=================================
@@ -61,7 +57,7 @@ export default class DesignerActionFormComponentView extends FormInputBaseCompon
      * @protected. */
     getFormLayout() {
         let flags = {
-            "inputExpressions": this.getComponent().getAllowInputExpressions(),
+            "inputExpressions": this.getComponent().getField("allowInputExpressions"),
             "submit": true
         }
         return ConfigurablePanel.getFormDesignerLayout(flags);

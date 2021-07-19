@@ -61,7 +61,7 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
      * @protected. */
     getFormLayout() {
         let flags = {
-            "inputExpressions": this.getComponent().getAllowInputExpressions(),
+            "inputExpressions": this.getComponent().getField("allowInputExpressions"),
             "submit": false
         }
         return ConfigurablePanel.getFormDesignerLayout(flags);
