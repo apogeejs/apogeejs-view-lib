@@ -17,7 +17,7 @@ export function updateComponentProperties(componentView) {
     var componentClass = component.constructor;
     var componentViewClass = componentView.constructor;
 
-    var displayName = componentClass.displayName
+    var displayName = componentClass.getClassDisplayName();
     var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
     var initialValues = component.getPropertyValues(modelManager.getModel()); 
@@ -50,13 +50,13 @@ export function updateComponentProperties(componentView) {
         
         var memberUpdateJson = {};
         if(componentClass.transferMemberProperties) {
-            componentClass.transferMemberProperties(newValues,memberUpdateJson,componentClass);
+            componentClass.transferMemberProperties(newValues,memberUpdateJson);
         }
         var numMemberProps = apogeeutil.jsonObjectLength(memberUpdateJson);
         
         var componentUpdateJson = {};
         if(componentClass.transferComponentProperties) {
-            componentClass.transferComponentProperties(newValues,componentUpdateJson,componentClass);
+            componentClass.transferComponentProperties(newValues,componentUpdateJson);
         }
         var numComponentProps = apogeeutil.jsonObjectLength(componentUpdateJson);
         

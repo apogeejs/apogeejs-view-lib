@@ -18,7 +18,7 @@ import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js
 //piggybackCommand is a temporary test!!!
 export function addComponent(appViewInterface,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
-        let componentViewClass = getComponentViewClass(componentClass.uniqueName);
+        let componentViewClass = getComponentViewClass(componentClass.getClassUniqueName());
 
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
@@ -37,7 +37,7 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
 
         
         //get the tyep display name
-        var displayName = componentClass.displayName
+        var displayName = componentClass.getClassDisplayName();
         
         //get any additional property content for dialog beyond basic properties
         var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
@@ -181,7 +181,7 @@ export function addAdditionalComponent(appViewInterface,app,optionalInitialPrope
     let additionalComponents = componentInfo.getAdditionalComponentNames();
     let componentInfoList = additionalComponents.map( componentName => {
         let componentClass = componentInfo.getComponentClass(componentName); 
-        return {displayName: componentClass.displayName, uniqueName: componentName};
+        return {displayName: componentClass.getClassDisplayName(), uniqueName: componentName};
     });
     //open select component dialog
     showSelectComponentDialog(componentInfoList,onSelect);

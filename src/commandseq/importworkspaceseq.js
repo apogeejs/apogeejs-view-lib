@@ -137,21 +137,21 @@ function doRequest(url,onDownload,onFailure) {
 function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var memberFolderJson = workspaceJson.workspace.data;
     
-    if(componentClass.uniqueName == "apogeeapp.PageFunctionComponent") {
+    if(componentClass.getClassUniqueName() == "apogeeapp.PageFunctionComponent") {
         //I want to do the commented out code differently
         alert("Implementation not working! Fix the code below here");
         throw new Error("REDO THE CODE BELOW!");
-        // var memberFolderFunctionJson = componentClass.DEFAULT_MEMBER_JSON;
+        // var memberFolderFunctionJson = componentClass.getDefaultMemberJson();
         // var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
         // internalFolderJson.name = "body";
         // memberFolderFunctionJson.internalFolder = internalFolderJson;
         // return memberFolderFunctionJson;
     }
-    else if(componentClass.uniqueName == "apogeeapp.PageComponent") {
+    else if(componentClass.getClassUniqueName() == "apogeeapp.PageComponent") {
         return memberFolderJson;
     }
     else {
-        throw new Error("Unknown target type: " + componentClass.uniqueName);
+        throw new Error("Unknown target type: " + componentClass.getClassUniqueName());
     }
 
 }
@@ -160,19 +160,19 @@ function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
 function getComponentJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var componentFolderJson = workspaceJson.components;
     
-    if(componentClass.uniqueName == "apogeeapp.PageFunctionComponent") {
+    if(componentClass.getClassUniqueName() == "apogeeapp.PageFunctionComponent") {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
         var componentFolderFunctionJson = {
-            type: componentClass.uniqueName,
+            type: componentClass.getClassUniqueName(),
             children: componentFolderJson.children
         }
         return componentFolderFunctionJson;
     }
-    else if(componentClass.uniqueName == "apogeeapp.PageComponent") {
+    else if(componentClass.getClassUniqueName() == "apogeeapp.PageComponent") {
         return componentFolderJson;
     }
     else {
-        throw new Error("Unknown target type: " + componentClass.uniqueName);
+        throw new Error("Unknown target type: " + componentClass.getClassUniqueName());
     }
 }
         
