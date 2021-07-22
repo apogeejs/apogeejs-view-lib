@@ -13,7 +13,7 @@ export function getErrorViewModeEntry() {
         isTransient: true,
         isInfoView: true,
         getDataDisplay: (componentView,displayContainer) => {
-            dataDisplayHelper.getStandardErrorDataSource(componentView.getApp(),componentView);
+            let dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(componentView.getApp(),componentView);
             return new StandardErrorDisplay(displayContainer,dataDisplaySource);
         }
     }

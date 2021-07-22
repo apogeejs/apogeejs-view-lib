@@ -11,6 +11,8 @@ export {default as AceTextEditor} from "/apogeejs-view-lib/src/datadisplay/AceTe
 export {default as ConfigurableFormEditor} from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 export {default as DataDisplay} from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
 export {default as dataDisplayHelper} from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
+export * from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+
 export {default as DATA_DISPLAY_CONSTANTS} from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 export {default as ErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/ErrorDisplay.js";
 export {default as HandsonGridEditor} from "/apogeejs-view-lib/src/datadisplay/HandsonGridEditor.js";
