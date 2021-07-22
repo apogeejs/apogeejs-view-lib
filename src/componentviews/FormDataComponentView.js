@@ -1,9 +1,8 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
-import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -14,60 +13,13 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
  * data value, you can use the dynmaic form. */
 export default class FormDataComponentView extends ComponentView {
 
-    constructor(appViewInterface,folderComponent) {
-        //extend edit component
-        super(appViewInterface,folderComponent);
-    };
-
     //==============================
     // Protected and Private Instance Methods
     //==============================
 
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return FormDataComponentView.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-                
-            case FormDataComponentView.VIEW_FORM:
-                dataDisplaySource = this.getFormEditorCallbacks();
-                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-                
-            case FormDataComponentView.VIEW_LAYOUT_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.layout");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.layout");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-            
-            case FormDataComponentView.VIEW_FORM_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.data");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-                
-            case FormDataComponentView.VIEW_INPUT_INVALID_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.isInputValid");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.isInputValid");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            default:
-    //temporary error handling...
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
+    getFormViewDisplay(displayContainer) {
+        let dataDisplaySource = this.getFormEditorCallbacks();
+        return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
     }
 
     getFormEditorCallbacks() {
@@ -155,36 +107,26 @@ export default class FormDataComponentView extends ComponentView {
         return dataDisplaySource;
     }
 
-    //======================================
-    // Static methods
-    //======================================
-
-}
-
-
-FormDataComponentView.VIEW_FORM = "Form";
-FormDataComponentView.VIEW_LAYOUT_CODE = "Layout Code";
-FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE = "Layout Private";
-FormDataComponentView.VIEW_FORM_VALUE = "Form Value";
-FormDataComponentView.VIEW_INPUT_INVALID_CODE = "isInputValid(formValue)";
-FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE = "isInputValid Private";
-
-FormDataComponentView.VIEW_MODES = [
-    FormDataComponentView.VIEW_FORM,
-    FormDataComponentView.VIEW_LAYOUT_CODE,
-    FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE,
-    FormDataComponentView.VIEW_INPUT_INVALID_CODE,
-    FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE,
-    FormDataComponentView.VIEW_FORM_VALUE
-];
-
-FormDataComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": FormDataComponentView.VIEW_MODES
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
+
+FormDataComponentView.VIEW_MODES = [
+    getErrorViewModeEntry(),
+    {
+        name: "Form",
+        label: "Form",
+        isActive: true,
+        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+    },
+    getFormulaViewModeEntry("member.layout",{name:"Layout Code",label:"Layout Code"}),
+    getPrivateViewModeEntry("member.layout",{name:"Layout Private",label:"Layout Private"}),
+    getFormulaViewModeEntry("member.isInputValid",{name:"isInputValid(formValue)",label:"isInputValid",argList: "formValue"}),
+    getPrivateViewModeEntry("member.isInputValid",{name:"isInputValid Private",label:"isInputValid Private"}),
+    getMemberDataTextViewModeEntry("member.data",{name: "Form Value",label: "Form Value"})
+];
 
 
 FormDataComponentView.componentName = "apogeeapp.DataFormCell";

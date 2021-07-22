@@ -73,6 +73,7 @@ export function getFormulaViewModeEntry(memberFieldName,options) {
         label: ((options)&&(options.label)) ? options.label : "Formula",
         sourceLayer: "model",
         sourceType: "function",
+        argList: ((options)&&(options.argList !== undefined)) ? options.argList : "",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
         getDataDisplay: (componentView,displayContainer) => getFormulaDataDisplay(componentView,displayContainer,memberFieldName,options)
     }

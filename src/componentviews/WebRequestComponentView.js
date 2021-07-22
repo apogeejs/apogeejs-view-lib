@@ -1,54 +1,27 @@
 //These are in lieue of the import statements
 import FormInputBaseComponentView from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
 import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import {getErrorViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
 export default class WebRequestComponentView extends FormInputBaseComponentView {
 
-    constructor(appViewInterface,component) {
-        super(appViewInterface,component);
-    };
-
     //=================================
     // Implementation Methods
     //=================================
 
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return WebRequestComponentView.TABLE_EDIT_SETTINGS;
+    getMetaViewDisplay(displayContainer) {
+        let dataDisplaySource = this._getMetaDataSource();
+        return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
     }
 
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        let dataDisplaySource;
-        switch(viewType) {
-
-            case WebRequestComponentView.VIEW_META:
-                dataDisplaySource = this._getMetaDataSource();
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
-            case WebRequestComponentView.VIEW_BODY:
-                dataDisplaySource = this._getBodyDataSource();
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
-            case WebRequestComponentView.VIEW_INPUT:
-                return this.getFormDataDisplay(displayContainer);
-
-            case FormInputBaseComponentView.VIEW_ERROR: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
-                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
-
-            default:
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
+    getBodyViewDisplay(displayContainer) {
+        let dataDisplaySource = this._getBodyDataSource();
+        return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_SOME);
     }
 
     /** This method returns the form layout.
@@ -328,42 +301,33 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
 
 const MIME_TYPE_JSON = "application/json"
 
-//===================================
-// View Definitions Constants (referenced internally)
-//==================================
-
-WebRequestComponentView.VIEW_META = "Meta";
-WebRequestComponentView.VIEW_BODY = "Body";
+//===============================
+// Required External Settings
+//===============================
 
 WebRequestComponentView.VIEW_MODES = [
-    FormInputBaseComponentView.VIEW_ERROR_MODE_ENTRY,
+    getErrorViewModeEntry(),
     {
-        name: WebRequestComponentView.VIEW_META,
+        name: "Meta",
         label: "Response Info",
         sourceLayer: "model", 
         sourceType: "data",
         suffix: ".data.meta",
-        isActive: false
+        isActive: false,
+        getDataDisplay: (componentView,displayContainer) => componentView.getMetaViewDisplay(displayContainer)
+
     },
     {
-        name: WebRequestComponentView.VIEW_BODY,
+        name: "Body",
         label: "Response Body",
         sourceLayer: "model", 
         sourceType: "data",
         suffix: ".data.body",
-        isActive: true
+        isActive: true,
+        getDataDisplay: (componentView,displayContainer) => componentView.getBodyViewDisplay(displayContainer)
     },
-    FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG
+    FormInputBaseComponentView.getConfigViewModeEntry(),
 ];
-
-WebRequestComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": WebRequestComponentView.VIEW_MODES
-}
-
-
-//===============================
-// Required External Settings
-//===============================
 
 /** This is the component name with which this view is associated. */
 WebRequestComponentView.componentName = "apogeeapp.WebRequestCell";

@@ -1,59 +1,18 @@
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
-import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
 /** This component represents a table object. */
 export default class DynamicFormView extends ComponentView {
         
-    constructor(appViewInterface,component) {
-        //extend edit component
-        super(appViewInterface,component);
-    };
-
     //==============================
     // Protected and Private Instance Methods
     //==============================
 
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return DynamicFormView.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-            
-            case DynamicFormView.VIEW_FORM:
-                dataDisplaySource = this.getFormCallbacks();
-                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-                
-            case DynamicFormView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case DynamicFormView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-
-            case ComponentView.VIEW_ERROR: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
-                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
-                
-            default:
-    //temporary error handling...
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
+    getFormViewDisplay(displayContainer) {
+        let dataDisplaySource = this.getFormCallbacks();
+        return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
     }
 
     getFormCallbacks() { 
@@ -96,32 +55,24 @@ export default class DynamicFormView extends ComponentView {
 
         return dataDisplaySource;
     }
-        
-    //======================================
-    // Static methods
-    //======================================
 
-
-}
-
-DynamicFormView.VIEW_FORM = "Form";
-DynamicFormView.VIEW_CODE = "Code";
-DynamicFormView.VIEW_SUPPLEMENTAL_CODE = "Private";
-
-DynamicFormView.VIEW_MODES = [
-    ComponentView.VIEW_ERROR_MODE_ENTRY,
-    {name: DynamicFormView.VIEW_FORM, label: "Form", isActive: true},
-    {name: DynamicFormView.VIEW_CODE, label: "Code", isActive: false},
-    {name: DynamicFormView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
-];
-
-DynamicFormView.TABLE_EDIT_SETTINGS = {
-    "viewModes": DynamicFormView.VIEW_MODES
 }
 
 //======================================
 // This is the component generator, to register the component
 //======================================
+
+DynamicFormView.VIEW_MODES = [
+    getErrorViewModeEntry(),
+    {
+        name: "Form",
+        label: "Form",
+        isActive: true,
+        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+    },
+    getFormulaViewModeEntry("member",{name:"Input Code",label:"Layout Code",argList:"admin"}),
+    getPrivateViewModeEntry("member",{name:"Input Private",label:"Layout Private"}),
+];
 
 DynamicFormView.componentName = "apogeeapp.ActionFormCell";
 DynamicFormView.hasTabEntry = false;

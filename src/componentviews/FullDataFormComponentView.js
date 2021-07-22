@@ -1,10 +1,9 @@
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -12,63 +11,13 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
  * confugred with initialization data from the model. */
 export default class FullDataFormComponentView extends ComponentView {
 
-    constructor(appViewInterface,component) {
-        super(appViewInterface,component);
-    };
-
     //==============================
     // Protected and Private Instance Methods
     //==============================
 
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return FullDataFormComponentView.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-            
-            case FullDataFormComponentView.VIEW_FORM:
-                var dataDisplaySource = this.getOutputDataDisplaySource();
-                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-
-            case FullDataFormComponentView.VIEW_LAYOUT_CODE:
-                dataDisplaySource = this.getLayoutDataDisplaySource(app);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case FullDataFormComponentView.VIEW_INPUT_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.input");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case FullDataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.input");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-
-            case FullDataFormComponentView.VIEW_VALIDATOR_CODE:
-                dataDisplaySource = this.getValidatorDataDisplaySource(app);
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-
-            case FullDataFormComponentView.VIEW_FORM_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.value");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
-            case ComponentView.VIEW_ERROR: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
-                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
-                
-            default:
-    //temporary error handling...
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
+    getFormViewDisplay(displayContainer) {
+        let dataDisplaySource = this.getOutputDataDisplaySource();
+        return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
     }
 
     getOutputDataDisplaySource() {
@@ -164,146 +113,29 @@ export default class FullDataFormComponentView extends ComponentView {
         }
     }
 
-    getLayoutDataDisplaySource(app) {
-        return {
-
-            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isFieldUpdated("layoutCode");
-                let reloadDataDisplay = false;
-                return {reloadData,reloadDataDisplay};
-            },
-
-            getData: () => {
-                return this.getComponent().getField("layoutCode");
-            },
-
-            getEditOk: () => {
-                return true;
-            },
-
-            saveData: (targetLayoutCode) => {
-                let component = this.getComponent();
-
-                var command = {};
-                command.type = "updateComponentField";
-                command.memberId = component.getMemberId();
-                command.fieldName = "layoutCode";
-                command.initialValue = component.getField("layoutCode");
-                command.targetValue = targetLayoutCode;
-
-                app.executeCommand(command);
-                return true; 
-            }
-
-        }
-    }
-
-    getValidatorDataDisplaySource(app) {
-        return {
-
-            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isFieldUpdated("validatorCode");
-                let reloadDataDisplay = false;
-                return {reloadData,reloadDataDisplay};
-            },
-
-            getData: () => {
-                return this.getComponent().getField("validatorCode");
-            },
-
-            getEditOk: () => {
-                return true;
-            },
-
-            saveData: (validatorCode) => {
-                let component = this.getComponent();
-
-                var command = {};
-                command.type = "updateComponentField";
-                command.memberId = component.getMemberId();
-                command.fieldName = "validatorCode";
-                command.initialValue = component.getField("validatorCode");
-                command.targetValue = validatorCode;
-
-                app.executeCommand(command);
-                return true; 
-            }
-
-        }
-    }
 }
 
-FullDataFormComponentView.VIEW_FORM = "form";
-FullDataFormComponentView.VIEW_LAYOUT_CODE = "layout";
-FullDataFormComponentView.VIEW_INPUT_CODE = "input";
-FullDataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE = "inputPrivate";
-FullDataFormComponentView.VIEW_VALIDATOR_CODE = "validator";
-FullDataFormComponentView.VIEW_FORM_VALUE = "value";
+//======================================
+// This is the control generator, to register the control
+//======================================
 
 FullDataFormComponentView.VIEW_MODES = [
-    ComponentView.VIEW_ERROR_MODE_ENTRY,
+    getErrorViewModeEntry(),
     {
         name: FullDataFormComponentView.VIEW_FORM,
         label: "Form",
         sourceLayer: "model",
         sourceType: "data",
         suffix: ".value", 
-        isActive: true
-    },
-    {
-        name: FullDataFormComponentView.VIEW_LAYOUT_CODE,
-        label: "Layout Code",
-        sourceLayer: "app",
-        sourceType: "function", 
-        argList: "commandMessenger,inputData",
         isActive: true,
-        //description: "This is a test of the description!"
+        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
     },
-    {
-        name: FullDataFormComponentView.VIEW_VALIDATOR_CODE,
-        label: "Validator Code",
-        sourceLayer: "app",
-        sourceType: "function", 
-        argList: "formValue,inputData",
-        isActive: false
-    },
-    {
-        name: FullDataFormComponentView.VIEW_INPUT_CODE,
-        label: "Input Data Code",
-        sourceLayer: "model",
-        sourceType: "function", 
-        suffix: ".input",
-        isActive: false
-    },
-    {
-        name: FullDataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE,
-        label: "Input Data Private",
-        sourceLayer: "model", 
-        sourceType: "private code",
-        suffix: ".input",
-        isActive: false
-    },
-    {
-        name: FullDataFormComponentView.VIEW_FORM_VALUE,
-        label: "Value",
-        sourceLayer: "model",
-        sourceType: "data",
-        suffix: ".value", 
-        isActive: false
-    }
+    getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
+    getAppCodeViewModeEntry("validatorCode","validator","Validator Code",{argList:"formValue,inputData"}),
+    getFormulaViewModeEntry("member.input",{name: "input", label:"Input Data Code"}),
+    getPrivateViewModeEntry("member.input",{name: "inputPrivate", label:"Input Data Private"}),
+    getMemberDataTextViewModeEntry("member.value")
 ];
-
-FullDataFormComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": FullDataFormComponentView.VIEW_MODES
-}
-
-//======================================
-// This is the control generator, to register the control
-//======================================
 
 FullDataFormComponentView.componentName = "apogeeapp.FullDataFormCell";
 FullDataFormComponentView.hasTabEntry = false;
