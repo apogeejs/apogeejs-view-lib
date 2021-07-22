@@ -103,10 +103,17 @@ export default class FormInputBaseComponentView extends ComponentView {
 
 }
 
-//This is the standard formview mode info
-FormInputBaseComponentView.VIEW_INPUT = "Input"
 
-FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG = {name: FormInputBaseComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
+FormInputBaseComponentView.VIEW_INPUT = "Input";
+
+//This is the standard formview mode info
+FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG = {
+    name: FormInputBaseComponentView.VIEW_INPUT,
+    label: "Configuration",
+    isActive: true,
+    getDataDisplay: (componentView,displayContainer) => componentView.getFormDataDisplay(displayContainer)
+}
+
 //legacy name update - old name
 FormInputBaseComponentView.INPUT_VIEW_MODE_INFO = FormInputBaseComponentView.INPUT_VIEW_MODE_CONFIG;
 

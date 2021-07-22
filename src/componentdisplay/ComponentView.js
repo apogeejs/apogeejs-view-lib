@@ -5,6 +5,9 @@ import {updateComponentProperties} from "/apogeejs-view-lib/src/commandseq/updat
 import {deleteComponent} from "/apogeejs-view-lib/src/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeejs-view-lib/src/componentdisplay/TreeComponentDisplay.js";
 
+//here for legacy support
+import {getErrorViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+
 /** This is the base functionality for a component. */
 export default class ComponentView {
 
@@ -160,6 +163,41 @@ export default class ComponentView {
     /** This method is called when the workspace is closing */
     closeWorkspace() {
         this.onDelete();
+    }
+
+    getViewModeEntries() {
+        return this.constructor.VIEW_MODES;
+
+        //legacy note: There is some small chance there are legacy modules out there
+        //that don't have this static field. The official API only had the "getTableEditSettings"
+        //instance method. But the official API was never really documented before version 2 and was
+        //only in my head. If anyone even made their cown components they hopefully followed the pattern
+        //I had used. 
+    }
+
+    /**  This method retrieves the table edit settings for this component instance
+     * @deprecated */
+    getTableEditSettings() {
+        return {
+            viewModes: this.getViewModeEntries()
+        };
+    }
+
+    /** This method should be implemented to retrieve a data display for the given view. 
+     * @protected. */
+    getDataDisplay(displayContainer,viewType) {
+        if(!this.constructor.VIEW_MODES) {
+            console.error("View Modes static field missing for class " + typeof this);
+            return null;
+        }
+
+        let viewModeInfo = this.constructor.VIEW_MODES.find(viewModeInfo => viewModeInfo.name == viewType);
+        if(!viewModeInfo) {
+            console.error("unrecognized view element: " + viewType);
+            return null;
+        }
+
+        return viewModeInfo.getDataDisplay(this,displayContainer);
     }
 
     //-----------------------------------
@@ -682,11 +720,12 @@ ComponentView.DEFAULT_PAGE_ICON = "/icons3/pageIcon.png";
 
 ComponentView.MENU_ITEM_OPEN = 0x01;
 
-/** this is the name for the info data view, a standard data view for components. */
-ComponentView.VIEW_ERROR = "Info";
-//legacy name - kept for back compatibility
-ComponentView.VIEW_INFO = "Info";
-
-ComponentView.VIEW_ERROR_MODE_ENTRY = {name: ComponentView.VIEW_ERROR, label: "Error Info", isActive: true, isTransient: true, isInfoView: true}
+////////////////////////////////////////////////////
 //legacy variable name - kept for back compatibility
-ComponentView.VIEW_INFO_MODE_ENTRY = ComponentView.VIEW_ERROR_MODE_ENTRY
+ComponentView.VIEW_ERROR = "Info";
+ComponentView.VIEW_INFO = "Info";
+ComponentView.VIEW_ERROR_MODE_ENTRY = getErrorViewModeEntry();
+ComponentView.VIEW_INFO_MODE_ENTRY = ComponentView.VIEW_ERROR_MODE_ENTRY;
+/////////////////////////////////////////////////////
+
+                

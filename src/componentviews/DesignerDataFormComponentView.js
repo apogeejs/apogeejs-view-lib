@@ -1,8 +1,7 @@
 //These are in lieue of the import statements
 import FormInputBaseComponentView from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
-import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import {getAppCodeViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
@@ -12,50 +11,9 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
  * for how to set the data. */
 export default class DesignerDataFormComponentView extends FormInputBaseComponentView {
 
-    constructor(appViewInterface,component) {
-        super(appViewInterface,component);
-    };
-
     //=================================
     // Implementation Methods
     //=================================
-
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-     getTableEditSettings() {
-        return DesignerDataFormComponentView.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        let dataDisplaySource;
-        switch(viewType) {
-
-            case DesignerDataFormComponentView.VIEW_FORM:
-                dataDisplaySource = this._getOutputFormDataSource();
-                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-
-            case FormInputBaseComponentView.VIEW_INPUT:
-                return this.getFormDataDisplay(displayContainer);
-
-            case FormInputBaseComponentView.VIEW_ERROR: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
-                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
-
-            case DesignerDataFormComponentView.VIEW_ON_SAVE_CODE:
-                dataDisplaySource = this.getValidatorDataDisplaySource(this.getApp());
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-
-            case DesignerDataFormComponentView.VIEW_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(this.getApp(),this,"member.value");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
-            default:
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
-    }
 
     /** This method returns the form layout.
      * @protected. */
@@ -65,6 +23,11 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
             "submit": false
         }
         return ConfigurablePanel.getFormDesignerLayout(flags);
+    }
+
+    getFormViewDataDisplay(displayContainer) {
+        let dataDisplaySource = this._getOutputFormDataSource();
+        return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
     }
 
     //==========================
@@ -148,87 +111,27 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
             }
         }
     }
-
-    getValidatorDataDisplaySource(app) {
-        return {
-
-            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isFieldUpdated("validatorCode");
-                let reloadDataDisplay = false;
-                return {reloadData,reloadDataDisplay};
-            },
-
-            getData: () => {
-                return this.getComponent().getField("validatorCode");
-            },
-
-            getEditOk: () => {
-                return true;
-            },
-
-            saveData: (targetLayoutCode) => {
-                let component = this.getComponent();
-
-                var command = {};
-                command.type = "updateComponentField";
-                command.memberId = component.getMemberId();
-                command.fieldName = "validatorCode";
-                command.initialValue = component.getField("validatorCode");
-                command.targetValue = targetLayoutCode;
-
-                app.executeCommand(command);
-                return true; 
-            }
-
-        }
-    }
-
 }
-
-//======================================
-// Static properties
-//======================================
-
 
 //===================================
 // View Definitions Constants (referenced internally)
-//==================================
-
-DesignerDataFormComponentView.VIEW_FORM = "Form";
-DesignerDataFormComponentView.VIEW_VALUE = "Value";
-DesignerDataFormComponentView.VIEW_ON_SAVE_CODE = "On Save"
+//==========================
 
 DesignerDataFormComponentView.VIEW_MODES = [
     {
-        name: DesignerDataFormComponentView.VIEW_FORM,
-        label: "Form",
-        isActive: true
+        name: "Form",
+        label: "Form", 
+        isActive: true,
+        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
     },
     FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-    {
-        name: DesignerDataFormComponentView.VIEW_ON_SAVE_CODE,
-        label: "isValid",
-        sourceLayer: "app",
-        sourceType: "function", 
-        argList: "formValue,formLayout",
-        isActive: false
-    },
-    {
-        name: DesignerDataFormComponentView.VIEW_VALUE,
-        label: "Value",
-        sourceLayer: "model",
-        sourceType: "data",
-        suffix: ".value", 
-        isActive: false
-    }
+    getAppCodeViewModeEntry("validatorCode","On Save","isValid",{argList: "formValue,formLayout"}),
+    getMemberDataTextViewModeEntry("member.value")
 ];
 
 DesignerDataFormComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": DesignerDataFormComponentView.VIEW_MODES
 }
-
 
 //===============================
 // Required External Settings

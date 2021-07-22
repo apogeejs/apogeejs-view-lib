@@ -1,9 +1,7 @@
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
-import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 import HtmlJsDataDisplay from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 /** This is a custom resource component. 
@@ -47,57 +45,11 @@ export default class CustomComponentView extends ComponentView {
         super.onDelete();
     }
 
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return CustomComponentView.TABLE_EDIT_SETTINGS;
-    }
 
-    /** This method should be implemented to retrieve a data display of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-            
-            case CustomComponentView.VIEW_OUTPUT:
-                displayContainer.setDestroyViewOnInactive(this.getComponent().getField("destroyOnInactive"));
-                var dataDisplaySource = this.getOutputDataDisplaySource();
-                var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
-                return dataDisplay;
-                
-            case CustomComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case CustomComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-            
-            case CustomComponentView.VIEW_HTML:
-                dataDisplaySource = this.getUiDataDisplaySource("html");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/html",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-        
-            case CustomComponentView.VIEW_CSS:
-                dataDisplaySource = this.getUiDataDisplaySource("css");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/css",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            case CustomComponentView.VIEW_UI_CODE:
-                dataDisplaySource = this.getUiDataDisplaySource("uiCode");
-                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-
-            case ComponentView.VIEW_ERROR: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
-                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
-                
-            default:
-    //temporary error handling...
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
+    getOutputDataDisplay(displayContainer) {
+        displayContainer.setDestroyViewOnInactive(this.getComponent().getField("destroyOnInactive"));
+        var dataDisplaySource = this.getOutputDataDisplaySource();
+        return new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
     }
 
     getOutputDataDisplaySource() {
@@ -135,99 +87,6 @@ export default class CustomComponentView extends ComponentView {
             }
         }
     }
-
-    /** This method returns the data dispklay data source for the code field data displays. */
-    getUiDataDisplaySource(codeFieldName) {
-
-        return {
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isFieldUpdated(codeFieldName);
-                let reloadDataDisplay = false;
-                return {reloadData,reloadDataDisplay};
-            },
-
-            getData: () => {
-                let codeField = this.getComponent().getField(codeFieldName);
-                if((codeField === undefined)||(codeField === null)) codeField = "";
-                return codeField;
-            },
-
-            getEditOk: () => {
-                return true;
-            },
-            
-            saveData: (text) => {
-                let app = this.getApp();
-
-                var initialValue = this.getComponent().getField(codeFieldName);
-                var command = {};
-                command.type = "updateComponentField";
-                command.memberId = this.getMemberId();
-                command.fieldName = codeFieldName;
-                command.initialValue = initialValue;
-                command.targetValue = text;
-
-                app.executeCommand(command);
-                return true; 
-            }
-        }
-    }
-}
-
-CustomComponentView.VIEW_OUTPUT = "Display";
-CustomComponentView.VIEW_CODE = "Input Code";
-CustomComponentView.VIEW_SUPPLEMENTAL_CODE = "Input Private";
-CustomComponentView.VIEW_HTML = "HTML";
-CustomComponentView.VIEW_CSS = "CSS";
-CustomComponentView.VIEW_UI_CODE = "uiGenerator()";
-
-CustomComponentView.VIEW_MODES = [
-    ComponentView.VIEW_ERROR_MODE_ENTRY,
-    {
-        name: CustomComponentView.VIEW_OUTPUT, 
-        label: "Display", 
-        isActive: true
-    },
-    {
-        name: CustomComponentView.VIEW_HTML, 
-        label: "HTML",
-        sourceLayer: "app",
-        sourceType: "data",
-        isActive: false
-    },
-    {
-        name: CustomComponentView.VIEW_CSS, 
-        label: "CSS", 
-        sourceLayer: "app",
-        sourceType: "data",
-        isActive: false
-    },
-    {
-        name: CustomComponentView.VIEW_UI_CODE, 
-        label: "UI Generator", 
-        sourceLayer: "app",
-        sourceType: "function",
-        isActive: false
-    },
-    {
-        name: CustomComponentView.VIEW_CODE, 
-        label: "Input Code", 
-        sourceLayer: "model",
-        sourceType: "function",
-        isActive: false
-    },
-    {
-        name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE,
-        label: "Input Private",
-        sourceLayer: "model", 
-        sourceType: "private code", 
-        isActive: false
-    },
-];
-
-CustomComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomComponentView.VIEW_MODES
 }
 
 /** This is the format string to create the code body for updateing the member
@@ -245,13 +104,25 @@ CustomComponentView.GENERATOR_FUNCTION_FORMAT_TEXT = [
     "return resourceFunction;",
     ""
        ].join("\n");
-    
-    
-
 
 //======================================
 // This is the control generator, to register the control
 //======================================
+
+CustomComponentView.VIEW_MODES = [
+    getErrorViewModeEntry(),
+    {
+        name: "Display", 
+        label: "Display", 
+        isActive: true,
+        getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
+    },
+    getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
+    getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
+    getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
+    getFormulaViewModeEntry("member","Input Code","Input Code"),
+    getPrivateViewModeEntry("member","Input Private","Input Private")  
+];
 
 CustomComponentView.componentName = "apogeeapp.CustomCell";
 CustomComponentView.hasTabEntry = false;
