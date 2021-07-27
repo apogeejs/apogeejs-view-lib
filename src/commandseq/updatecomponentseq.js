@@ -20,23 +20,38 @@ export function updateComponentProperties(componentView) {
     var displayName = componentClass.getClassDisplayName();
     var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
-    var initialValues = component.getPropertyValues(modelManager.getModel()); 
+    var initialPropertyValues = component.getPropertyValues(modelManager.getModel()); 
+    var initialFormValues;
+    if(componentViewClass.propertyToFormValues) {
+        initialFormValues = componentViewClass.propertyToFormValues(initialPropertyValues);
+    }
+    else {
+        initialFormValues = initialPropertyValues;
+    }
 
     // add the folders to which we can move this (it can move to root only if it is a parent)
     let includeRootFolder = componentViewClass.hasTabEntry;
     var parentList = modelManager.getParentList(includeRootFolder);
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,false,initialValues);
+    var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,false,initialFormValues);
 
     //create on submit callback
     var onSubmitFunction = function(submittedValues) {
+
+        let resultPropertyValues;
+        if(componentViewClass.formToPropertyValues) {
+            resultPropertyValues = componentViewClass.formToPropertyValues(submittedValues);
+        }
+        else {
+            resultPropertyValues = submittedValues;
+        }
         
         //get the changed values
-        var newValues = {};
-        for(var key in initialValues) {
-            if(initialValues[key] !== submittedValues[key]) {
-                newValues[key] = submittedValues[key];
+        var newPropertyValues = {};
+        for(var key in initialFormValues) {
+            if(!_.isEqual(initialFormValues[key],resultPropertyValues[key])) {
+                newPropertyValues[key] = resultPropertyValues[key];
             }
         }
         
@@ -50,13 +65,13 @@ export function updateComponentProperties(componentView) {
         
         var memberUpdateJson = {};
         if(componentClass.transferMemberProperties) {
-            componentClass.transferMemberProperties(newValues,memberUpdateJson);
+            componentClass.transferMemberProperties(newPropertyValues,memberUpdateJson);
         }
         var numMemberProps = apogeeutil.jsonObjectLength(memberUpdateJson);
         
         var componentUpdateJson = {};
         if(componentClass.transferComponentProperties) {
-            componentClass.transferComponentProperties(newValues,componentUpdateJson);
+            componentClass.transferComponentProperties(newPropertyValues,componentUpdateJson);
         }
         var numComponentProps = apogeeutil.jsonObjectLength(componentUpdateJson);
         
@@ -73,11 +88,11 @@ export function updateComponentProperties(componentView) {
         // Move
         //--------------
         
-        if((newValues.name)||(newValues.parentId)) {
+        if((newPropertyValues.name)||(newPropertyValues.parentId)) {
             
             //validate the name
-            if(newValues.name) {
-                var nameResult = validateTableName(newValues.name);
+            if(newPropertyValues.name) {
+                var nameResult = validateTableName(newPropertyValues.name);
                 if(!nameResult.valid) {
                     apogeeUserAlert(nameResult.errorMessage);
                     return false;
@@ -101,7 +116,7 @@ export function updateComponentProperties(componentView) {
                     if(oldParentComponent) {
                         let oldParentComponentView = appViewInterface.getComponentViewByComponentId(oldParentComponent.getId());
 
-                        if(newValues.parentId) {
+                        if(newPropertyValues.parentId) {
                             //----------------------------
                             //move case
                             //delete old node
@@ -109,12 +124,12 @@ export function updateComponentProperties(componentView) {
                             let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
                             commands.push(oldParentEditorCommand);
                         }
-                        else if(newValues.name) {
+                        else if(newPropertyValues.name) {
                             //---------------------------
                             //rename case
                             //get the rename editr comamnds, then apply the one to clear the component node name
                             //----------------------------
-                            renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newValues.name);
+                            renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newPropertyValues.name);
                             commands.push(renameEditorCommands.setupCommand);
                         }
                     }
@@ -126,7 +141,7 @@ export function updateComponentProperties(componentView) {
             moveCommand.type = "moveComponent";
             moveCommand.memberId = component.getMemberId();
             moveCommand.newMemberName = submittedValues.name;
-            moveCommand.newParentId = newValues.parentId;
+            moveCommand.newParentId = newPropertyValues.parentId;
             commands.push(moveCommand);
 
             //do the second stage of editor commands
@@ -136,8 +151,8 @@ export function updateComponentProperties(componentView) {
                 // move case
                 // add the compone nodes to the new page after the component has been moved there
                 //----------------------------------------------
-                if(newValues.parentId) {
-                    let newParentComponentId = modelManager.getComponentIdByMemberId(newValues.parentId);
+                if(newPropertyValues.parentId) {
+                    let newParentComponentId = modelManager.getComponentIdByMemberId(newPropertyValues.parentId);
                     //there will be no component id if we are putting this in the root folder
                     if(newParentComponentId) {
                         let appViewInterface = componentView.getAppViewInterface();
@@ -145,7 +160,7 @@ export function updateComponentProperties(componentView) {
                             let newParentComponentView = appViewInterface.getComponentViewByComponentId(newParentComponentId);
 
                             if(newParentComponentView) {
-                                let newName = newValues.name ? newValues.name : oldName;
+                                let newName = newPropertyValues.name ? newPropertyValues.name : oldName;
 
                                 //insert node add at end of new page
                                 let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
@@ -253,7 +268,7 @@ function returnToEditor(componentView) {
 
 //this is for a create or update dialog
 //omit folder names (null) and folder initial value to omit the parent selection
-export function getPropertiesDialogLayout(displayName,folderNames,additionalLines,doCreate,initialValues) { 
+export function getPropertiesDialogLayout(displayName,folderNames,additionalLines,doCreate,initialFormValues) { 
     
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
@@ -311,11 +326,11 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     // lines.push(submitLine);
     
     //set the initial values
-    if(initialValues) {
+    if(initialFormValues) {
         for(var i = 0; i < lines.length; i++) {
             var line = lines[i];
-            if((line.key)&&(initialValues[line.key] !== undefined)) {
-                line.value = initialValues[line.key];
+            if((line.key)&&(initialFormValues[line.key] !== undefined)) {
+                line.value = initialFormValues[line.key];
             }
         }
     }

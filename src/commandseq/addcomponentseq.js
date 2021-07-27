@@ -12,11 +12,8 @@ import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js
 //=====================================
 
 /** This functions initiates the add component action. It will create a dialog for the user to enter the relevent 
- * properties, with the values optionalInitialProperties preset. The created componenent will also use the 
- * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
- * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
-//piggybackCommand is a temporary test!!!
-export function addComponent(appViewInterface,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+ * properties, with the values optionalInitialProperties preset.  */   
+export function addComponent(appViewInterface,app,componentClass,optionalInitialProperties) {
 
         let componentViewClass = getComponentViewClass(componentClass.getClassUniqueName());
 
@@ -53,7 +50,15 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
         
         
         //create on submit callback
-        var onSubmitFunction = function(userInputProperties) {
+        var onSubmitFunction = function(userInputFormValues) {
+
+            let userInputProperties;
+            if(componentViewClass.formToPropertyValues) {
+                userInputProperties = componentViewClass.formToPropertyValues(userInputFormValues);
+            }
+            else {
+                userInputProperties = userInputFormValues;
+            }
             
             //validate the name
             var nameResult = validateTableName(userInputProperties.name);
@@ -75,8 +80,8 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
             let createCommandData = {};
             createCommandData.type = "addComponent";
             createCommandData.parentId = parentMemberId;
-            createCommandData.memberJson = Component.createMemberJson(componentClass,userInputProperties,optionalBaseMemberValues);
-            createCommandData.componentJson = Component.createComponentJson(componentClass,userInputProperties,optionalBaseComponentValues);
+            createCommandData.memberJson = Component.createMemberJson(componentClass,userInputProperties);
+            createCommandData.componentJson = Component.createComponentJson(componentClass,userInputProperties);
 
             //editor related commands
             let additionalCommandInfo;
@@ -166,12 +171,12 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-export function addAdditionalComponent(appViewInterface,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addAdditionalComponent(appViewInterface,app,optionalInitialProperties) {
         
     var onSelect = function(componentUniqueName) {
         let componentClass = componentInfo.getComponentClass(componentUniqueName);
         if(componentClass) {
-            addComponent(appViewInterface,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+            addComponent(appViewInterface,app,componentClass,optionalInitialProperties);
         }
         else {
             apogeeUserAlert("Unknown component type: " + componentType);

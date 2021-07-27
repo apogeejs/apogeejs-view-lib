@@ -114,9 +114,9 @@ JsonTableComponentView.propertyDialogLines = [
         "type":"dropdown",
         "label":"Data Display Format: ",
         "entries":[
-            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.COLORIZED_DATA_VEW] , JsonTableComponentView.COLORIZED_DATA_VEW ],
-            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.TEXT_DATA_VEW] , JsonTableComponentView.TEXT_DATA_VEW ],
-            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.GRID_DATA_VEW] , JsonTableComponentView.GRID_DATA_VEW ]
+            [ VIEW_DISPLAY_NAMES[COLORIZED_DATA_VEW] , COLORIZED_DATA_VEW ],
+            [ VIEW_DISPLAY_NAMES[TEXT_DATA_VEW] , TEXT_DATA_VEW ],
+            [ VIEW_DISPLAY_NAMES[GRID_DATA_VEW] , GRID_DATA_VEW ]
         ],
         "key":"dataView"
     }
