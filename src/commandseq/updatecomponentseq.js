@@ -18,15 +18,75 @@ export function updateComponentProperties(componentView) {
     var componentViewClass = componentView.constructor;
 
     var displayName = componentClass.getClassDisplayName();
-    var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
-    var initialPropertyValues = component.getPropertyValues(modelManager.getModel()); 
-    var initialFormValues;
-    if(componentViewClass.propertyToFormValues) {
-        initialFormValues = componentViewClass.propertyToFormValues(initialPropertyValues);
+    //////////////////////////////////////////////
+    const __getBasePropertyValues__ = () => {
+        let basePropertyValues = {};
+        let member = this.getField("member");
+        basePropertyValues.name = member.getName();
+        basePropertyValues.parentId = member.getParentId();
+        return basePropertyValues;
     }
-    else {
-        initialFormValues = initialPropertyValues;
+    const __getDialogValue__ = entry => {
+        //POPULATE THIS!!!
+        //This reads a property value from the given component/member and
+        //converts it to a form value.
+        if((!childName)||(childName == ".")) return component;
+        let propertyComponent = __getPropertyComponent__(this,entry.component);
+
+        let propertyValue;
+        if(entry.member !== undefined) {
+            let propertyMember = __getChildMember__(propertyComponent,entry.member);
+            if(propertyMember) {
+                propertyValue = propertyMember.getField(enry.propertyKey);
+            }
+            else {
+                return undefined;
+            }
+        }
+        else {
+            propertyValue = propertyComponent.getField(entry.propertyKey);
+        }
+
+        if(entry.propertyToForm) {
+            return entry.propertyToForm(propertyValue);
+        }
+        else {
+            return propertyValue;
+        }
+
+    }
+    //for now only 1 generation of children is allowed! so "component" = componentPath = componentName!!!
+    const __getPropertyComponent__ = (componentView,componentPath) => {
+        let localComponent = componentView.getComponent();
+        if((!childName)||(childName == ".")) return localComponent;
+        else return __getChildComponent__(localComponent,componentPath);
+    }
+    const __getChildComponent__ = (component,childName) => {
+        if(!component.getParentFolderForChildren) return null;
+
+        let folderMember = component.getParentFolderForChildren();
+        let childMemberId = folderMember.lookupChildIs(childName);
+        let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+        return modelManager.getComponentByComponentId(childComponentId);
+    }
+    const __getChildMember__ = (component,childPath) => {
+        if(childPath == ".") {
+            return component.getMember();
+        }
+        else {
+            let childFieldName = "member." + childPath;
+            return component.getField(childFieldName);
+        }
+    }
+    ///////////////////////////////////////////////////
+    var additionalLines = [];
+    var initialFormValues = __getBasePropertyValues__();
+    if(componentViewClass.propertyDialogEntries) {
+        componentViewClass.propertyDialogEntries.forEach(entry => {
+            additionalLines.push(apogeeutil.jsonCopy(entry.dialogElement));
+            initialFormValues.entry.dialogElement.key = __getDialogValue__(entry);
+        }); 
     }
 
     // add the folders to which we can move this (it can move to root only if it is a parent)
@@ -37,21 +97,13 @@ export function updateComponentProperties(componentView) {
     var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,false,initialFormValues);
 
     //create on submit callback
-    var onSubmitFunction = function(submittedValues) {
-
-        let resultPropertyValues;
-        if(componentViewClass.formToPropertyValues) {
-            resultPropertyValues = componentViewClass.formToPropertyValues(submittedValues);
-        }
-        else {
-            resultPropertyValues = submittedValues;
-        }
+    var onSubmitFunction = function(submittedFormValues) {
         
         //get the changed values
-        var newPropertyValues = {};
+        var newFormValues = {};
         for(var key in initialFormValues) {
-            if(!_.isEqual(initialFormValues[key],resultPropertyValues[key])) {
-                newPropertyValues[key] = resultPropertyValues[key];
+            if(!_.isEqual(initialFormValues[key],resultFormValues[key])) {
+                newFormValues[key] = resultFormValues[key];
             }
         }
         
@@ -62,37 +114,93 @@ export function updateComponentProperties(componentView) {
         //--------------
         // Update Properties
         //--------------
-        
-        var memberUpdateJson = {};
-        if(componentClass.transferMemberProperties) {
-            componentClass.transferMemberProperties(newPropertyValues,memberUpdateJson);
+
+        ////////////////////////////////////
+        //procee newFormValues to give property json
+        const __getUpdateJsons__ = (dialogEntries,newFormValues) => {
+            let memberUpdateJson, componentUpdateJson;
+
+            if(dialogEntries) {
+                dialogEntries.forEach(entry => {
+                    let formValue = newFormValues[entry.dialogElement.key];
+                    if(formValue !== undefined) {
+                        let propertyValue = entry.formToProperty ? entry.formToProperty(formValue) : formValue;
+
+                        if(entry.member !== undefined) {
+                            let memberJson = __lookupSinglePropertyJson__(memberUpdateJson,entry.member);
+                            memberJson[entry.propertyKey] = propertyValue;
+
+                            if(!memberUpdateJson) memberUpdateJson = memberJson;
+                         }
+                        else {
+                            let memberJson = __lookupSinglePropertyJson__(componentUpdateJson,entry.component);
+                            memberJson[entry.propertyKey] = propertyValue;
+
+                            if(!componentUpdateJson) componentUpdateJson = memberJson;
+                        }
+                    }
+                })
+            }
+
+            return {memberUpdateJson, componentUpdateJson};
         }
-        var numMemberProps = apogeeutil.jsonObjectLength(memberUpdateJson);
-        
-        var componentUpdateJson = {};
-        if(componentClass.transferComponentProperties) {
-            componentClass.transferComponentProperties(newPropertyValues,componentUpdateJson);
+        const __lookupSinglePropertyJson__ = (propertyJson,path) => {
+            if(!propertyJson) propertyJson = {};
+            if((!path)||(path == ".")) {
+                return propertyJson;
+            }
+            else {
+                let pathArray = path.split(".");
+                return __getPathJson__(propertyJson,pathArray,0);
+            }
+
         }
-        var numComponentProps = apogeeutil.jsonObjectLength(componentUpdateJson);
-        
-        if((numMemberProps > 0)||(numComponentProps > 0)) {
-            let updateCommand = {};
-            updateCommand.type = "updateComponentProperties";
-            updateCommand.memberId = component.getMemberId();
-            if(numMemberProps > 0) updateCommand.updatedMemberProperties = memberUpdateJson;
-            if(numComponentProps > 0) updateCommand.updatedComponentProperties = componentUpdateJson;
-            commands.push(updateCommand)
+        const __getPathJson__ = (parentJson,pathArray,startFrom) => {
+            if((startFrom >= pathArray.length)||(startFrom < 0)) {
+                throw new Error("Unexpected path for property entry!");
+            }
+            let childJson = __getChildJson__(parentJson,pathArray[startFrom]);
+            if(startFrom == pathArray.length - 1) {
+                return childJson;
+            }
+            return __getPathJson__(childJson,pathArray,startFrom+1);
+        }
+        const __getChildJson__ = (json,childName) => {
+            let childJson;
+            if(!json.children) {
+                json.children = [];
+            }
+            else {
+                childJson = json.children.find(entry => entry.name == childName);
+            }
+            if(!childJson) {
+                childJson = {name:childName};
+            }
+            return childJson;
+        }
+        /////////////////////////////////////////
+
+        if(componentViewClass.propertyDialogEntries) {
+            let {memberUpdateJson, componentUpdateJson} = __getUpdateJsons__(componentViewClass.propertyDialogEntries,newFormValues);
+            if((memberUpdateJson)||(componentUpdateJson)) {
+                let updateCommand = {};
+                updateCommand.type = "updateComponentProperties";
+                updateCommand.memberId = component.getMemberId();
+                updateCommand.updatedMemberProperties = memberUpdateJson;
+                updateCommand.updatedComponentProperties = componentUpdateJson;
+                commands.push(updateCommand)
+            }
         }
         
         //--------------
         // Move
         //--------------
         
-        if((newPropertyValues.name)||(newPropertyValues.parentId)) {
+        if((newFormValues.name)||(newFormValues.parentId)) {
             
             //validate the name
-            if(newPropertyValues.name) {
-                var nameResult = validateTableName(newPropertyValues.name);
+            if(newFormValues.name) {
+                var nameResult = validateTableName(newFormValues.name);
                 if(!nameResult.valid) {
                     apogeeUserAlert(nameResult.errorMessage);
                     return false;
@@ -116,7 +224,7 @@ export function updateComponentProperties(componentView) {
                     if(oldParentComponent) {
                         let oldParentComponentView = appViewInterface.getComponentViewByComponentId(oldParentComponent.getId());
 
-                        if(newPropertyValues.parentId) {
+                        if(newFormValues.parentId) {
                             //----------------------------
                             //move case
                             //delete old node
@@ -124,12 +232,12 @@ export function updateComponentProperties(componentView) {
                             let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
                             commands.push(oldParentEditorCommand);
                         }
-                        else if(newPropertyValues.name) {
+                        else if(newFormValues.name) {
                             //---------------------------
                             //rename case
                             //get the rename editr comamnds, then apply the one to clear the component node name
                             //----------------------------
-                            renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newPropertyValues.name);
+                            renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newFormValues.name);
                             commands.push(renameEditorCommands.setupCommand);
                         }
                     }
@@ -140,8 +248,8 @@ export function updateComponentProperties(componentView) {
             let moveCommand = {};
             moveCommand.type = "moveComponent";
             moveCommand.memberId = component.getMemberId();
-            moveCommand.newMemberName = submittedValues.name;
-            moveCommand.newParentId = newPropertyValues.parentId;
+            moveCommand.newMemberName = submittedFormValues.name;
+            moveCommand.newParentId = newFormValues.parentId;
             commands.push(moveCommand);
 
             //do the second stage of editor commands
@@ -151,8 +259,8 @@ export function updateComponentProperties(componentView) {
                 // move case
                 // add the compone nodes to the new page after the component has been moved there
                 //----------------------------------------------
-                if(newPropertyValues.parentId) {
-                    let newParentComponentId = modelManager.getComponentIdByMemberId(newPropertyValues.parentId);
+                if(newFormValues.parentId) {
+                    let newParentComponentId = modelManager.getComponentIdByMemberId(newFormValues.parentId);
                     //there will be no component id if we are putting this in the root folder
                     if(newParentComponentId) {
                         let appViewInterface = componentView.getAppViewInterface();
@@ -160,7 +268,7 @@ export function updateComponentProperties(componentView) {
                             let newParentComponentView = appViewInterface.getComponentViewByComponentId(newParentComponentId);
 
                             if(newParentComponentView) {
-                                let newName = newPropertyValues.name ? newPropertyValues.name : oldName;
+                                let newName = newFormValues.name ? newFormValues.name : oldName;
 
                                 //insert node add at end of new page
                                 let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
@@ -226,13 +334,13 @@ export function updateComponentProperties(componentView) {
                 app.executeCommand(command);
             }
 
-            returnToEditor(componentView,submittedValues.name);
+            returnToEditor(componentView,submittedFormValues.name);
         }
 
         if(commandsDeleteComponent) {
             //if there is a delete, verify the user wants to do this
             let cancelAction = () => {
-                returnToEditor(componentView,submittedValues.name);
+                returnToEditor(componentView,submittedFormValues.name);
             };
             apogeeUserConfirm(deleteMsg,"Delete","Cancel",doAction,cancelAction);
         }
