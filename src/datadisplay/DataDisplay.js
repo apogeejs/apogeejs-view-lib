@@ -30,17 +30,20 @@ export default class DataDisplay {
         this.useContainerHeightUi = false;
     }
 
-    /** This method updates the internal component instance and also returns
-     * true if the data display needs to be refreshed. */
+    /** This method returns {reloadDataDisplay, reloadData}, indicating if the data display or the data need to be updated. */
     doUpdate() {
         if(this.dataSource) {
             return this.dataSource.doUpdate();
         }
         else {
-            return false;
+            return {
+                    reloadData: false,
+                    reloadDataDisplay: false
+                };
         }
     }
     
+    /** For edit mode, this is used to save data in the data display editor. */
     save() {
         var data;
         var dataValid = false;
@@ -84,6 +87,7 @@ export default class DataDisplay {
         }
     }
 
+    /** For edit mode, this is used to cancel editing. */
     cancel() {
         //reset the original data
         var cancelComplete = this.displayContainer.onCancel();
@@ -190,6 +194,7 @@ export default class DataDisplay {
         this.displayValid = displayValid;
     }
 	
+    /** This method udpates the data in the data display, reading it from the underlying data source. */
     showData() {
         if(!this.displayValid) return;
 

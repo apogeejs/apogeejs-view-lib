@@ -19,73 +19,13 @@ export function updateComponentProperties(componentView) {
 
     var displayName = componentClass.getClassDisplayName();
 
-    //////////////////////////////////////////////
-    const __getBasePropertyValues__ = () => {
-        let basePropertyValues = {};
-        let member = this.getField("member");
-        basePropertyValues.name = member.getName();
-        basePropertyValues.parentId = member.getParentId();
-        return basePropertyValues;
-    }
-    const __getDialogValue__ = entry => {
-        //POPULATE THIS!!!
-        //This reads a property value from the given component/member and
-        //converts it to a form value.
-        if((!childName)||(childName == ".")) return component;
-        let propertyComponent = __getPropertyComponent__(this,entry.component);
-
-        let propertyValue;
-        if(entry.member !== undefined) {
-            let propertyMember = __getChildMember__(propertyComponent,entry.member);
-            if(propertyMember) {
-                propertyValue = propertyMember.getField(enry.propertyKey);
-            }
-            else {
-                return undefined;
-            }
-        }
-        else {
-            propertyValue = propertyComponent.getField(entry.propertyKey);
-        }
-
-        if(entry.propertyToForm) {
-            return entry.propertyToForm(propertyValue);
-        }
-        else {
-            return propertyValue;
-        }
-
-    }
-    //for now only 1 generation of children is allowed! so "component" = componentPath = componentName!!!
-    const __getPropertyComponent__ = (componentView,componentPath) => {
-        let localComponent = componentView.getComponent();
-        if((!childName)||(childName == ".")) return localComponent;
-        else return __getChildComponent__(localComponent,componentPath);
-    }
-    const __getChildComponent__ = (component,childName) => {
-        if(!component.getParentFolderForChildren) return null;
-
-        let folderMember = component.getParentFolderForChildren();
-        let childMemberId = folderMember.lookupChildIs(childName);
-        let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
-        return modelManager.getComponentByComponentId(childComponentId);
-    }
-    const __getChildMember__ = (component,childPath) => {
-        if(childPath == ".") {
-            return component.getMember();
-        }
-        else {
-            let childFieldName = "member." + childPath;
-            return component.getField(childFieldName);
-        }
-    }
-    ///////////////////////////////////////////////////
     var additionalLines = [];
-    var initialFormValues = __getBasePropertyValues__();
+    var initialFormValues = __getBasePropertyValues__(component);
     if(componentViewClass.propertyDialogEntries) {
         componentViewClass.propertyDialogEntries.forEach(entry => {
-            additionalLines.push(apogeeutil.jsonCopy(entry.dialogElement));
-            initialFormValues.entry.dialogElement.key = __getDialogValue__(entry);
+            let entryCopy = apogeeutil.jsonCopy(entry.dialogElement);
+            initialFormValues[entry.dialogElement.key] = __getDialogValue__(modelManager,component,entry);
+            additionalLines.push(entryCopy);
         }); 
     }
 
@@ -102,8 +42,8 @@ export function updateComponentProperties(componentView) {
         //get the changed values
         var newFormValues = {};
         for(var key in initialFormValues) {
-            if(!_.isEqual(initialFormValues[key],resultFormValues[key])) {
-                newFormValues[key] = resultFormValues[key];
+            if(!_.isEqual(initialFormValues[key],submittedFormValues[key])) {
+                newFormValues[key] = submittedFormValues[key];
             }
         }
         
@@ -114,71 +54,6 @@ export function updateComponentProperties(componentView) {
         //--------------
         // Update Properties
         //--------------
-
-        ////////////////////////////////////
-        //procee newFormValues to give property json
-        const __getUpdateJsons__ = (dialogEntries,newFormValues) => {
-            let memberUpdateJson, componentUpdateJson;
-
-            if(dialogEntries) {
-                dialogEntries.forEach(entry => {
-                    let formValue = newFormValues[entry.dialogElement.key];
-                    if(formValue !== undefined) {
-                        let propertyValue = entry.formToProperty ? entry.formToProperty(formValue) : formValue;
-
-                        if(entry.member !== undefined) {
-                            let memberJson = __lookupSinglePropertyJson__(memberUpdateJson,entry.member);
-                            memberJson[entry.propertyKey] = propertyValue;
-
-                            if(!memberUpdateJson) memberUpdateJson = memberJson;
-                         }
-                        else {
-                            let memberJson = __lookupSinglePropertyJson__(componentUpdateJson,entry.component);
-                            memberJson[entry.propertyKey] = propertyValue;
-
-                            if(!componentUpdateJson) componentUpdateJson = memberJson;
-                        }
-                    }
-                })
-            }
-
-            return {memberUpdateJson, componentUpdateJson};
-        }
-        const __lookupSinglePropertyJson__ = (propertyJson,path) => {
-            if(!propertyJson) propertyJson = {};
-            if((!path)||(path == ".")) {
-                return propertyJson;
-            }
-            else {
-                let pathArray = path.split(".");
-                return __getPathJson__(propertyJson,pathArray,0);
-            }
-
-        }
-        const __getPathJson__ = (parentJson,pathArray,startFrom) => {
-            if((startFrom >= pathArray.length)||(startFrom < 0)) {
-                throw new Error("Unexpected path for property entry!");
-            }
-            let childJson = __getChildJson__(parentJson,pathArray[startFrom]);
-            if(startFrom == pathArray.length - 1) {
-                return childJson;
-            }
-            return __getPathJson__(childJson,pathArray,startFrom+1);
-        }
-        const __getChildJson__ = (json,childName) => {
-            let childJson;
-            if(!json.children) {
-                json.children = [];
-            }
-            else {
-                childJson = json.children.find(entry => entry.name == childName);
-            }
-            if(!childJson) {
-                childJson = {name:childName};
-            }
-            return childJson;
-        }
-        /////////////////////////////////////////
 
         if(componentViewClass.propertyDialogEntries) {
             let {memberUpdateJson, componentUpdateJson} = __getUpdateJsons__(componentViewClass.propertyDialogEntries,newFormValues);
@@ -450,7 +325,155 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
 
 
 
+//////////////////////////////////////////////
+const __getBasePropertyValues__ = component => {
+    let basePropertyValues = {};
+    let member = component.getField("member");
+    basePropertyValues.name = member.getName();
+    basePropertyValues.parentId = member.getParentId();
+    return basePropertyValues;
+}
+const __getDialogValue__ = (modelManager,parentComponent,entry) => {
+    //This reads a property value from the given component/member and
+    //converts it to a form value.
+    let propertyComponent = __getPropertyComponent__(modelManager,parentComponent,entry.component);
 
+    let propertyValue;
+    if(entry.member !== undefined) {
+        let propertyMember = __getChildMember__(propertyComponent,entry.member);
+        if(propertyMember) {
+            propertyValue = propertyMember.getField(entry.propertyKey);
+        }
+        else {
+            throw new Error("Property Member " + entry.member + " not found in component " + entry.component);
+        }
+    }
+    else {
+        propertyValue = propertyComponent.getField(entry.propertyKey);
+    }
+
+    if(entry.propertyToForm) {
+        return entry.propertyToForm(propertyValue);
+    }
+    else {
+        return propertyValue;
+    }
+
+}
+//for now only 1 generation of children is allowed! so "component" = componentPath = componentName!!!
+const __getPropertyComponent__ = (modelManager,parentComponent,componentPath) => {
+    if((!componentPath)||(componentPath == ".")) return parentComponent;
+    else return __getChildComponent__(modelManager,parentComponent,componentPath);
+}
+const __getChildComponent__ = (modelManager,parentComponent,childName) => {
+    if(!parentComponent.getParentFolderForChildren) throw new Error("Invalid parent component for child component path " + componentPath);
+
+    let folderMember = parentComponent.getParentFolderForChildren();
+    let childMemberId = folderMember.lookupChildId(childName);
+    let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+    return modelManager.getComponentByComponentId(childComponentId);
+}
+const __getChildMember__ = (component,childPath) => {
+    if(childPath == ".") {
+        return component.getMember();
+    }
+    else {
+        let childFieldName = "member." + childPath;
+        return component.getField(childFieldName);
+    }
+}
+///////////////////////////////////////////////////
+
+
+
+
+
+////////////////////////////////////
+    //procee newFormValues to give property json
+    const __getUpdateJsons__ = (dialogEntries,newFormValues) => {
+        let memberUpdateJson, componentUpdateJson;
+
+        //two problems
+        // 1) for the member json, it does not account for the member path to the proper component
+        // 2) for the component json, it constructs the parent json internally, but sets the child json as the output json
+        if(dialogEntries) {
+            dialogEntries.forEach(entry => {
+                let formValue = newFormValues[entry.dialogElement.key];
+                if(formValue !== undefined) {
+                    let propertyValue = entry.formToProperty ? entry.formToProperty(formValue) : formValue;
+
+                    if(entry.member !== undefined) {
+                        if(!memberUpdateJson) memberUpdateJson = {};
+                        let memberPath = __getFullMemberPath__(entry.component,entry.member);
+                        let memberJson = __lookupSinglePropertyJson__(memberUpdateJson,memberPath);
+                        ///////////////////////////////////////
+                        //for members (but not components) we have the "updateData" wrapper
+                        if(!memberJson.updateData) memberJson.updateData = {};
+                        ////////////////////////////////////////////////
+                        memberJson.updateData[entry.propertyKey] = propertyValue;
+                    }
+                    else {
+                        if(!componentUpdateJson) componentUpdateJson = {};
+                        let memberJson = __lookupSinglePropertyJson__(componentUpdateJson,entry.component);
+                        memberJson[entry.propertyKey] = propertyValue;
+                    }
+                }
+            })
+        }
+
+        return {memberUpdateJson, componentUpdateJson};
+    }
+    const __getFullMemberPath__ = (componentPath,memberPath) => {
+        ///////////////////////////////////////////////////
+        //with rule that component is folder and has one child level, 
+        //member path to component is the same as component path.
+        let fullMemberPath
+        if((componentPath)&&(componentPath != ".")) {
+            fullMemberPath = componentPath;
+            if(memberPath != ".") fullMemberPath += "." + memberPath;
+        }
+        else {
+            fullMemberPath = memberPath;
+        }
+        return fullMemberPath;
+        /////////////////////////////////////////////////////////
+    }
+    const __lookupSinglePropertyJson__ = (propertyJson,path) => {
+        if(!propertyJson) propertyJson = {};
+        if((!path)||(path == ".")) {
+            return propertyJson;
+        }
+        else {
+            let pathArray = path.split(".");
+            return __getPathJson__(propertyJson,pathArray,0);
+        }
+
+    }
+    const __getPathJson__ = (parentJson,pathArray,startFrom) => {
+        if((startFrom >= pathArray.length)||(startFrom < 0)) {
+            throw new Error("Unexpected path for property entry!");
+        }
+        let childJson = __getChildJson__(parentJson,pathArray[startFrom]);
+        if(startFrom == pathArray.length - 1) {
+            return childJson;
+        }
+        return __getPathJson__(childJson,pathArray,startFrom+1);
+    }
+    const __getChildJson__ = (json,childName) => {
+        let childJson;
+        if(!json.children) {
+            json.children = {};
+        }
+        else {
+            childJson = json.children[childName];
+        }
+        if(!childJson) {
+            childJson = {};
+            json.children[childName] = childJson;
+        }
+        return childJson;
+    }
+    /////////////////////////////////////////
 
 
 
