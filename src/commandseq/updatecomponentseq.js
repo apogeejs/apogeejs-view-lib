@@ -56,7 +56,7 @@ export function updateComponentProperties(componentView) {
         //--------------
 
         if(componentViewClass.propertyDialogEntries) {
-            let {memberUpdateJson, componentUpdateJson} = __getUpdateJsons__(componentViewClass.propertyDialogEntries,newFormValues);
+            let {memberUpdateJson, componentUpdateJson} = __getUpdateJsons__(component,componentViewClass.propertyDialogEntries,newFormValues);
             if((memberUpdateJson)||(componentUpdateJson)) {
                 let updateCommand = {};
                 updateCommand.type = "updateComponentProperties";
@@ -336,11 +336,11 @@ const __getBasePropertyValues__ = component => {
 const __getDialogValue__ = (modelManager,parentComponent,entry) => {
     //This reads a property value from the given component/member and
     //converts it to a form value.
-    let propertyComponent = __getPropertyComponent__(modelManager,parentComponent,entry.component);
+    let propertyComponent = parentComponent.getChildComponent(modelManager,entry.component);
 
     let propertyValue;
     if(entry.member !== undefined) {
-        let propertyMember = __getChildMember__(propertyComponent,entry.member);
+        let propertyMember = propertyComponent.getDirectChildMember(entry.member);
         if(propertyMember) {
             propertyValue = propertyMember.getField(entry.propertyKey);
         }
@@ -358,30 +358,9 @@ const __getDialogValue__ = (modelManager,parentComponent,entry) => {
     else {
         return propertyValue;
     }
+}
 
-}
-//for now only 1 generation of children is allowed! so "component" = componentPath = componentName!!!
-const __getPropertyComponent__ = (modelManager,parentComponent,componentPath) => {
-    if((!componentPath)||(componentPath == ".")) return parentComponent;
-    else return __getChildComponent__(modelManager,parentComponent,componentPath);
-}
-const __getChildComponent__ = (modelManager,parentComponent,childName) => {
-    if(!parentComponent.getParentFolderForChildren) throw new Error("Invalid parent component for child component path " + componentPath);
 
-    let folderMember = parentComponent.getParentFolderForChildren();
-    let childMemberId = folderMember.lookupChildId(childName);
-    let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
-    return modelManager.getComponentByComponentId(childComponentId);
-}
-const __getChildMember__ = (component,childPath) => {
-    if(childPath == ".") {
-        return component.getMember();
-    }
-    else {
-        let childFieldName = "member." + childPath;
-        return component.getField(childFieldName);
-    }
-}
 ///////////////////////////////////////////////////
 
 
@@ -390,12 +369,11 @@ const __getChildMember__ = (component,childPath) => {
 
 ////////////////////////////////////
     //procee newFormValues to give property json
-    const __getUpdateJsons__ = (dialogEntries,newFormValues) => {
+    const __getUpdateJsons__ = (mainComponent,dialogEntries,newFormValues) => {
         let memberUpdateJson, componentUpdateJson;
 
         //two problems
         // 1) for the member json, it does not account for the member path to the proper component
-        // 2) for the component json, it constructs the parent json internally, but sets the child json as the output json
         if(dialogEntries) {
             dialogEntries.forEach(entry => {
                 let formValue = newFormValues[entry.dialogElement.key];
@@ -404,7 +382,7 @@ const __getChildMember__ = (component,childPath) => {
 
                     if(entry.member !== undefined) {
                         if(!memberUpdateJson) memberUpdateJson = {};
-                        let memberPath = __getFullMemberPath__(entry.component,entry.member);
+                        let memberPath = mainComponent.getFullMemberPath(entry.component,entry.member);
                         let memberJson = __lookupSinglePropertyJson__(memberUpdateJson,memberPath);
                         ///////////////////////////////////////
                         //for members (but not components) we have the "updateData" wrapper
@@ -422,21 +400,6 @@ const __getChildMember__ = (component,childPath) => {
         }
 
         return {memberUpdateJson, componentUpdateJson};
-    }
-    const __getFullMemberPath__ = (componentPath,memberPath) => {
-        ///////////////////////////////////////////////////
-        //with rule that component is folder and has one child level, 
-        //member path to component is the same as component path.
-        let fullMemberPath
-        if((componentPath)&&(componentPath != ".")) {
-            fullMemberPath = componentPath;
-            if(memberPath != ".") fullMemberPath += "." + memberPath;
-        }
-        else {
-            fullMemberPath = memberPath;
-        }
-        return fullMemberPath;
-        /////////////////////////////////////////////////////////
     }
     const __lookupSinglePropertyJson__ = (propertyJson,path) => {
         if(!propertyJson) propertyJson = {};

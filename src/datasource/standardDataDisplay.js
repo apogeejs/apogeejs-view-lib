@@ -9,7 +9,7 @@ export function getErrorViewModeEntry() {
     return {
         name: "Info", //unfortunate legacy name
         label: "Error Info",
-        isActive: false,
+        isActive: true,
         isTransient: true,
         isInfoView: true,
         getDataDisplay: (componentView,displayContainer) => {
