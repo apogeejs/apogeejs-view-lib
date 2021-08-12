@@ -1,8 +1,8 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {validateTableName} from "/apogeejs-model-lib/src/apogeeModelLib.js"; 
 
-import {getPropertiesDialogLayout} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
-import {Component,componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
+import {getPropertiesDialogLayout,getPropertyJsons} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
+import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import {showSelectComponentDialog} from "/apogeejs-view-lib/src/dialogs/SelectControlDialog.js";
 import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js";
@@ -36,14 +36,19 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
         //get the tyep display name
         var displayName = componentClass.getClassDisplayName();
         
-        //get any additional property content for dialog beyond basic properties
-        var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
-        
         //get the folder list
         let includeRootFolder = componentViewClass.hasTabEntry;
         var parentList = modelManager.getParentList(includeRootFolder);
         
         //create the dialog layout - do on the fly because folder list changes
+        var additionalLines = [];
+        //var initialFormValues = _getBasePropertyValues(component);
+        if(componentViewClass.propertyDialogEntries) {
+            componentViewClass.propertyDialogEntries.forEach(entry => {
+                let entryCopy = apogeeutil.jsonCopy(entry.dialogElement);
+                additionalLines.push(entryCopy);
+            }); 
+        }
         var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,true,optionalInitialProperties);
 
         //we will populate the parent if we need to insert thenew component as a child in the parent document. 
@@ -76,12 +81,14 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
             let deleteMsg;
             let commands = [];
             
-            //create the model command
+            //create the command
+            let {memberJson, componentJson} = getPropertyJsons(componentClass,null,componentViewClass.propertyDialogEntries,userInputFormValues);
+
             let createCommandData = {};
             createCommandData.type = "addComponent";
             createCommandData.parentId = parentMemberId;
-            createCommandData.memberJson = Component.createMemberJson(componentClass,userInputProperties);
-            createCommandData.componentJson = Component.createComponentJson(componentClass,userInputProperties);
+            createCommandData.memberJson = memberJson
+            createCommandData.componentJson = componentJson;
 
             //editor related commands
             let additionalCommandInfo;
@@ -214,3 +221,4 @@ function getUseParentSelection(parentComponentView) {
     
     return tabDisplay.getIsShowing();
 }
+

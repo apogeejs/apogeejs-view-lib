@@ -20,11 +20,11 @@ export function updateComponentProperties(componentView) {
     var displayName = componentClass.getClassDisplayName();
 
     var additionalLines = [];
-    var initialFormValues = __getBasePropertyValues__(component);
+    var initialFormValues = _getBasePropertyValues(component);
     if(componentViewClass.propertyDialogEntries) {
         componentViewClass.propertyDialogEntries.forEach(entry => {
             let entryCopy = apogeeutil.jsonCopy(entry.dialogElement);
-            initialFormValues[entry.dialogElement.key] = __getDialogValue__(modelManager,component,entry);
+            initialFormValues[entry.dialogElement.key] = _getDialogValue(modelManager,component,entry);
             additionalLines.push(entryCopy);
         }); 
     }
@@ -56,13 +56,15 @@ export function updateComponentProperties(componentView) {
         //--------------
 
         if(componentViewClass.propertyDialogEntries) {
-            let {memberUpdateJson, componentUpdateJson} = __getUpdateJsons__(component,componentViewClass.propertyDialogEntries,newFormValues);
-            if((memberUpdateJson)||(componentUpdateJson)) {
+            let componentClass = component.constructor;
+            let {memberJson, componentJson} = getPropertyJsons(componentClass,component,componentViewClass.propertyDialogEntries,newFormValues);
+            //let {undoMemberUpdateJson, undoComponentUpdateJson} = getPropertyJsons(componentClass,component,componentViewClass.propertyDialogEntries,initialFormValues);
+            if((memberJson)||(componentJson)) {
                 let updateCommand = {};
                 updateCommand.type = "updateComponentProperties";
                 updateCommand.memberId = component.getMemberId();
-                updateCommand.updatedMemberProperties = memberUpdateJson;
-                updateCommand.updatedComponentProperties = componentUpdateJson;
+                updateCommand.updatedMemberProperties = memberJson;
+                updateCommand.updatedComponentProperties = componentJson;
                 commands.push(updateCommand)
             }
         }
@@ -322,21 +324,27 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
 }
 
 
-
-
-
-//////////////////////////////////////////////
-const __getBasePropertyValues__ = component => {
+//===========================
+// Property Value Lookup
+//===========================
+function _getBasePropertyValues(component) {
     let basePropertyValues = {};
     let member = component.getField("member");
     basePropertyValues.name = member.getName();
     basePropertyValues.parentId = member.getParentId();
     return basePropertyValues;
 }
-const __getDialogValue__ = (modelManager,parentComponent,entry) => {
-    //This reads a property value from the given component/member and
-    //converts it to a form value.
-    let propertyComponent = parentComponent.getChildComponent(modelManager,entry.component);
+/** This reads a property value from the given component/member and
+ * converts it to a form value. */
+function _getDialogValue(modelManager,mainComponent,entry) {
+    
+    let propertyComponent;
+    if((entry.component)&&(entry.component != ".")) {
+        propertyComponent = mainComponent.getChildComponent(modelManager,entry.component);
+    }
+    else {
+        propertyComponent = mainComponent;
+    }
 
     let propertyValue;
     if(entry.member !== undefined) {
@@ -360,83 +368,90 @@ const __getDialogValue__ = (modelManager,parentComponent,entry) => {
     }
 }
 
-
-///////////////////////////////////////////////////
-
-
-
+//=================================
+// Dialog Value processing
+//=================================
 
 
-////////////////////////////////////
-    //procee newFormValues to give property json
-    const __getUpdateJsons__ = (mainComponent,dialogEntries,newFormValues) => {
-        let memberUpdateJson, componentUpdateJson;
+/** This function creates the property jsons for a component and member, for both create and update,
+ * feeding in the property dialog values.
+ * Pass mainComponent for update component, set to null create component. */
+export function getPropertyJsons(mainComponentClass,mainComponent,dialogEntries,newFormValues) {
+    let memberJson;
+    let componentJson;
+    //for a "create", get the default jsons
+    if(!mainComponent) {
+        memberJson = apogeeutil.jsonCopy(mainComponentClass.getTotalMemberJson());
+        memberJson.name = newFormValues.name;
+        componentJson = apogeeutil.jsonCopy(mainComponentClass.getDefaultComponentJson());
+    }
 
-        //two problems
-        // 1) for the member json, it does not account for the member path to the proper component
-        if(dialogEntries) {
-            dialogEntries.forEach(entry => {
-                let formValue = newFormValues[entry.dialogElement.key];
-                if(formValue !== undefined) {
-                    let propertyValue = entry.formToProperty ? entry.formToProperty(formValue) : formValue;
+    //add in the property dialog results
+    if(dialogEntries) {
+        dialogEntries.forEach(entry => {
+            let formValue = newFormValues[entry.dialogElement.key];
+            if(formValue !== undefined) {
+                let propertyValue = entry.formToProperty ? entry.formToProperty(formValue) : formValue;
 
-                    if(entry.member !== undefined) {
-                        if(!memberUpdateJson) memberUpdateJson = {};
-                        let memberPath = mainComponent.getFullMemberPath(entry.component,entry.member);
-                        let memberJson = __lookupSinglePropertyJson__(memberUpdateJson,memberPath);
-                        ///////////////////////////////////////
-                        //for members (but not components) we have the "updateData" wrapper
-                        if(!memberJson.updateData) memberJson.updateData = {};
-                        ////////////////////////////////////////////////
-                        memberJson.updateData[entry.propertyKey] = propertyValue;
-                    }
-                    else {
-                        if(!componentUpdateJson) componentUpdateJson = {};
-                        let memberJson = __lookupSinglePropertyJson__(componentUpdateJson,entry.component);
-                        memberJson[entry.propertyKey] = propertyValue;
-                    }
+                if(entry.member !== undefined) {
+                    if(!memberJson) memberJson = {}; //used in update only
+
+                    let memberPath = mainComponentClass.getFullMemberPath(entry.component,entry.member);
+                    let singleMemberJson = _lookupSinglePropertyJson(memberJson,memberPath);
+                    //for members (but not components) we have the "updateData" wrapper
+                    if(!singleMemberJson.updateData) singleMemberJson.updateData = {};
+                    singleMemberJson.updateData[entry.propertyKey] = propertyValue;
                 }
-            })
-        }
+                else {
+                    if(!componentJson) componentJson = {}; //used in update only
 
-        return {memberUpdateJson, componentUpdateJson};
+                    let singleComponentJson = _lookupSinglePropertyJson(componentJson,entry.component);
+                    singleComponentJson[entry.propertyKey] = propertyValue;
+                }
+            }
+        })
     }
-    const __lookupSinglePropertyJson__ = (propertyJson,path) => {
-        if(!propertyJson) propertyJson = {};
-        if((!path)||(path == ".")) {
-            return propertyJson;
-        }
-        else {
-            let pathArray = path.split(".");
-            return __getPathJson__(propertyJson,pathArray,0);
-        }
 
+    return {memberJson, componentJson};
+}
+
+
+
+function _lookupSinglePropertyJson(propertyJson,path) {
+    if(!propertyJson) propertyJson = {};
+    if((!path)||(path == ".")) {
+        return propertyJson;
     }
-    const __getPathJson__ = (parentJson,pathArray,startFrom) => {
-        if((startFrom >= pathArray.length)||(startFrom < 0)) {
-            throw new Error("Unexpected path for property entry!");
-        }
-        let childJson = __getChildJson__(parentJson,pathArray[startFrom]);
-        if(startFrom == pathArray.length - 1) {
-            return childJson;
-        }
-        return __getPathJson__(childJson,pathArray,startFrom+1);
+    else {
+        let pathArray = path.split(".");
+        return _getPathJson(propertyJson,pathArray,0);
     }
-    const __getChildJson__ = (json,childName) => {
-        let childJson;
-        if(!json.children) {
-            json.children = {};
-        }
-        else {
-            childJson = json.children[childName];
-        }
-        if(!childJson) {
-            childJson = {};
-            json.children[childName] = childJson;
-        }
+
+}
+
+function _getPathJson(parentJson,pathArray,startFrom) {
+    if((startFrom >= pathArray.length)||(startFrom < 0)) {
+        throw new Error("Unexpected path for property entry!");
+    }
+    let childJson = _getChildJson(parentJson,pathArray[startFrom]);
+    if(startFrom == pathArray.length - 1) {
         return childJson;
     }
-    /////////////////////////////////////////
+    return _getPathJson(childJson,pathArray,startFrom+1);
+}
 
-
-
+function _getChildJson(json,childName) {
+    let childJson;
+    if(!json.children) {
+        json.children = {};
+    }
+    else {
+        childJson = json.children[childName];
+    }
+    if(!childJson) {
+        childJson = {};
+        json.children[childName] = childJson;
+    }
+    return childJson;
+}
+    

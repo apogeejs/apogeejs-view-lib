@@ -131,11 +131,14 @@ CustomDataComponentView.hasTabEntry = false;
 CustomDataComponentView.hasChildEntry = true;
 CustomDataComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
 
-CustomDataComponentView.propertyDialogLines = [
+CustomDataComponentView.propertyDialogEntries = [
     {
-        "type":"checkbox",
-        "label":"Destroy on Hide: ",
-        "key":"destroyOnInactive"
+        propertyKey: "destroyOnInactive",
+        dialogElement: {
+            "type":"checkbox",
+            "label":"Destroy on Hide: ",
+            "key":"destroyOnInactive"
+        }
     }
 ];
 

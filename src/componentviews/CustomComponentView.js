@@ -128,11 +128,14 @@ CustomComponentView.componentName = "apogeeapp.CustomCell";
 CustomComponentView.hasTabEntry = false;
 CustomComponentView.hasChildEntry = true;
 CustomComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
-CustomComponentView.propertyDialogLines = [
+CustomComponentView.propertyDialogEntries = [
     {
-        "type":"checkbox",
-        "label":"Destroy on Hide: ",
-        "key":"destroyOnInactive"
+        propertyKey: "destroyOnInactive",
+        dialogElement: {
+            "type":"checkbox",
+            "label":"Destroy on Hide: ",
+            "key":"destroyOnInactive"
+        }
     }
 ];
 

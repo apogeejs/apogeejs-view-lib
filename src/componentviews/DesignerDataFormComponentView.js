@@ -150,12 +150,15 @@ DesignerDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
 
 /** This is configuration for the properties dialog box, the results of which
  * our code will read in. */
-DesignerDataFormComponentView.propertyDialogLines = [
+DesignerDataFormComponentView.propertyDialogEntries = [
     {
-        "type":"checkbox",
-        "label":"Allow Designer Input Expressions: ",
-        "value": true,
-        "key":"allowInputExpressions"
+        propertyKey: "allowInputExpressions",
+        dialogElement: {
+            "type":"checkbox",
+            "label":"Allow Designer Input Expressions: ",
+            "value": true,
+            "key":"allowInputExpressions"
+        }
     }
 ];
 

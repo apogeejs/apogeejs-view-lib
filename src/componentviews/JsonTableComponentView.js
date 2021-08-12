@@ -109,16 +109,19 @@ JsonTableComponentView.ICON_RES_PATH = "/icons3/jsonCellIcon.png";
 
  /** This is configuration for the properties dialog box, the results of which
  * our code will read in. */
-JsonTableComponentView.propertyDialogLines = [
+JsonTableComponentView.propertyDialogEntries = [
     {
-        "type":"dropdown",
-        "label":"Data Display Format: ",
-        "entries":[
-            [ VIEW_DISPLAY_NAMES[COLORIZED_DATA_VEW] , COLORIZED_DATA_VEW ],
-            [ VIEW_DISPLAY_NAMES[TEXT_DATA_VEW] , TEXT_DATA_VEW ],
-            [ VIEW_DISPLAY_NAMES[GRID_DATA_VEW] , GRID_DATA_VEW ]
-        ],
-        "key":"dataView"
+        propertyKey: "dataView",
+        dialogElement: {
+            "type":"dropdown",
+            "label":"Data Display Format: ",
+            "entries":[
+                [ VIEW_DISPLAY_NAMES[COLORIZED_DATA_VEW] , COLORIZED_DATA_VEW ],
+                [ VIEW_DISPLAY_NAMES[TEXT_DATA_VEW] , TEXT_DATA_VEW ],
+                [ VIEW_DISPLAY_NAMES[GRID_DATA_VEW] , GRID_DATA_VEW ]
+            ],
+            "key":"dataView"
+        }
     }
 ];
 
