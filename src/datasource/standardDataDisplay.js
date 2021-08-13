@@ -54,7 +54,8 @@ export function getMemberDataTextViewModeEntry(memberFieldName,options) {
         sourceType: "data",
         suffix: suffix, //default value comes from member field name 
         isActive: ((options)&&(options.suffix)) ? options.suffix : false,
-        getDataDisplay: (componentView,displayContainer) => getMemberDataTextDisplay(componentView,displayContainer,memberFieldName,options)
+        getDataDisplay: (componentView,displayContainer) => getMemberDataTextDisplay(componentView,displayContainer,memberFieldName,options),
+        childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
 
@@ -75,7 +76,8 @@ export function getFormulaViewModeEntry(memberFieldName,options) {
         sourceType: "function",
         argList: ((options)&&(options.argList !== undefined)) ? options.argList : "",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getFormulaDataDisplay(componentView,displayContainer,memberFieldName,options)
+        getDataDisplay: (componentView,displayContainer) => getFormulaDataDisplay(componentView,displayContainer,memberFieldName,options),
+        childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
 
@@ -92,7 +94,8 @@ export function getPrivateViewModeEntry(memberFieldName,options) {
         sourceLayer: "model",
         sourceType: "private code",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getPrivateDataDisplay(componentView,displayContainer,memberFieldName,options)
+        getDataDisplay: (componentView,displayContainer) => getPrivateDataDisplay(componentView,displayContainer,memberFieldName,options),
+        childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 } 
 
@@ -116,7 +119,8 @@ export function getAppCodeViewModeEntry(componentFieldName,viewName,viewLabel,op
         sourceType: ((options)&&(options.sourceType)) ? options.sourceType : "function",
         argList: ((options)&&(options.argList !== undefined)) ? options.argList : "",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,options)
+        getDataDisplay: (componentView,displayContainer) => getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,options),
+        childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
 
