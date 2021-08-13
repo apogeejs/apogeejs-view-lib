@@ -193,7 +193,7 @@ export function addAdditionalComponent(appViewInterface,app,optionalInitialPrope
     let additionalComponents = componentInfo.getAdditionalComponentNames();
     let componentInfoList = additionalComponents.map( componentName => {
         let componentClass = componentInfo.getComponentClass(componentName); 
-        return {displayName: componentClass.getClassDisplayName(), uniqueName: componentName};
+        return {displayName: componentClass.getClassDisplayName(), uniqueName: componentClass.getClassUniqueName()};
     });
     //open select component dialog
     showSelectComponentDialog(componentInfoList,onSelect);

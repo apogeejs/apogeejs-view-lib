@@ -348,7 +348,7 @@ function _getDialogValue(modelManager,mainComponent,entry) {
 
     let propertyValue;
     if(entry.member !== undefined) {
-        let propertyMember = propertyComponent.getDirectChildMember(entry.member);
+        let propertyMember = propertyComponent.getChildMemberFromPath(entry.member);
         if(propertyMember) {
             propertyValue = propertyMember.getField(entry.propertyKey);
         }
@@ -381,7 +381,7 @@ export function getPropertyJsons(mainComponentClass,mainComponent,dialogEntries,
     let componentJson;
     //for a "create", get the default jsons
     if(!mainComponent) {
-        memberJson = apogeeutil.jsonCopy(mainComponentClass.getTotalMemberJson());
+        memberJson = apogeeutil.jsonCopy(mainComponentClass.getDefaultMemberJson());
         memberJson.name = newFormValues.name;
         componentJson = apogeeutil.jsonCopy(mainComponentClass.getDefaultComponentJson());
     }
