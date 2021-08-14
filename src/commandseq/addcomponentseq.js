@@ -56,17 +56,9 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
         
         //create on submit callback
         var onSubmitFunction = function(userInputFormValues) {
-
-            let userInputProperties;
-            if(componentViewClass.formToPropertyValues) {
-                userInputProperties = componentViewClass.formToPropertyValues(userInputFormValues);
-            }
-            else {
-                userInputProperties = userInputFormValues;
-            }
             
             //validate the name
-            var nameResult = validateTableName(userInputProperties.name);
+            var nameResult = validateTableName(userInputFormValues.name);
             if(!nameResult.valid) {
                 apogeeUserAlert(nameResult.errorMessage);
                 return false;
@@ -75,7 +67,7 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
             //other validation of inputs?
 
 //we should do this cleaner - by storing parent id in the submit input
-            let parentMemberId = userInputProperties.parentId;
+            let parentMemberId = userInputFormValues.parentId;
 
             let commandsDeleteComponent = false;
             let deleteMsg;
@@ -99,7 +91,7 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
                     parentComponentView = appViewInterface.getComponentViewByComponentId(parentComponentId);
                     if(!parentComponentView) throw new Error("Parent component not found!");
 
-                    additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
+                    additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputFormValues.name);
 
                     //added the editor setup command
                     if(additionalCommandInfo.editorSetupCommand) commands.push(additionalCommandInfo.editorSetupCommand);

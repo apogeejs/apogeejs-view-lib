@@ -21,6 +21,7 @@ FunctionComponentView.ICON_RES_PATH = "/icons3/functionCellIcon.png";
 
 FunctionComponentView.propertyDialogEntries = [
     {
+        member: ".",
         propertyKey: "argList",
         dialogElement: {
             "type":"textField",

@@ -398,15 +398,15 @@ export function getPropertyJsons(mainComponentClass,mainComponent,dialogEntries,
 
                     let memberPath = mainComponentClass.getFullMemberPath(entry.component,entry.member);
                     let singleMemberJson = _lookupSinglePropertyJson(memberJson,memberPath);
-                    //for members (but not components) we have the "updateData" wrapper
-                    if(!singleMemberJson.updateData) singleMemberJson.updateData = {};
-                    singleMemberJson.updateData[entry.propertyKey] = propertyValue;
+                    if(!singleMemberJson.fields) singleMemberJson.fields = {};
+                    singleMemberJson.fields[entry.propertyKey] = propertyValue;
                 }
                 else {
                     if(!componentJson) componentJson = {}; //used in update only
 
                     let singleComponentJson = _lookupSinglePropertyJson(componentJson,entry.component);
-                    singleComponentJson[entry.propertyKey] = propertyValue;
+                    if(!singleComponentJson.fields) singleComponentJson.fields = {};
+                    singleComponentJson.fields[entry.propertyKey] = propertyValue;
                 }
             }
         })
