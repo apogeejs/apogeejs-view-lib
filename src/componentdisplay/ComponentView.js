@@ -201,6 +201,17 @@ export default class ComponentView {
     }
 
     //-----------------------------------
+    // Interface for Parent Component Views
+    // These methods should be populated for the views of parent components
+    //-----------------------------------
+
+    // /** This function is called when a child is added to a parent component. */
+    // addChild(childComponentView);
+
+    // /** This function is called when a child is removed to a parent component. */
+    //removeChild(childComponentView);
+
+    //-----------------------------------
     // Save methods
     //-----------------------------------
 

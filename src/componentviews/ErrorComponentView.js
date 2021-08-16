@@ -2,45 +2,16 @@ import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView
 import ErrorDisplay from "/apogeejs-view-lib/src/datadisplay/ErrorDisplay.js";
 
 /** This component represents a json table object. */
-export default class ErrorComponentView extends ComponentView {
-
-    constructor(appViewInterface,component) {
-        //extend edit component
-        super(appViewInterface,component);
-    };
-
-    //==============================
-    // Protected and Private Instance Methods
-    //==============================
-
-    /**  This method retrieves the table edit settings for this component instance
-     * @protected */
-    getTableEditSettings() {
-        return ErrorComponentView.TABLE_EDIT_SETTINGS;
-    }
-
-    /** This method should be implemented to retrieve a view mode of the give type. 
-     * @protected. */
-    getDataDisplay(displayContainer,viewType) {
-        return new ErrorDisplay(displayContainer,false);
-    }
-
-    //======================================
-    // Static methods
-    //======================================
-
-}
-
-ErrorComponentView.EMPTY_VIEW = "EMPTY_VIEW";
+export default class ErrorComponentView extends ComponentView {}
 
 ErrorComponentView.VIEW_MODES = [
-    ErrorComponentView.EMPTY_VIEW
+    {
+        name: "ComponentError",
+        label: "Component Error",
+        isActive: true,
+        getDataDisplay: (componentView,displayContainer) => new ErrorDisplay(displayContainer,false)
+    }
 ];
-
-ErrorComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": ErrorComponentView.VIEW_MODES,
-    "emptyDataValue": ""
-}
 
 //======================================
 // This is the component generator, to register the component

@@ -8,10 +8,6 @@ import { FormResultFunctionGenerator } from "/apogeejs-ui-lib/src/apogeeUiLib.js
  * for how to set the data. */
 export default class FormInputBaseComponentView extends ComponentView {
 
-    constructor(appViewInterface,component) {
-        super(appViewInterface,component);
-    }
-
     getFormDataDisplay(displayContainer) {
         let dataDisplaySource = this._getInputFormDataSource();
         return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
