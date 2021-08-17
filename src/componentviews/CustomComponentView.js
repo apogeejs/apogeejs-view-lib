@@ -8,10 +8,10 @@ import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class CustomComponentView extends ComponentView {
+class CustomComponentView extends ComponentView {
 
-    constructor(appViewInterface,component) {
-        super(appViewInterface,component);
+    constructor(appViewInterface,component,viewConfig) {
+        super(appViewInterface,component,viewConfig);
 
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         //add css to page! I think this should go in a separate on create event, but until I 
@@ -109,35 +109,38 @@ CustomComponentView.GENERATOR_FUNCTION_FORMAT_TEXT = [
 // This is the control generator, to register the control
 //======================================
 
-CustomComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "Display", 
-        label: "Display", 
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
-    },
-    getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
-    getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
-    getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
-    getFormulaViewModeEntry("member","Input Code","Input Code"),
-    getPrivateViewModeEntry("member","Input Private","Input Private")  
-];
-
-CustomComponentView.componentName = "apogeeapp.CustomCell";
-CustomComponentView.hasTabEntry = false;
-CustomComponentView.hasChildEntry = true;
-CustomComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
-CustomComponentView.propertyDialogEntries = [
-    {
-        propertyKey: "destroyOnInactive",
-        dialogElement: {
-            "type":"checkbox",
-            "label":"Destroy on Hide: ",
-            "key":"destroyOnInactive"
+const CustomComponentViewConfig = {
+    componentType: "apogeeapp.CustomCell",
+    viewClass: CustomComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "Display", 
+            label: "Display", 
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
+        },
+        getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
+        getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
+        getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
+        getFormulaViewModeEntry("member","Input Code","Input Code"),
+        getPrivateViewModeEntry("member","Input Private","Input Private")  
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/genericCellIcon.png",
+    propertyDialogEntries: [
+        {
+            propertyKey: "destroyOnInactive",
+            dialogElement: {
+                "type":"checkbox",
+                "label":"Destroy on Hide: ",
+                "key":"destroyOnInactive"
+            }
         }
-    }
-];
+    ]
+}
+export default CustomComponentViewConfig;
 
 
 

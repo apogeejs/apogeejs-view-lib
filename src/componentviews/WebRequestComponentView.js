@@ -8,7 +8,7 @@ import {getErrorViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardD
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
-export default class WebRequestComponentView extends FormInputBaseComponentView {
+class WebRequestComponentView extends FormInputBaseComponentView {
 
     //=================================
     // Implementation Methods
@@ -295,57 +295,42 @@ export default class WebRequestComponentView extends FormInputBaseComponentView 
 
 }
 
-//======================================
-// Static properties
-//======================================
-
 const MIME_TYPE_JSON = "application/json"
 
 //===============================
-// Required External Settings
+// config
 //===============================
 
-WebRequestComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "Meta",
-        label: "Response Info",
-        sourceLayer: "model", 
-        sourceType: "data",
-        suffix: ".data.meta",
-        isActive: false,
-        getDataDisplay: (componentView,displayContainer) => componentView.getMetaViewDisplay(displayContainer)
-
-    },
-    {
-        name: "Body",
-        label: "Response Body",
-        sourceLayer: "model", 
-        sourceType: "data",
-        suffix: ".data.body",
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getBodyViewDisplay(displayContainer)
-    },
-    FormInputBaseComponentView.getConfigViewModeEntry(),
-];
-
-/** This is the component name with which this view is associated. */
-WebRequestComponentView.componentName = "apogeeapp.WebRequestCell";
-
-/** If true, this indicates the component has a tab entry */
-WebRequestComponentView.hasTabEntry = false;
-/** If true, this indicates the component has an entry appearing on the parent tab */
-WebRequestComponentView.hasChildEntry = true;
-
-/** This is the icon url for the component. */
-WebRequestComponentView.ICON_RES_PATH = "/icons3/mapCellIcon.png";
-
-//-----------------------
-// Other random internal constants
-//-----------------------
-
-const JSON_TEXT_FORMAT_STRING = "\t";
-
-const HEADER_GRID_PIXEL_HEIGHT = 75;
+const WebRequestComponentViewConfig = {
+    componentType: "apogeeapp.WebRequestCell",
+    viewClass: WebRequestComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "Meta",
+            label: "Response Info",
+            sourceLayer: "model", 
+            sourceType: "data",
+            suffix: ".data.meta",
+            isActive: false,
+            getDataDisplay: (componentView,displayContainer) => componentView.getMetaViewDisplay(displayContainer)
+    
+        },
+        {
+            name: "Body",
+            label: "Response Body",
+            sourceLayer: "model", 
+            sourceType: "data",
+            suffix: ".data.body",
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getBodyViewDisplay(displayContainer)
+        },
+        FormInputBaseComponentView.getConfigViewModeEntry(),
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/mapCellIcon.png"
+}
+export default WebRequestComponentViewConfig;
 
 

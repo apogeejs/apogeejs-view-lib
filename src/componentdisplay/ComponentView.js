@@ -15,7 +15,9 @@ export default class ComponentView {
      * In the full UI the appViewInterface is nominally the modelView. However, this 
      * abstraction was added to allow use embedded in a web page as an alternate UI. 
      */
-    constructor(appViewInterface,component) {
+    constructor(appViewInterface,component,viewConfig) { 
+    
+        this.viewConfig = viewConfig;
         
         this.app = appViewInterface.getApp();
         this.appViewInterface = appViewInterface;
@@ -129,11 +131,11 @@ export default class ComponentView {
 
     /** This method returns the icon url for the component. */
     getIconUrl() {
-        if(this.constructor.ICON_URL) {
-            return this.constructor.ICON_URL;
+        if(this.viewConfig.ICON_URL) {
+            return this.viewConfig.ICON_URL;
         }
         else {
-            var resPath = this.constructor.ICON_RES_PATH;
+            var resPath = this.viewConfig.iconResPath;
             if(!resPath) {
                 if(this.usesTabDisplay()) {
                     resPath = ComponentView.DEFAULT_PAGE_ICON;
@@ -166,7 +168,7 @@ export default class ComponentView {
     }
 
     getViewModeEntries() {
-        return this.constructor.VIEW_MODES;
+        return this.viewConfig.viewModes;
 
         //legacy note: There is some small chance there are legacy modules out there
         //that don't have this static field. The official API only had the "getTableEditSettings"
@@ -186,18 +188,22 @@ export default class ComponentView {
     /** This method should be implemented to retrieve a data display for the given view. 
      * @protected. */
     getDataDisplay(displayContainer,viewType) {
-        if(!this.constructor.VIEW_MODES) {
+        if(!this.viewConfig.viewModes) {
             console.error("View Modes static field missing for class " + typeof this);
             return null;
         }
 
-        let viewModeInfo = this.constructor.VIEW_MODES.find(viewModeInfo => viewModeInfo.name == viewType);
+        let viewModeInfo = this.viewConfig.viewModes.find(viewModeInfo => viewModeInfo.name == viewType);
         if(!viewModeInfo) {
             console.error("unrecognized view element: " + viewType);
             return null;
         }
 
         return viewModeInfo.getDataDisplay(this,displayContainer);
+    }
+
+    getViewConfig() {
+        return this.viewConfig;
     }
 
     //-----------------------------------
@@ -337,7 +343,8 @@ export default class ComponentView {
         }
         
         //default sort order within parent
-        var treeEntrySortOrder = (this.constructor.TREE_ENTRY_SORT_ORDER !== undefined) ? this.constructor.TREE_ENTRY_SORT_ORDER : ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
+        let treeEntrySortOrder = this.viewConfig.treeEntrySortOrder;
+        if(treeEntrySortOrder == undefined) treeEntrySortOrder = ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
         treeDisplay.setComponentTypeSortOrder(treeEntrySortOrder);
         
         return treeDisplay;
@@ -387,7 +394,7 @@ export default class ComponentView {
 
     /** This indicates if the component has a tab display. */
     usesTabDisplay() {
-        return this.constructor.hasTabEntry;
+        return this.viewConfig.hasTabEntry;
     }
     //Implement in extending class:
     ///** This creates the tab display for the component. */
@@ -568,7 +575,7 @@ export default class ComponentView {
             //remove the tree from the parent
             openCallback = () => {
                 var parentComponentView = this.getParentComponentView();
-                if((parentComponentView)&&(parentComponentView.constructor.hasTabEntry)) {
+                if((parentComponentView)&&(parentComponentView.viewConfig.hasTabEntry)) {
 
                     //execute command to select child
                     let command = parentComponentView.getSelectApogeeNodeCommand(this.getName());

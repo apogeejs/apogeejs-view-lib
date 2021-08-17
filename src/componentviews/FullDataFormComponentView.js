@@ -9,7 +9,7 @@ import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,ge
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class FullDataFormComponentView extends ComponentView {
+class FullDataFormComponentView extends ComponentView {
 
     //==============================
     // Protected and Private Instance Methods
@@ -115,33 +115,31 @@ export default class FullDataFormComponentView extends ComponentView {
 
 }
 
-//======================================
-// This is the control generator, to register the control
-//======================================
-
-FullDataFormComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: FullDataFormComponentView.VIEW_FORM,
-        label: "Form",
-        sourceLayer: "model",
-        sourceType: "data",
-        suffix: ".value", 
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
-    },
-    getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
-    getAppCodeViewModeEntry("validatorCode","validator","Validator Code",{argList:"formValue,inputData"}),
-    getFormulaViewModeEntry("member.input",{name: "input", label:"Input Data Code"}),
-    getPrivateViewModeEntry("member.input",{name: "inputPrivate", label:"Input Data Private"}),
-    getMemberDataTextViewModeEntry("member.value")
-];
-
-FullDataFormComponentView.componentName = "apogeeapp.FullDataFormCell";
-FullDataFormComponentView.hasTabEntry = false;
-FullDataFormComponentView.hasChildEntry = true;
-FullDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
-
+const FullDataFormComponentViewConfig = {
+    componentType: "apogeeapp.FullDataFormCell",
+    viewClass: FullDataFormComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: FullDataFormComponentView.VIEW_FORM,
+            label: "Form",
+            sourceLayer: "model",
+            sourceType: "data",
+            suffix: ".value", 
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+        },
+        getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
+        getAppCodeViewModeEntry("validatorCode","validator","Validator Code",{argList:"formValue,inputData"}),
+        getFormulaViewModeEntry("member.input",{name: "input", label:"Input Data Code"}),
+        getPrivateViewModeEntry("member.input",{name: "inputPrivate", label:"Input Data Private"}),
+        getMemberDataTextViewModeEntry("member.value")
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/formCellIcon.png"
+}
+export default FullDataFormComponentViewConfig;
 
 
 

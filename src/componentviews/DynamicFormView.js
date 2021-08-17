@@ -4,7 +4,7 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
 /** This component represents a table object. */
-export default class DynamicFormView extends ComponentView {
+class DynamicFormView extends ComponentView {
         
     //==============================
     // Protected and Private Instance Methods
@@ -58,24 +58,22 @@ export default class DynamicFormView extends ComponentView {
 
 }
 
-//======================================
-// This is the component generator, to register the component
-//======================================
-
-DynamicFormView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "Form",
-        label: "Form",
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
-    },
-    getFormulaViewModeEntry("member",{name:"Input Code",label:"Layout Code",argList:"admin"}),
-    getPrivateViewModeEntry("member",{name:"Input Private",label:"Layout Private"}),
-];
-
-DynamicFormView.componentName = "apogeeapp.ActionFormCell";
-DynamicFormView.hasTabEntry = false;
-DynamicFormView.hasChildEntry = true;
-DynamicFormView.ICON_RES_PATH = "/icons3/formCellIcon.png";
-
+const DynamicFormViewConfig = {
+    componentType: "apogeeapp.ActionFormCell",
+    viewClass: DynamicFormView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "Form",
+            label: "Form",
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+        },
+        getFormulaViewModeEntry("member",{name:"Input Code",label:"Layout Code",argList:"admin"}),
+        getPrivateViewModeEntry("member",{name:"Input Private",label:"Layout Private"}),
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/formCellIcon.png"
+}
+export default DynamicFormViewConfig;

@@ -9,7 +9,7 @@ import {getAppCodeViewModeEntry} from "/apogeejs-view-lib/src/datasource/standar
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
-export default class DesignerActionFormComponentView extends FormInputBaseComponentView {
+class DesignerActionFormComponentView extends FormInputBaseComponentView {
 
     /** This method returns the form layout.
      * @protected. */
@@ -109,40 +109,37 @@ export default class DesignerActionFormComponentView extends FormInputBaseCompon
 // Required External Settings
 //===============================
 
-DesignerActionFormComponentView.VIEW_MODES = [
-    {
-        name: "Form",
-        label: "Form", 
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
-    },
-    FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-    getAppCodeViewModeEntry("onSubmitCode","On Save","onSubmit",{argList:"cmdMsngr,formValue,formObject"}),
-    getAppCodeViewModeEntry("onCancelCode","On Cancel", "onCancel",{argList: "cmdMsngr,formObject"}),
-];
+
 
 /** This is the component name with which this view is associated. */
-DesignerActionFormComponentView.componentName = "apogeeapp.DesignerActionFormCell";
-
-/** If true, this indicates the component has a tab entry */
-DesignerActionFormComponentView.hasTabEntry = false;
-/** If true, this indicates the component has an entry appearing on the parent tab */
-DesignerActionFormComponentView.hasChildEntry = true;
-
-/** This is the icon url for the component. */
-DesignerActionFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
-
-/** This is configuration for the properties dialog box, the results of which
- * our code will read in. */
-DesignerActionFormComponentView.propertyDialogEntries = [
-    {
-        propertyKey: "allowInputExpressions",
-        dialogElement: {
-            "type":"checkbox",
-            "label":"Allow Designer Input Expressions: ",
-            "value": true,
-            "key":"allowInputExpressions"
+const DesignerActionFormComponentViewConfig = {
+    componentType: "apogeeapp.DesignerActionFormCell",
+    viewClass: DesignerActionFormComponentView,
+    viewModes: [
+        {
+            name: "Form",
+            label: "Form", 
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
+        },
+        FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
+        getAppCodeViewModeEntry("onSubmitCode","On Save","onSubmit",{argList:"cmdMsngr,formValue,formObject"}),
+        getAppCodeViewModeEntry("onCancelCode","On Cancel", "onCancel",{argList: "cmdMsngr,formObject"}),
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/formCellIcon.png",
+    propertyDialogEntries: [
+        {
+            propertyKey: "allowInputExpressions",
+            dialogElement: {
+                "type":"checkbox",
+                "label":"Allow Designer Input Expressions: ",
+                "value": true,
+                "key":"allowInputExpressions"
+            }
         }
-    }
-];
+    ]
+}
+export default DesignerActionFormComponentViewConfig;
 

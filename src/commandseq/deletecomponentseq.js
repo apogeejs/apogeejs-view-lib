@@ -28,7 +28,7 @@ function deleteComponentImpl(componentView) {
     var member = component.getMember();
     var commands = [];
 
-    if(componentView.constructor.hasChildEntry) {
+    if(componentView.getViewConfig().hasChildEntry) {
         let parentComponentView = componentView.getParentComponentView();
         if(parentComponentView) {
             let editorCommand = parentComponentView.getRemoveApogeeNodeFromPageCommand(component.getName());

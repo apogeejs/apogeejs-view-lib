@@ -16,12 +16,12 @@ export function updateComponentProperties(componentView) {
     var component = componentView.getComponent();
     
     var componentConfig = component.getComponentConfig();
-    var componentViewClass = componentView.constructor;
+    var componentViewConfig = componentView.getViewConfig();
 
     var additionalLines = [];
     var initialFormValues = _getBasePropertyValues(component);
-    if(componentViewClass.propertyDialogEntries) {
-        componentViewClass.propertyDialogEntries.forEach(entry => {
+    if(componentViewConfig.propertyDialogEntries) {
+        componentViewConfig.propertyDialogEntries.forEach(entry => {
             let entryCopy = apogeeutil.jsonCopy(entry.dialogElement);
             initialFormValues[entry.dialogElement.key] = _getDialogValue(modelManager,component,entry);
             additionalLines.push(entryCopy);
@@ -29,7 +29,7 @@ export function updateComponentProperties(componentView) {
     }
 
     // add the folders to which we can move this (it can move to root only if it is a parent)
-    let includeRootFolder = componentViewClass.hasTabEntry;
+    let includeRootFolder = componentViewConfig.hasTabEntry;
     var parentList = modelManager.getParentList(includeRootFolder);
 
     //create the dialog layout - do on the fly because folder list changes
@@ -54,8 +54,8 @@ export function updateComponentProperties(componentView) {
         // Update Properties
         //--------------
 
-        if(componentViewClass.propertyDialogEntries) {
-            let {memberJson, componentJson} = getPropertyJsons(componentConfig,component,componentViewClass.propertyDialogEntries,newFormValues);
+        if(componentViewConfig.propertyDialogEntries) {
+            let {memberJson, componentJson} = getPropertyJsons(componentConfig,component,componentViewConfig.propertyDialogEntries,newFormValues);
             if((memberJson)||(componentJson)) {
                 let updateCommand = {};
                 updateCommand.type = "updateComponentProperties";
@@ -86,7 +86,7 @@ export function updateComponentProperties(componentView) {
             let renameEditorCommands;
 
             //do the first stage of editor commands
-            if(componentViewClass.hasChildEntry) {
+            if(componentViewConfig.hasChildEntry) {
                 //load model view, will be used for old parent and new parent
                 let appViewInterface = componentView.getAppViewInterface();
 
@@ -127,7 +127,7 @@ export function updateComponentProperties(componentView) {
             commands.push(moveCommand);
 
             //do the second stage of editor commands
-            if(componentViewClass.hasChildEntry) {
+            if(componentViewConfig.hasChildEntry) {
 
                 //-----------------------------------
                 // move case
@@ -166,7 +166,7 @@ export function updateComponentProperties(componentView) {
                         }
                     }
                     else {
-                        if(!componentViewClass.hasTabEntry) {
+                        if(!componentViewConfig.hasTabEntry) {
                             //TBR if we want to enforce this condition...
                             throw new Error("This component can not be placed in the root folder.");
                         }
@@ -235,8 +235,8 @@ export function updateComponentProperties(componentView) {
 }
 
 function returnToEditor(componentView) {
-    let componentViewClass = componentView.constructor;
-    if(componentViewClass.hasChildDisplay) {
+    let componentViewConfig = componentView.getViewConfig();
+    if(componentViewConfig.hasChildDisplay) {
         let parentComponentView = componentView.getParentComponentView();
         if(parentComponentView) {
             parentComponentView.giveEditorFocusIfShowing();

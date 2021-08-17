@@ -9,7 +9,7 @@ import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,ge
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class FullActionFormComponentView extends ComponentView {
+class FullActionFormComponentView extends ComponentView {
 
     //==============================
     // Protected and Private Instance Methods
@@ -73,27 +73,25 @@ export default class FullActionFormComponentView extends ComponentView {
     }
 }
 
-//======================================
-// This is the control generator, to register the control
-//======================================
-
-FullActionFormComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "form",
-        label: "Form",
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
-    },
-    getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
-    getFormulaViewModeEntry("member",{name: "input", label:"Input Data Code"}),
-    getPrivateViewModeEntry("member",{name: "inputPrivate", label:"Input Data Private"})
-];
-
-
-FullActionFormComponentView.componentName = "apogeeapp.FullActionFormCell";
-FullActionFormComponentView.hasTabEntry = false;
-FullActionFormComponentView.hasChildEntry = true;
-FullActionFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+const FullActionFormComponentViewConfig = {
+    componentType: "apogeeapp.FullActionFormCell",
+    viewClass: FullActionFormComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "form",
+            label: "Form",
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+        },
+        getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
+        getFormulaViewModeEntry("member",{name: "input", label:"Input Data Code"}),
+        getPrivateViewModeEntry("member",{name: "inputPrivate", label:"Input Data Private"})
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/formCellIcon.png"
+}
+export default FullActionFormComponentViewConfig;
 
 

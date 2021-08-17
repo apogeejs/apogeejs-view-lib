@@ -14,11 +14,11 @@ import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class CustomDataComponentView extends ComponentView {
+class CustomDataComponentView extends ComponentView {
 
-    constructor(appViewInterface,component) {
+    constructor(appViewInterface,component,viewConfig) {
         //extend edit component
-        super(appViewInterface,component);
+        super(appViewInterface,component,viewConfig);
 
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         //add css to page! I think this should go in a separate on create event, but until I 
@@ -126,35 +126,36 @@ export default class CustomDataComponentView extends ComponentView {
 // This is the control generator, to register the control
 //======================================
 
-CustomDataComponentView.componentName = "apogeeapp.CustomDataCell";
-CustomDataComponentView.hasTabEntry = false;
-CustomDataComponentView.hasChildEntry = true;
-CustomDataComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
-
-CustomDataComponentView.propertyDialogEntries = [
-    {
-        propertyKey: "destroyOnInactive",
-        dialogElement: {
-            "type":"checkbox",
-            "label":"Destroy on Hide: ",
-            "key":"destroyOnInactive"
+const CustomDataComponentViewConfig = {
+    componentType: "apogeeapp.CustomDataCell",
+    componentClass: CustomDataComponentView,
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/genericCellIcon.png",
+    propertyDialogEntries: [
+        {
+            propertyKey: "destroyOnInactive",
+            dialogElement: {
+                "type":"checkbox",
+                "label":"Destroy on Hide: ",
+                "key":"destroyOnInactive"
+            }
         }
-    }
-];
-
-
-CustomDataComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "Display", 
-        label: "Display", 
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
-    },
-    getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
-    getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
-    getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
-    getFormulaViewModeEntry("member.input","Input Code","Input Code"),
-    getPrivateViewModeEntry("member.input","Input Private","Input Private"),
-    getMemberDataTextViewModeEntry("member.data",{name: "Data Value",label: "Data Value"})
-];
+    ],
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "Display", 
+            label: "Display", 
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
+        },
+        getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
+        getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
+        getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
+        getFormulaViewModeEntry("member.input","Input Code","Input Code"),
+        getPrivateViewModeEntry("member.input","Input Private","Input Private"),
+        getMemberDataTextViewModeEntry("member.data",{name: "Data Value",label: "Data Value"})
+    ]
+}
+export default CustomDataComponentViewConfig;

@@ -4,7 +4,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
-export default class JsonPlusTableComponentView extends ComponentView {
+class JsonPlusTableComponentView extends ComponentView {
 
     //==============================
     // Protected and Private Instance Methods
@@ -84,11 +84,6 @@ export default class JsonPlusTableComponentView extends ComponentView {
 
 const FORMAT_STRING = "\t";
 
-/** The following functions update a json with functions to be a plain json, with a
- * replacement string for any functions. (It is pretty inefficient.) */
-
-const FUNCTION_REPLACEMENT_STRING = "[**FUNCTION**]";
-
 function replaceFunctions(jsonPlus) {
     var copiedJson;
 
@@ -132,39 +127,24 @@ function replaceFunctionsInArray(jsonPlus) {
     return copiedJson;
 }
 
-//===============================
-// Internal Settings
-//===============================
-
-JsonPlusTableComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "Data",
-        label: "Data",
-        sourceLayer: "model",
-        sourceType: "data",
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getDataDataDisplay(displayContainer)
-    },
-    getFormulaViewModeEntry("member"),
-    getPrivateViewModeEntry("member")
-];
-
-
-//===============================
-// External Settings
-//===============================
-
-/** This is the component name with which this view is associated. */
-JsonPlusTableComponentView.componentName = "apogeeapp.ExtendedJsonCell";
-
-/** If true, this indicates the component has a tab entry */
-JsonPlusTableComponentView.hasTabEntry = false;
-/** If true, this indicates the component has an entry appearing on the parent tab */
-JsonPlusTableComponentView.hasChildEntry = true;
-/** This is the icon url for the component. */
-JsonPlusTableComponentView.ICON_RES_PATH = "/icons3/jsonCellIcon.png";
-/** This field gives the default value for the JSON taht should be deserialized to
- * create the member for this object. The field "name" can be omitted. This will 
- * be added when the member is created. */
-
+const JsonPlusTableComponentViewConfig = {
+    componentType: "apogeeapp.ExtendedJsonCell",
+    viewClass: JsonPlusTableComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "Data",
+            label: "Data",
+            sourceLayer: "model",
+            sourceType: "data",
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getDataDataDisplay(displayContainer)
+        },
+        getFormulaViewModeEntry("member"),
+        getPrivateViewModeEntry("member")
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/jsonCellIcon.png"
+}
+export default JsonPlusTableComponentViewConfig;

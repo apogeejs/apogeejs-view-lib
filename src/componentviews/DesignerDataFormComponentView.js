@@ -9,7 +9,7 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
-export default class DesignerDataFormComponentView extends FormInputBaseComponentView {
+class DesignerDataFormComponentView extends FormInputBaseComponentView {
 
     //=================================
     // Implementation Methods
@@ -113,52 +113,34 @@ export default class DesignerDataFormComponentView extends FormInputBaseComponen
     }
 }
 
-//===================================
-// View Definitions Constants (referenced internally)
-//==========================
-
-DesignerDataFormComponentView.VIEW_MODES = [
-    {
-        name: "Form",
-        label: "Form", 
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
-    },
-    FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-    getAppCodeViewModeEntry("validatorCode","On Save","isValid",{argList: "formValue,formLayout"}),
-    getMemberDataTextViewModeEntry("member.value")
-];
-
-DesignerDataFormComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": DesignerDataFormComponentView.VIEW_MODES
-}
-
-//===============================
-// Required External Settings
-//===============================
-
-/** This is the component name with which this view is associated. */
-DesignerDataFormComponentView.componentName = "apogeeapp.DesignerDataFormCell";
-
-/** If true, this indicates the component has a tab entry */
-DesignerDataFormComponentView.hasTabEntry = false;
-/** If true, this indicates the component has an entry appearing on the parent tab */
-DesignerDataFormComponentView.hasChildEntry = true;
-
-/** This is the icon url for the component. */
-DesignerDataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
-
-/** This is configuration for the properties dialog box, the results of which
- * our code will read in. */
-DesignerDataFormComponentView.propertyDialogEntries = [
-    {
-        propertyKey: "allowInputExpressions",
-        dialogElement: {
-            "type":"checkbox",
-            "label":"Allow Designer Input Expressions: ",
-            "value": true,
-            "key":"allowInputExpressions"
+const DesignerDataFormComponentViewConfig = {
+    componentType: "apogeeapp.DesignerDataFormCell",
+    viewClass: DesignerDataFormComponentView,
+    viewModes: [
+        {
+            name: "Form",
+            label: "Form", 
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
+        },
+        FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
+        getAppCodeViewModeEntry("validatorCode","On Save","isValid",{argList: "formValue,formLayout"}),
+        getMemberDataTextViewModeEntry("member.value")
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/formCellIcon.png",
+    propertyDialogEntries: [
+        {
+            propertyKey: "allowInputExpressions",
+            dialogElement: {
+                "type":"checkbox",
+                "label":"Allow Designer Input Expressions: ",
+                "value": true,
+                "key":"allowInputExpressions"
+            }
         }
-    }
-];
+    ]
+}
+export default DesignerDataFormComponentViewConfig;
 

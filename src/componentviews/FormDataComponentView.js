@@ -11,7 +11,7 @@ import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,ge
  * to validate form input.
  * If you want a form to take an action on submit rather than create and edit a 
  * data value, you can use the dynmaic form. */
-export default class FormDataComponentView extends ComponentView {
+class FormDataComponentView extends ComponentView {
 
     //==============================
     // Protected and Private Instance Methods
@@ -109,27 +109,25 @@ export default class FormDataComponentView extends ComponentView {
 
 }
 
-//======================================
-// This is the component generator, to register the component
-//======================================
-
-FormDataComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    {
-        name: "Form",
-        label: "Form",
-        isActive: true,
-        getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
-    },
-    getFormulaViewModeEntry("member.layout",{name:"Layout Code",label:"Layout Code"}),
-    getPrivateViewModeEntry("member.layout",{name:"Layout Private",label:"Layout Private"}),
-    getFormulaViewModeEntry("member.isInputValid",{name:"isInputValid(formValue)",label:"isInputValid",argList: "formValue"}),
-    getPrivateViewModeEntry("member.isInputValid",{name:"isInputValid Private",label:"isInputValid Private"}),
-    getMemberDataTextViewModeEntry("member.data",{name: "Form Value",label: "Form Value"})
-];
-
-
-FormDataComponentView.componentName = "apogeeapp.DataFormCell";
-FormDataComponentView.hasTabEntry = false;
-FormDataComponentView.hasChildEntry = true;
-FormDataComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+const FormDataComponentViewConfig = {
+    componentType: "apogeeapp.DataFormCell",
+    viewClass: FormDataComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        {
+            name: "Form",
+            label: "Form",
+            isActive: true,
+            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+        },
+        getFormulaViewModeEntry("member.layout",{name:"Layout Code",label:"Layout Code"}),
+        getPrivateViewModeEntry("member.layout",{name:"Layout Private",label:"Layout Private"}),
+        getFormulaViewModeEntry("member.isInputValid",{name:"isInputValid(formValue)",label:"isInputValid",argList: "formValue"}),
+        getPrivateViewModeEntry("member.isInputValid",{name:"isInputValid Private",label:"isInputValid Private"}),
+        getMemberDataTextViewModeEntry("member.data",{name: "Form Value",label: "Form Value"})
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/formCellIcon.png"
+}
+export default FormDataComponentViewConfig;

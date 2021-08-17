@@ -5,7 +5,7 @@ import {getPropertiesDialogLayout,getPropertyJsons} from "/apogeejs-view-lib/src
 import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import {showSelectComponentDialog} from "/apogeejs-view-lib/src/dialogs/SelectControlDialog.js";
-import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js";
+import {getComponentViewConfig} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 //=====================================
 // UI Entry Point
@@ -16,7 +16,7 @@ import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js
 export function addComponent(appViewInterface,app,componentType,optionalInitialProperties) {
 
         let componentConfig = componentInfo.getComponentConfig(componentType);
-        let componentViewClass = getComponentViewClass(componentType);
+        let componentViewConfig = getComponentViewConfig(componentType);
 
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
@@ -38,14 +38,14 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
         var displayName = componentConfig.displayName;
         
         //get the folder list
-        let includeRootFolder = componentViewClass.hasTabEntry;
+        let includeRootFolder = componentViewConfig.hasTabEntry;
         var parentList = modelManager.getParentList(includeRootFolder);
         
         //create the dialog layout - do on the fly because folder list changes
         var additionalLines = [];
         //var initialFormValues = _getBasePropertyValues(component);
-        if(componentViewClass.propertyDialogEntries) {
-            componentViewClass.propertyDialogEntries.forEach(entry => {
+        if(componentViewConfig.propertyDialogEntries) {
+            componentViewConfig.propertyDialogEntries.forEach(entry => {
                 let entryCopy = apogeeutil.jsonCopy(entry.dialogElement);
                 additionalLines.push(entryCopy);
             }); 
@@ -75,7 +75,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
             let commands = [];
             
             //create the command
-            let {memberJson, componentJson} = getPropertyJsons(componentConfig,null,componentViewClass.propertyDialogEntries,userInputFormValues);
+            let {memberJson, componentJson} = getPropertyJsons(componentConfig,null,componentViewConfig.propertyDialogEntries,userInputFormValues);
 
             let createCommandData = {};
             createCommandData.type = "addComponent";
@@ -86,7 +86,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
             //editor related commands
             let additionalCommandInfo;
             let parentComponentView;
-            if(componentViewClass.hasChildEntry) {
+            if(componentViewConfig.hasChildEntry) {
                 let parentComponentId = modelManager.getComponentIdByMemberId(parentMemberId);
                 if((parentComponentId)&&(appViewInterface.hasParentDisplays())) {
                     parentComponentView = appViewInterface.getComponentViewByComponentId(parentComponentId);
