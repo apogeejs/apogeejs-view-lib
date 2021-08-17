@@ -37,8 +37,8 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     line.appendChild(document.createTextNode("Component:"));
     var select = uiutil.createElement("select");
     line.appendChild(select);
-    componentInfoList.forEach( componentInfo => {
-		select.add(uiutil.createElement("option",{"text":componentInfo.displayName,"value":componentInfo.uniqueName}));
+    componentInfoList.forEach( componentData => {
+		select.add(uiutil.createElement("option",{"text":componentData.displayName,"value":componentData.componentType}));
     });
     content.appendChild(line);
     

@@ -81,12 +81,12 @@ export default class TreeComponentDisplay {
                 let app = this.componentView.getApp();
                 var appViewInterface = this.componentView.getAppViewInterface();
                 let initialValues = {parentId: component.getMemberId()};
-                let pageComponents = componentInfo.getPageComponentNames();
-                pageComponents.forEach(pageComponentName => {
+                let pageComponents = componentInfo.getPageComponentTypes();
+                pageComponents.forEach(pageComponentType => {
                     let childMenuItem = {};
-                    let pageComponentClass = componentInfo.getComponentClass(pageComponentName);
-                    childMenuItem.title = "Add Child " + pageComponentClass.getClassDisplayName();
-                    childMenuItem.callback = () => addComponent(appViewInterface,app,pageComponentClass,initialValues);
+                    let pageComponentConfig = componentInfo.getComponentConfig(pageComponentName);
+                    childMenuItem.title = "Add Child " + pageComponentConfig.displayName;
+                    childMenuItem.callback = () => addComponent(appViewInterface,app,pageComponentType,initialValues);
                     menuItemList.push(childMenuItem);
                 })
             }

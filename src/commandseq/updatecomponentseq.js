@@ -1,5 +1,6 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import {validateTableName} from "/apogeejs-model-lib/src/apogeeModelLib.js"; 
+import {Component} from "/apogeejs-app-lib/src/apogeeAppLib.js"; 
 
 import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
@@ -14,10 +15,8 @@ export function updateComponentProperties(componentView) {
     var modelManager = app.getModelManager(); 
     var component = componentView.getComponent();
     
-    var componentClass = component.constructor;
+    var componentConfig = component.getComponentConfig();
     var componentViewClass = componentView.constructor;
-
-    var displayName = componentClass.getClassDisplayName();
 
     var additionalLines = [];
     var initialFormValues = _getBasePropertyValues(component);
@@ -34,7 +33,7 @@ export function updateComponentProperties(componentView) {
     var parentList = modelManager.getParentList(includeRootFolder);
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,false,initialFormValues);
+    var dialogLayout = getPropertiesDialogLayout(componentConfig.displayName,parentList,additionalLines,false,initialFormValues);
 
     //create on submit callback
     var onSubmitFunction = function(submittedFormValues) {
@@ -56,9 +55,7 @@ export function updateComponentProperties(componentView) {
         //--------------
 
         if(componentViewClass.propertyDialogEntries) {
-            let componentClass = component.constructor;
-            let {memberJson, componentJson} = getPropertyJsons(componentClass,component,componentViewClass.propertyDialogEntries,newFormValues);
-            //let {undoMemberUpdateJson, undoComponentUpdateJson} = getPropertyJsons(componentClass,component,componentViewClass.propertyDialogEntries,initialFormValues);
+            let {memberJson, componentJson} = getPropertyJsons(componentConfig,component,componentViewClass.propertyDialogEntries,newFormValues);
             if((memberJson)||(componentJson)) {
                 let updateCommand = {};
                 updateCommand.type = "updateComponentProperties";
@@ -376,14 +373,14 @@ function _getDialogValue(modelManager,mainComponent,entry) {
 /** This function creates the property jsons for a component and member, for both create and update,
  * feeding in the property dialog values.
  * Pass mainComponent for update component, set to null create component. */
-export function getPropertyJsons(mainComponentClass,mainComponent,dialogEntries,newFormValues) {
+export function getPropertyJsons(mainComponentConfig,mainComponent,dialogEntries,newFormValues) {
     let memberJson;
     let componentJson;
     //for a "create", get the default jsons
     if(!mainComponent) {
-        memberJson = apogeeutil.jsonCopy(mainComponentClass.getDefaultMemberJson());
+        memberJson = apogeeutil.jsonCopy(mainComponentConfig.defaultMemberJson);
         memberJson.name = newFormValues.name;
-        componentJson = apogeeutil.jsonCopy(mainComponentClass.getDefaultComponentJson());
+        componentJson = apogeeutil.jsonCopy(mainComponentConfig.defaultComponentJson);
     }
 
     //add in the property dialog results
@@ -396,7 +393,7 @@ export function getPropertyJsons(mainComponentClass,mainComponent,dialogEntries,
                 if(entry.member !== undefined) {
                     if(!memberJson) memberJson = {}; //used in update only
 
-                    let memberPath = mainComponentClass.getFullMemberPath(entry.component,entry.member);
+                    let memberPath = Component.getFullMemberPath(entry.component,entry.member);
                     let singleMemberJson = _lookupSinglePropertyJson(memberJson,memberPath);
                     if(!singleMemberJson.fields) singleMemberJson.fields = {};
                     singleMemberJson.fields[entry.propertyKey] = propertyValue;

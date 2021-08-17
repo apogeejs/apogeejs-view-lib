@@ -13,9 +13,10 @@ import {getComponentViewClass} from "/apogeejs-view-lib/src/componentViewInfo.js
 
 /** This functions initiates the add component action. It will create a dialog for the user to enter the relevent 
  * properties, with the values optionalInitialProperties preset.  */   
-export function addComponent(appViewInterface,app,componentClass,optionalInitialProperties) {
+export function addComponent(appViewInterface,app,componentType,optionalInitialProperties) {
 
-        let componentViewClass = getComponentViewClass(componentClass.getClassUniqueName());
+        let componentConfig = componentInfo.getComponentConfig(componentType);
+        let componentViewClass = getComponentViewClass(componentType);
 
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
@@ -34,7 +35,7 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
 
         
         //get the tyep display name
-        var displayName = componentClass.getClassDisplayName();
+        var displayName = componentConfig.displayName;
         
         //get the folder list
         let includeRootFolder = componentViewClass.hasTabEntry;
@@ -74,7 +75,7 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
             let commands = [];
             
             //create the command
-            let {memberJson, componentJson} = getPropertyJsons(componentClass,null,componentViewClass.propertyDialogEntries,userInputFormValues);
+            let {memberJson, componentJson} = getPropertyJsons(componentConfig,null,componentViewClass.propertyDialogEntries,userInputFormValues);
 
             let createCommandData = {};
             createCommandData.type = "addComponent";
@@ -172,20 +173,14 @@ export function addComponent(appViewInterface,app,componentClass,optionalInitial
  * in the main component menu. */
 export function addAdditionalComponent(appViewInterface,app,optionalInitialProperties) {
         
-    var onSelect = function(componentUniqueName) {
-        let componentClass = componentInfo.getComponentClass(componentUniqueName);
-        if(componentClass) {
-            addComponent(appViewInterface,app,componentClass,optionalInitialProperties);
-        }
-        else {
-            apogeeUserAlert("Unknown component type: " + componentType);
-        }
+    var onSelect = function(componentType) {
+        addComponent(appViewInterface,app,componentType,optionalInitialProperties);
     }
     //get the display names
-    let additionalComponents = componentInfo.getAdditionalComponentNames();
-    let componentInfoList = additionalComponents.map( componentName => {
-        let componentClass = componentInfo.getComponentClass(componentName); 
-        return {displayName: componentClass.getClassDisplayName(), uniqueName: componentClass.getClassUniqueName()};
+    let additionalComponents = componentInfo.getAdditionalComponentTypes();
+    let componentInfoList = additionalComponents.map( componentType => {
+        let displayName = componentInfo.getComponentDisplayName(componentType); 
+        return {displayName, componentType};
     });
     //open select component dialog
     showSelectComponentDialog(componentInfoList,onSelect);
