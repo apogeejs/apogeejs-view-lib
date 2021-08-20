@@ -21,10 +21,6 @@ class FullDataFormComponentView extends ComponentView {
     }
 
     getOutputDataDisplaySource() {
-        //load this when the form is updated, to be used when form submitted
-        //we will update the form if this value changes
-        let isDataValidFunction;
-
         return {
             //NEED TO FACTOR IN INPUT VALUE!!!
 
@@ -33,7 +29,7 @@ class FullDataFormComponentView extends ComponentView {
                 //return value is whether or not the data display needs to be udpated
                 let component = this.getComponent();
                 let reloadData = component.isMemberDataUpdated("member.value");
-                let reloadDataDisplay = component.areAnyFieldsUpdated(["layoutCode","validatorCode"]) || component.isMemberFieldUpdated("member.input","data");
+                let reloadDataDisplay = component.areAnyFieldsUpdated(["layoutFunction"]) || component.isMemberFieldUpdated("member.input","data");
                 return {reloadData,reloadDataDisplay};
             },
 
@@ -42,11 +38,11 @@ class FullDataFormComponentView extends ComponentView {
 
                 //get the layout function
                 let component = this.getComponent();
-                let {layoutFunction,validatorFunction,errorMessage} = component.createFormFunctions();
-                if(errorMessage) {
+                let layoutFunction = component.getField("layoutFunction");
+                if(layoutFunction instanceof Error) {
                     wrappedData.displayInvalid = true;
                     wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                    wrappedData.message = errorMessage;
+                    wrappedData.message = "Error in layout function: " + layoutFunction.toString();
                     return wrappedData;
                 }
 
@@ -56,9 +52,6 @@ class FullDataFormComponentView extends ComponentView {
                 if(abnormalWrappedData) {
                     return abnormalWrappedData;
                 }
-
-                //save this for use on submit
-                isDataValidFunction = validatorFunction;
 
                 //use the parent folder as the context base
                 let contextMemberId = component.getMember().getParentId();
@@ -89,6 +82,14 @@ class FullDataFormComponentView extends ComponentView {
                 let inputData = component.getField("member.input").getData();
 
                 try {
+                    let isDataValidFunction = component.getField("validatorFunction");
+                    if(isDataValidFunction instanceof Error) {
+                        //this is clumsy - we need to show the user somewhere that there is an error
+                        //maybe in the code?
+                        apogeeUserAlert("Error in validator function! Input could not be processed!");
+                        return false;
+                    }
+
                     let isValidResult = isDataValidFunction(formValue,inputData);
                     if(isValidResult === true) {
                         //save data
