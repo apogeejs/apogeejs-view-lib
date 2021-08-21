@@ -3,6 +3,7 @@ import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -40,28 +41,34 @@ class FormDataComponentView extends ComponentView {
             if(layoutFunctionMember.getState() == apogeeutil.STATE_NORMAL) {
                 let layoutFunction = layoutFunctionMember.getData();   
                 if(layoutFunction instanceof Function) {
+                    let layout;
                     try { 
-                        let layout = layoutFunction();
-                        if(layout) return layout;
-                        else return ConfigurableFormEditor.getEmptyLayout();
+                        layout = layoutFunction();
+                        if(!layout) layout = ConfigurableFormEditor.getEmptyLayout();
                     }
                     catch(error) {
                         console.error("Error reading form layout " + this.getName() + ": " + error.toString());
                         if(error.stack) console.error(error.stack);
-                        return ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
+                        layout = ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString());
+                    }
+                    return {
+                        data: layout
                     }
                 }
             }
-            //if we get here there was a problem with the return value
-            return  apogeeutil.INVALID_VALUE;
+            else {
+                return {
+                    data: apogeeutil.INVALID_VALUE,
+                    hideDisplay: true,
+                    messageType: DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,
+                    message: "Form layout not available"
+                }
+            }
             
         }
         
         //return desired form value
-        dataDisplaySource.getData = () => {
-            let dataTable = this.getComponent().getField("member.data");
-            return dataTable.getData();
-        } 
+        dataDisplaySource.getData = () => dataDisplayHelper.getWrappedMemberData(this,"member.data");
         
         //edit ok - always true
         dataDisplaySource.getEditOk = () => {

@@ -4,6 +4,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -34,12 +35,11 @@ class FullDataFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-
                 //get the layout function
                 let component = this.getComponent();
                 let layoutFunction = component.getField("layoutFunction");
                 if(layoutFunction instanceof Error) {
+                    let wrappedData = {};
                     wrappedData.displayInvalid = true;
                     wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
                     wrappedData.message = "Error in layout function: " + layoutFunction.toString();
@@ -47,32 +47,29 @@ class FullDataFormComponentView extends ComponentView {
                 }
 
                 //load the layout
-                let inputMember = component.getField("member.input");
-                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(inputMember);
-                if(abnormalWrappedData) {
-                    return abnormalWrappedData;
-                }
+                let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member.input");
 
                 //use the parent folder as the context base
-                let contextMemberId = component.getMember().getParentId();
-                let commandMessenger = new UiCommandMessenger(this,contextMemberId);
-                try {
-                    let layout = layoutFunction(commandMessenger,inputData);
-                    wrappedData.data = layout;
-                    return wrappedData;
+                if(wrappedData.data != apogeeutil.INVALID_VALUE) {
+                    let contextMemberId = component.getMember().getParentId();
+                    let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+                    try {
+                        let layout = layoutFunction(commandMessenger,inputData);
+                        wrappedData.data = layout;
+                    }
+                    catch(error) {
+                        let errorWrappedData = {};
+                        errorWrappedData.hideDisplay = true;
+                        errorWrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                        errorWrappedData.message = "Error executing layout function: " + error.toString();
+                        return errorWrappedData;
+                    }
                 }
-                catch(error) {
-                    wrappedData.displayInvalid = true;
-                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                    wrappedData.message = "Error executing layout function: " + error.toString();
-                    return wrappedData;
-                }
+
+                return wrappedData;
             },
 
-            getData: () => {
-                let valueMember = this.getComponent().getField("member.value");
-                return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
-            },
+            getData: () => dataDisplayHelper.getWrappedMemberData(this,"member.value"),
 
             getEditOk: () => true,
 
@@ -130,8 +127,8 @@ const FullDataFormComponentViewConfig = {
             isActive: true,
             getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
         },
-        getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
-        getAppCodeViewModeEntry("validatorCode","validator","Validator Code",{argList:"formValue,inputData"}),
+        getAppCodeViewModeEntry("layoutCode","layoutFunction","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
+        getAppCodeViewModeEntry("validatorCode","validatorFunction","validator","Validator Code",{argList:"formValue,inputData"}),
         getFormulaViewModeEntry("member.input",{name: "input", label:"Input Data Code"}),
         getPrivateViewModeEntry("member.input",{name: "inputPrivate", label:"Input Data Private"}),
         getMemberDataTextViewModeEntry("member.value")

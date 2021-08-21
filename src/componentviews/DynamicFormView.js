@@ -2,6 +2,8 @@ import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
 /** This component represents a table object. */
 class DynamicFormView extends ComponentView {
@@ -30,27 +32,36 @@ class DynamicFormView extends ComponentView {
 
                 //make sure this is a function (could be invalid value, or a user code error)
                 if(layoutFunction instanceof Function) {
+                    let layout;
                     let admin = {
                         getCommandMessenger: () => new UiCommandMessenger(this,functionMember.getId())
                     }
                     try {
-                        let layout = layoutFunction(admin);
-                        if(layout) return layout;
-                        else return ConfigurableFormEditor.getEmptyLayout();
+                        layout = layoutFunction(admin);
+                        if(!layout) layout = ConfigurableFormEditor.getEmptyLayout();
                     }
                     catch(error) {
                         console.error("Error reading form layout " + this.getName() + ": " + error.toString());
                         if(error.stack) console.error(error.stack);
-                        return ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
+                        layout = ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
+                    }
+
+                    return {
+                        data: layout
+                    }
+
+                }
+                else {
+                    return {
+                        data: apogeeutil.INVALID_VALUE,
+                        hideDisplay: true,
+                        messageType: DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,
+                        message: "Form layout not available"
                     }
                 }
-                //if we get here there was a problem with the layout
-                return apogeeutil.INVALID_VALUE;
             },
 
-            getData: () => {              
-                return null;
-            }
+            getData: () => null,
         }
 
         return dataDisplaySource;

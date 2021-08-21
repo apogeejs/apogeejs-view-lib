@@ -5,6 +5,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 import {getAppCodeViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
@@ -42,17 +43,15 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getDisplayData: () => {        
-                //load the layout
-                let formMember = this.getComponent().getField("member.data");
-                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(formMember);
-                if(abnormalWrappedData) {
-                    return abnormalWrappedData;
-                }
+            getDisplayData: () => {  
+                let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member.data");      
 
                 //input data is the layout from the form designer
-                let fullLayout = this._getFullLayout(inputData);
-                return fullLayout;
+                if(wrappedData.data !== apogeeutil.INVALID_VALUE) {
+                    wrappedData.data = this._getFullLayout(wrappedData.data);
+                }
+
+                return wrappedData;
             },
 
             getData: () => null,
@@ -123,8 +122,8 @@ const DesignerActionFormComponentViewConfig = {
             getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
         },
         FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-        getAppCodeViewModeEntry("onSubmitCode","On Save","onSubmit",{argList:"cmdMsngr,formValue,formObject"}),
-        getAppCodeViewModeEntry("onCancelCode","On Cancel", "onCancel",{argList: "cmdMsngr,formObject"}),
+        getAppCodeViewModeEntry("onSubmitCode",null,"On Save","onSubmit",{argList:"cmdMsngr,formValue,formObject"}),
+        getAppCodeViewModeEntry("onCancelCode",null,"On Cancel", "onCancel",{argList: "cmdMsngr,formObject"}),
     ],
     hasTabEntry: false,
     hasChildEntry: true,

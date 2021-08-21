@@ -31,8 +31,8 @@ export default class ConfigurableFormEditor extends DataDisplay {
 
         //get data and handle invalid display
         if(this.dataSource.getDisplayData) {
-            let dataResult = dataDisplayHelper.readWrappedDisplayData(this.dataSource.getDisplayData,"Error loading form layout: ");
-            if(dataResult.displayInvalid) {
+            let dataResult = this.dataSource.getDisplayData();
+            if(dataResult.hideDisplay) {
                 //display invalid! hide display and show message
                 this.displayContainer.setHideDisplay(dataResult.hideDisplay);
                 this.displayContainer.setMessage(dataResult.messageType,dataResult.message);

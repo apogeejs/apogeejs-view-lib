@@ -1,6 +1,7 @@
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import AceTextEditor from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
 import StandardErrorDisplay from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
 //============================
 //Component Error View Mode
@@ -9,9 +10,9 @@ export function getErrorViewModeEntry() {
     return {
         name: "Info", //unfortunate legacy name
         label: "Error Info",
-        isActive: true,
+        isActive: false,
         isTransient: true,
-        isInfoView: true,
+        isErrorView: true,
         getDataDisplay: (componentView,displayContainer) => {
             let dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(componentView.getApp(),componentView);
             return new StandardErrorDisplay(displayContainer,dataDisplaySource);
@@ -103,14 +104,17 @@ export function getPrivateViewModeEntry(memberFieldName,options) {
 // App Code/Text Field
 //=============================================
 
-export function getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,options) {
+export function getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,componentCompiledFieldName,options) {
     let textDisplayMode = ((options)&&(options.textDisplayMode)) ? options.textDisplayMode : "ace/mode/javascript";
     let editorOptions = ((options)&&(options.editorOptions)) ? options.editorOptions : AceTextEditor.OPTION_SET_DISPLAY_MAX;
-    let dataSource = getComponentFieldDisplaySource(componentView,componentFieldName);
+    let dataSource = getComponentFieldDisplaySource(componentView,componentFieldName,componentCompiledFieldName);
     return new AceTextEditor(displayContainer,dataSource,textDisplayMode,editorOptions);
 }
 
-export function getAppCodeViewModeEntry(componentFieldName,viewName,viewLabel,options) {
+/** GEts the data source for a component field that represents code. An optional input is componentCompiledFieldName which 
+ * should be the compiled version of the code and an error object if the code does not compile. If it is included as an error, error
+ * info will be displayed for the code. */
+export function getAppCodeViewModeEntry(componentFieldName,componentCompiledFieldName,viewName,viewLabel,options) {
 
     return {
         name: viewName,
@@ -119,26 +123,39 @@ export function getAppCodeViewModeEntry(componentFieldName,viewName,viewLabel,op
         sourceType: ((options)&&(options.sourceType)) ? options.sourceType : "function",
         argList: ((options)&&(options.argList !== undefined)) ? options.argList : "",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,options),
+        getDataDisplay: (componentView,displayContainer) => getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,componentCompiledFieldName,options),
         childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
 
 /** This method returns the data dispklay data source for the code field data displays. */
-function getComponentFieldDisplaySource(componentView,componentFieldName) {
+function getComponentFieldDisplaySource(componentView,componentCodeFieldName,componentCompiledFieldName) {
 
     return {
         doUpdate: () => {
             //return value is whether or not the data display needs to be udpated
-            let reloadData = componentView.getComponent().isFieldUpdated(componentFieldName);
+            let reloadData = componentView.getComponent().isFieldUpdated(componentCodeFieldName);
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: () => {
-            let componentField = componentView.getComponent().getField(componentFieldName);
-            if((componentField === undefined)||(componentField === null)) componentField = "";
-            return componentField;
+            let componentCodeField = componentView.getComponent().getField(componentCodeFieldName);
+            if((componentCodeField === undefined)||(componentCodeField === null)) componentCodeField = "";
+
+            let wrappedData = {};
+            wrappedData.data = componentCodeField;
+
+            //append compiled error info if applicable
+            if(componentCompiledFieldName) {
+                let componentCompiledField = componentView.getComponent().getField(componentCompiledFieldName);
+                if(componentCompiledField instanceof Error) {
+                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                    wrappedData.message = "Error compiling code: " + componentCompiledField.toString();
+                }
+            }
+
+            return wrappedData;
         },
 
         getEditOk: () => {
@@ -148,11 +165,11 @@ function getComponentFieldDisplaySource(componentView,componentFieldName) {
         saveData: (text) => {
             let app = componentView.getApp();
 
-            var initialValue = componentView.getComponent().getField(componentFieldName);
+            var initialValue = componentView.getComponent().getField(componentCodeFieldName);
             var command = {};
             command.type = "updateComponentField";
             command.memberId = componentView.getComponent().getMemberId();
-            command.fieldName = componentFieldName;
+            command.fieldName = componentCodeFieldName;
             command.initialValue = initialValue;
             command.targetValue = text;
 

@@ -64,10 +64,7 @@ class CustomComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getData: () => {
-                let member = this.getComponent().getMember();
-                return dataDisplayHelper.getStandardWrappedMemberData(member);
-            },
+            getData: () => dataDisplayHelper.getWrappedMemberData(this,"member"),
 
             //below - custom methods for HtmlJsDataDisplay
 
@@ -120,9 +117,9 @@ const CustomComponentViewConfig = {
             isActive: true,
             getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
         },
-        getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
-        getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
-        getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
+        getAppCodeViewModeEntry("html",null,"HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
+        getAppCodeViewModeEntry("css",null,"CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
+        getAppCodeViewModeEntry("uiCode",null,"uiGenerator()","UI Generator"),
         getFormulaViewModeEntry("member","Input Code","Input Code"),
         getPrivateViewModeEntry("member","Input Private","Input Private")  
     ],

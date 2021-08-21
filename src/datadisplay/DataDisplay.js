@@ -206,17 +206,10 @@ export default class DataDisplay {
             this.editOk = false;
         }
 
-        //get data
-        let dataResult = dataDisplayHelper.readWrappedData(this.dataSource.getData,"Error loading display data: ");
-
-        //configure view
-        this.displayContainer.setRemoveView(dataResult.removeView);
-        if(!dataResult.removeView) {
-            //only hide view and show message if view is not removed
-            //we will set data either way to clear old date
-            this.displayContainer.setHideDisplay(dataResult.hideDisplay);
-            this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
-        }
+        //update the display data
+        let dataResult = this.dataSource.getData();
+        this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+        this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
         this.setData(dataResult.data);
     }
 

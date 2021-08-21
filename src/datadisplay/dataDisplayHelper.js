@@ -1,4 +1,5 @@
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js"
 
 let dataDisplayHelper = {};
 export {dataDisplayHelper as default}
@@ -10,59 +11,19 @@ const SPACING_FORMAT_STRING = "\t";
 /** This function creates the data display data source  for the data of the given member. The
  * member field should be the field name used to access the data source from the associated component. */
 dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,memberFieldName,doReadOnly) {
-
-    //this is used internally to lookup the data member used here
-    let _getDataMember = function() {
-        let component = componentView.getComponent();
-        let member = component.getField(memberFieldName);
-        return member;
-    };
-    
-    return {
-
-        doUpdate: function() {
-            //return value is whether or not the data display needs to be udpated
-            let component = componentView.getComponent();
-            let reloadData = component.isMemberDataUpdated(memberFieldName);
-            let reloadDataDisplay = false;
-            return {reloadData,reloadDataDisplay};
-        },
-
-        getData: function() {
-            let member = _getDataMember();
-            return dataDisplayHelper.getStandardWrappedMemberData(member);
-        },
-
-        getEditOk: doReadOnly ? 
-            function () { return false; }  : 
-            function () {
-                return !_getDataMember().hasCode();
-            },
-
-        saveData: doReadOnly ? undefined :
-            function(data) {
-                var commandData = {};
-                commandData.type = "saveMemberData";
-                commandData.memberId = _getDataMember().getId();
-                commandData.data = data;
-                
-                app.executeCommand(commandData);
-                return true;
-            }
-    }
+    return _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly);
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. 
  * This data source sets error valueData (a substitue value) when the user tries to save an improperly 
  * formatted JSON. */
-dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName,doReadOnly) {
+ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName,doReadOnly) {
+    return _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,{stringify: true});
+ }
 
-    //this is used internally to lookup the data member used here
-    let _getDataMember = function() {
-        let component = componentView.getComponent();
-        let member = component.getField(memberFieldName);
-        return member;
-    };
+ /** This gets a data source for JSON or stringified JSON data from a member. */
+function _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,options) {
+    if(!options) options = {};
     
     return {
 
@@ -75,92 +36,49 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
         },
 
         getData: function() {
-            let member = _getDataMember();
-            let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-            if(member.getState() != apogeeutil.STATE_NORMAL) {
-                switch(member.getState()) {
-                    case apogeeutil.STATE_ERROR: 
-                        //check if there is valueData on the error object
-                        let error = member.getError();
-                        if((error)&&(error.valueData)) {
-                            //there is a substitute value
-                            //only process json, which is what we expect this to hold
-                            if(error.valueData.nominalType == MIME_TYPE_JSON) {
-                                if(error.valueData.stringified) {
-                                    wrappedData.data = error.valueData.value;
-                                }
-                                else {
-                                    wrappedData.data = JSON.stringify(error.valueData.value,null,SPACING_FORMAT_STRING);
-                                }
-                            }
-                        }
-                        //if no value was set, which is most times
-                        if(wrappedData.data === undefined) {
-                            //normal error with not substitue value
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                            wrappedData.message = "Error in value: " + member.getErrorMsg();
-                            wrappedData.hideDisplay = true;
-                            wrappedData.data = apogeeutil.INVALID_VALUE;
-                        }
-                        break;
-
-                    case apogeeutil.STATE_PENDING:
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Value pending!";
-                        wrappedData.hideDisplay = true;
-                        wrappedData.data = apogeeutil.INVALID_VALUE;
-                        break;
-
-                    case apogeeutil.STATE_INVALID:
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Value invalid!";
-                        wrappedData.hideDisplay = true;
-                        wrappedData.data = apogeeutil.INVALID_VALUE;
-                        break;
-
-                    default:
-                        throw new Error("Unknown display data value state!")
-                }
-            }
-            else {
-                //convert data to a string, as is appropriate
-                let textData;
-                let data = member.getData();
-                if(data == apogeeutil.INVALID_VALUE) {
-                    textData = apogeeutil.INVALID_VALUE;
-                }
-                else if(data === undefined) {
-                    textData = "undefined";
-                }
-                else {
-                    textData = JSON.stringify(data,null,SPACING_FORMAT_STRING);
-                }
-                wrappedData.data = textData;
-            }
-
-            return wrappedData;
+            return dataDisplayHelper.getWrappedMemberData(componentView,memberFieldName,options);
         },
 
         getEditOk: doReadOnly ? 
             function () { return false; }  : 
             function () {
-                return !_getDataMember().hasCode();
+                let member = componentView.getComponent().getField(memberFieldName);
+                return !member.hasCode();
             },
 
         saveData: doReadOnly ? undefined :
-            function(text) {
-                var data;
-                if(text === "undefined") {
-                    data = undefined;
-                }
-                else {
-                    //this call adds spogee specific error information if the parse fails
-                    data = apogeeutil.apogeeJsonParse(text);
+            function(data) {
+
+                //is the display data is stringified, parse it into a json
+                if(options.stringify) {
+                    let text = data;
+                    if(text === "undefined") {
+                        data = undefined;
+                    }
+                    else {
+                        //this call adds spogee specific error information if the parse fails
+                        try {
+                            data = JSON.parse(text);
+                        }
+                        catch(error) {
+                            //if we had an error parsing append the string data to the error so we can display it.
+                            if(apogeeutil._.isString(data)) {
+                                error.valueData = {
+                                    value: text,
+                                    nominalType: MIME_TYPE_JSON,
+                                    stringified: true
+                                };
+                            }
+                            data = error;
+                            
+                        }
+                    }
                 }
 
+                let member = componentView.getComponent().getField(memberFieldName);
                 var commandData = {};
                 commandData.type = "saveMemberData";
-                commandData.memberId = _getDataMember().getId();
+                commandData.memberId = member.getId();
                 commandData.data = data;
                 
                 app.executeCommand(commandData);
@@ -168,7 +86,6 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
             }
     }
 }
-
 
 /** This function creates editor callbacks or the member function body. 
  * The argument optionalClearCodeValue can optionally be set. If so, the member data will be 
@@ -176,13 +93,6 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
  * The optionalDefaultDataValue will be used to clear the function and save the data value if the formula and
  * private code are empty strings. */
 dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,memberFieldName) {
-
-    //this is used internally to lookup the data member used here
-    let _getFunctionMember = function() {
-        let component = componentView.getComponent();
-        let member = component.getField(memberFieldName);
-        return member;
-    };
 
     return {
 
@@ -195,7 +105,10 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
         },
 
         getData: function() {
-            return _getFunctionMember().getFunctionBody();
+            let functionMember = componentView.getComponent().getField(memberFieldName);
+            return { 
+                data: functionMember.getFunctionBody()
+            }
         },
 
         getEditOk: function() {
@@ -203,7 +116,7 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
         },
 
         saveData: function(text) {
-            let functionMember = _getFunctionMember();
+            let functionMember = componentView.getComponent().getField(memberFieldName);
 
             var commandData = {};
             commandData.type = "saveMemberCode";
@@ -221,13 +134,6 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
 /** This function creates editor callbacks or the member supplemental code. */
 dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,memberFieldName) {
 
-    //this is used internally to lookup the data member used here
-    let _getFunctionMember = function() {
-        let component = componentView.getComponent();
-        let member = component.getField(memberFieldName);
-        return member;
-    };
-
     return {
 
         doUpdate: function() {
@@ -239,7 +145,10 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
         },
 
         getData: function() {
-            return _getFunctionMember().getSupplementalCode();
+            let functionMember = componentView.getComponent().getField(memberFieldName);
+            return {
+                data: functionMember.getSupplementalCode()
+            }
         },
 
         getEditOk: function() {
@@ -247,7 +156,7 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
         },
 
         saveData: function(text) {
-            let functionMember = _getFunctionMember();
+            let functionMember = componentView.getComponent().getField(memberFieldName);
 
             var commandData = {};
             commandData.type = "saveMemberCode";
@@ -269,13 +178,20 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
     
     return {
         doUpdate: function() {
-            //return value is whether or not the data display needs to be udpated
-            //the overall state is taken from the main memberm which will encompass any changes to 
-            //the child members.
+            //remove the view if here is an error and error info
             let component = componentView.getComponent();
+            let removeView;
+            if(componentView.getBannerState() == apogeeutil.STATE_ERROR) {
+                let errorInfoList = componentView.getErrorInfoList();
+                removeView = !((errorInfoList)&&(errorInfoList.length > 0));
+            }
+            else {
+                removeView = true;
+            }
+
             let reloadData = component.isMemberDataUpdated("member");
             let reloadDataDisplay = false;
-            return {reloadData,reloadDataDisplay};
+            return {reloadData,reloadDataDisplay,removeView};
         },
 
         getData: function() {
@@ -283,43 +199,67 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
                 let errorInfoList = componentView.getErrorInfoList()
                 if((errorInfoList)&&(errorInfoList.length > 0)) {
                     //show data view, this is our data
-                    return errorInfoList;
+                    return {
+                        data: errorInfoList
+                    }
                 }
             }
 
-            //no error or error info; remove the data view
-            let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-            wrappedData.removeView = true;
-            return wrappedData;
+            //no error info; we shouldn't get here
+            return {
+                data: apogeeutil.INVALID_VALUE
+            }
             
         }
     }
 }
 
-/** This method reads the data from the given member and wraps it, including
- * handling error/pending/invalid data. This is appropriate for the 
- * getData function in a data source (not getDataDisplay though) 
- * There is one option - if optionalShowDispalyForInvalidData = true
- * the display will not be hidden if the data value is INVALID_VALUE. */
-dataDisplayHelper.getStandardWrappedMemberData = function(member,optionalShowDispalyForInvalidData) {
-    let wrappedData = dataDisplayHelper.getEmptyWrappedData();
+/** This method returns data source wrapped data, for getData and getDisplayData 
+ * options:
+ * - stringify - Stringifies the data. Otherwise it is returned as is (JSON data assumed).
+*/
+dataDisplayHelper.getWrappedMemberData = function(componentView,memberFieldName,options) {
+    if(!options) options = {};
+    let member = componentView.getComponent().getField(memberFieldName);
+    let wrappedData = {};
     if(member.getState() != apogeeutil.STATE_NORMAL) {
-        wrappedData.data = apogeeutil.INVALID_VALUE;
+        
         switch(member.getState()) {
             case apogeeutil.STATE_ERROR: 
-                wrappedData.hideDisplay = true;
+                //check if there is valueData on the error object, in which case we may be able to include it.
+                let error = member.getError();
+                if((error)&&(error.valueData)) {
+                    //there is a substitute value
+                    //only process json, which is what we expect this to hold
+                    if(error.valueData.nominalType == MIME_TYPE_JSON) {
+                        if(options.stringify) {
+                            if(error.valueData.stringified) {
+                                wrappedData.data = error.valueData.value;
+                            }
+                            else {
+                                wrappedData.data = _stringifyJsonData(error.valueData.value);
+                            }
+                        }
+                        else {
+                            wrappedData.data = error.valueData.value;
+                        }
+                    }
+                }
+                else {
+                    wrappedData.data = apogeeutil.INVALID_VALUE;
+                }
                 wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
                 wrappedData.message = "Error in value: " + member.getErrorMsg();
                 break;
 
             case apogeeutil.STATE_PENDING:
-                wrappedData.hideDisplay = true;
+                wrappedData.data = apogeeutil.INVALID_VALUE;
                 wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
                 wrappedData.message = "Value pending!";
                 break;
 
             case apogeeutil.STATE_INVALID:
-                wrappedData.hideDisplay = optionalShowDispalyForInvalidData ? false : true;
+                wrappedData.data = apogeeutil.INVALID_VALUE;
                 wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
                 wrappedData.message = "Value invalid!";
                 break;
@@ -327,201 +267,23 @@ dataDisplayHelper.getStandardWrappedMemberData = function(member,optionalShowDis
             default:
                 throw new Error("Unknown display data value state!")
         }
+
+        wrappedData.hideDisplay = (wrappedData.data === apogeeutil.INVALID_VALUE);
     }
     else {
-        wrappedData.data = member.getData();
+        let data = member.getData();
+        if(options.stringify) {
+            wrappedData.data = _stringifyJsonData(data);
+        }
+        else {
+            wrappedData.data = data;
+        }
     }
 
     return wrappedData;
 }
 
-/** This method wraps "abnormal" member data when read as part of
- * getDisplayData. The return value is {abnormalWrappedData,data} 
- * If the member state is normal, the data will be returned and abnomrlaWrappedData 
- * will be undefined. If the state is not normal, abnormalWrappedData will be
- * defined and data will be undefined. */
-dataDisplayHelper.getProcessedMemberDisplayData = function(member) {
-    let abnormalWrappedData,inputData;
-
-    if(member.getState() != apogeeutil.STATE_NORMAL) {
-        abnormalWrappedData = dataDisplayHelper.getEmptyWrappedData();
-        abnormalWrappedData.displayInvalid = true;
-
-        switch(member.getState()) {
-            case apogeeutil.STATE_ERROR: 
-                abnormalWrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                abnormalWrappedData.message = "Error in layout input value: " + member.getErrorMsg();
-                break;
-
-            case apogeeutil.STATE_PENDING:
-                abnormalWrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                abnormalWrappedData.message = "Display layout input value pending!";
-                break;
-
-            case apogeeutil.STATE_INVALID:
-                abnormalWrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                abnormalWrappedData.message = "Display layout input value invalid!";
-                break;
-
-            default:
-                throw new Error("Unknown display data value state!")
-        }
-    }
-    else {
-        inputData = member.getData();
-    }
-
-    return {abnormalWrappedData,inputData};
-}
-
-
-/** This function returns true if the passed in data is wrapped data. */
-dataDisplayHelper.isWrappedData = function(data) {
-    if(!data) return false;
-    return (data[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] == DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE);
-}
-
-/** This function returns empty wrapped data, since it can be cumbersome to construct. The return
- * value can be modified by adding additional fields. */
-dataDisplayHelper.getEmptyWrappedData = function() {
-    let wrappedData = {};
-    wrappedData[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] = DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE;
-    return wrappedData;
-}
-
-/** This function reads data, handling wrapped or unwrapped data.
- * Wrapped Data Options:
- * - data - This is the data to pass return
- * - messageType - This is the type of message to show. The option are none, error, warning and info. The message can be shown
- *      even if the display is not hidden (which is not true for display data).
- * - message - This is the message to show.
- * - hideDisplay - If this is true, the main display element will not be shown.
- * - removeView - If this is true, the entire data view will be removed, as if it were not there.
- * 
- * Unwrapped Data:
- * If the data is not wrapped, the return value is the data. If this value is apogeeutil.INVALID_VALUE, hideDisplay
- * will be set to true and a default message will be shown.
- * 
- * The return values is:
- *  {data,messageType,message,hideDisplay,removeView}
- */
-dataDisplayHelper.readWrappedData = function(getDataFunction,errorPrefix) {
-    
-    let data;
-    let messageType;
-    let message;
-    let hideDisplay;
-    let removeView;
-
-    try {
-        //load data from data source
-        let dataReturn
-        if(getDataFunction) {
-            dataReturn = getDataFunction();
-        }
-        else {
-            dataReturn = apogeeutil.INVALID_VALUE;
-        }
-
-        //load data display values
-        if((dataReturn)&&(dataDisplayHelper.isWrappedData(dataReturn))) {
-            //handle a wrapped return value
-            data = dataReturn.data;
-            messageType = dataReturn.messageType;
-            message = dataReturn.message;
-            removeView = dataReturn.removeView;
-            hideDisplay = dataReturn.hideDisplay;
-        }
-        else {
-            //straight data was returned
-            data = dataReturn;
-            hideDisplay = (data === apogeeutil.INVALID_VALUE);
-        }
-    }
-    catch(error) {
-        //hide dispay and show error message
-        messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-        message = errorPrefix + error.message ? error.message : error ? error.toString() : "Unknown";
-        removeView = false;
-        hideDisplay = true;
-        data = apogeeutil.INVALID_VALUE;
-
-        if(error.stack) console.error(error.stack);
-    }
-
-    //set values that have not be set
-    if(messageType === undefined) {
-        messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE
-        message = "";
-    }
-    hideDisplay = hideDisplay ? true : false;
-    removeView = removeView ? true : false;
-
-    return {data,messageType,message,hideDisplay,removeView};
-}
-
-/** This function reads display data, handling wrapped or unwrapped data.
- * Wrapped Data Options:
- * - data - this is the data to pass to the dispaly
- * - displayInvalid - if this is true the display is hidden and a message is shown. 
- * - messageType - This is the type of message to show. This is valid only if the display is invalid and ignored otherwise.
- *      If a message will be shown and this is not set, the message type wil be error.
- * - message - This is the message to show.
- * 
- * Unwrapped Data:
- * If the data is not wrapped, the return value is the data. If this value is apogeeutil.INVALID_VALUE, displayInvalid
- * will be set to true and a default message will be shown.
- * 
- * The return values is:
- *  {data,displayInvalid,messageType,message}
- */
-dataDisplayHelper.readWrappedDisplayData = function(getDataFunction,errorPrefix) {
-    
-    let data;
-    let messageType;
-    let message;
-    let displayInvalid;
-
-    try {
-        //load data from data source
-        let dataReturn
-        if(getDataFunction) {
-            dataReturn = getDataFunction();
-        }
-        else {
-            dataReturn = apogeeutil.INVALID_VALUE;
-        }
-
-        //load data display values
-        if((dataReturn)&&(dataDisplayHelper.isWrappedData(dataReturn))) {
-            //handle a wrapped return value
-            data = dataReturn.data;
-            displayInvalid = dataReturn.displayInvalid;
-            messageType = dataReturn.messageType;
-            message = dataReturn.message;
-        }
-        else {
-            //straight data was returned
-            data = dataReturn;
-            displayInvalid = (data === apogeeutil.INVALID_VALUE);
-        }
-    }
-    catch(error) {
-        //hide dispay and show error message
-        messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-        message = errorPrefix + error.message ? error.message : error ? error.toString() : "Unknown";
-        displayInvalid = true;
-        data = apogeeutil.INVALID_VALUE;
-
-        if(error.stack) console.error(error.stack);
-    }
-
-    //fill in the message type and message if they are not set
-    //by default, set message type to error
-    if(displayInvalid) {
-        if(messageType === undefined) messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-        if(message === undefined) message = "Data unavailable";
-    }
-
-    return {data,displayInvalid,messageType,message};
+function _stringifyJsonData(data) {
+    if(data == apogeeutil.INVALID_VALUE) return apogeeutilINVALID_VALUE;
+    else return JSON.stringify(data,null,SPACING_FORMAT_STRING);
 }

@@ -50,35 +50,25 @@ class DesignerDataFormComponentView extends FormInputBaseComponentView {
             },
 
             getDisplayData: () => {       
-                let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-
                 //get the layout function
                 let component = this.getComponent();
                 let {validatorFunction,errorMessage} = component.createValidatorFunction();
                 if(errorMessage) {
-                    wrappedData.displayInvalid = true;
+                    let wrappedData = {};
+                    wrappedData.hideDisplay = true;
                     wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
                     wrappedData.message = errorMessage;
                     return wrappedData;
                 }
 
-                //load the layout
-                let formMember = this.getComponent().getField("member.data");
-                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(formMember);
-                if(abnormalWrappedData) {
-                    return abnormalWrappedData;
-                }
-
                 //save this for use on submit
                 isDataValidFunction = validatorFunction;
 
-                return inputData;
+                //load the layout
+                return dataDisplayHelper.getWrappedMemberData(this,"member.data");
             },
 
-            getData: () => {
-                let valueMember = this.getComponent().getField("member.value");
-                return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
-            },
+            getData: () => dataDisplayHelper.getWrappedMemberData(this,"member.value"),
 
             getEditOk: () => true,
 
@@ -124,7 +114,7 @@ const DesignerDataFormComponentViewConfig = {
             getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
         },
         FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-        getAppCodeViewModeEntry("validatorCode","On Save","isValid",{argList: "formValue,formLayout"}),
+        getAppCodeViewModeEntry("validatorCode",null,"On Save","isValid",{argList: "formValue,formLayout"}),
         getMemberDataTextViewModeEntry("member.value")
     ],
     hasTabEntry: false,

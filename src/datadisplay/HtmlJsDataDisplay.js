@@ -86,8 +86,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             //get display data and handle invalid display data
             let displayData;
             if(dataSource.getDisplayData) {
-                let dataResult = dataDisplayHelper.readWrappedDisplayData(dataSource.getDisplayData,"Error loading display input data: ");
-                if(dataResult.displayInvalid) {
+                let dataResult = dataSource.getDisplayData();
+                if(dataResult.hideDisplay) {
                     //display invalid! hide display and show message
                     this.displayContainer.setHideDisplay(dataResult.hideDisplay);
                     this.displayContainer.setMessage(dataResult.messageType,dataResult.message);

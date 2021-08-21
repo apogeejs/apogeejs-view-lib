@@ -29,51 +29,20 @@ class JsonPlusTableComponentView extends ComponentView {
             },
 
             getData: () => {
-                let member = this.getComponent().getMember();
-                let state = member.getState();
-                if(state != apogeeutil.STATE_NORMAL) {
-                    //handle non-normal state returning wrapped data
-                    let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-                    wrappedData.hideDisplay = true;
-                    wrappedData.data = apogeeutil.INVALID_VALUE;
-                    switch(member.getState()) {
-                        case apogeeutil.STATE_ERROR: 
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                            wrappedData.message = "Error in value: " + member.getErrorMsg();
-                            break;
-
-                        case apogeeutil.STATE_PENDING:
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                            wrappedData.message = "Value pending!";
-                            break;
-
-                        case apogeeutil.STATE_INVALID:
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                            wrappedData.message = "Value invalid!";
-                            break;
-
-                        default:
-                            throw new Error("Unknown display data value state!")
+                let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member")
+                //if we have valid data, update it to display the functions with the otherwise JSON data.
+                if(wrappedData.data != apogeeutil.INVALID_VALUE) {
+                    var textData;
+                    if(wrappedData.data === undefined) {
+                        textData = "undefined";
                     }
-                    return wrappedData;
-                }
+                    else {
+                        let modifiedValueJson = replaceFunctions(wrappedData.data);
+                        textData = JSON.stringify(modifiedValueJson,null,FORMAT_STRING);
+                    }
 
-                let jsonPlus = member.getData();
-
-                var textData;
-                if(jsonPlus == apogeeutil.INVALID_VALUE) {
-                    //for invalid input, convert to display an empty string
-                    textData = "";
+                    wrappedData.data = textData;
                 }
-                else if(jsonPlus === undefined) {
-                    textData = "undefined";
-                }
-                else {
-                    let modifiedValueJson = replaceFunctions(jsonPlus);
-                    textData = JSON.stringify(modifiedValueJson,null,FORMAT_STRING);
-                }
-
-                return textData;
             }
         }
     }

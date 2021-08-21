@@ -69,20 +69,9 @@ class CustomDataComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getDisplayData: () => {
-                let inputMember = this.getComponent().getField("member.input");
-                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(inputMember);
-                if(abnormalWrappedData) {
-                    return abnormalWrappedData;
-                }
-                //data is just the member data, return as unwrapped 
-                return inputData;
-            },
+            getDisplayData: () => dataDisplayHelper.getWrappedMemberData(this,"member.input"),
 
-            getData: () => {
-                let member = this.getComponent().getField("member.data");
-                return dataDisplayHelper.getStandardWrappedMemberData(member);
-            },
+            getData: () => dataDisplayHelper.getWrappedMemberData(this,"member.data"),
 
             //edit ok - always true
             getEditOk: () => {
@@ -150,9 +139,9 @@ const CustomDataComponentViewConfig = {
             isActive: true,
             getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
         },
-        getAppCodeViewModeEntry("html","HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
-        getAppCodeViewModeEntry("css","CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
-        getAppCodeViewModeEntry("uiCode","uiGenerator()","UI Generator"),
+        getAppCodeViewModeEntry("html",null,"HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
+        getAppCodeViewModeEntry("css",null,"CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),
+        getAppCodeViewModeEntry("uiCode",null,"uiGenerator()","UI Generator"),
         getFormulaViewModeEntry("member.input","Input Code","Input Code"),
         getPrivateViewModeEntry("member.input","Input Private","Input Private"),
         getMemberDataTextViewModeEntry("member.data",{name: "Data Value",label: "Data Value"})

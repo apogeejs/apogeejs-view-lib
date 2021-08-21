@@ -4,6 +4,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -31,13 +32,12 @@ class FullActionFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-
                 //get the layout function
                 let component = this.getComponent();
                 let {formLayoutFunction,errorMessage} = component.createFormLayoutFunction();
                 if(errorMessage) {
-                    wrappedData.displayInvalid = true;
+                    let wrappedData = {};
+                    wrappedData.hideDisplay = true;
                     wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
                     wrappedData.message = errorMessage;
                     return wrappedData;
@@ -45,26 +45,27 @@ class FullActionFormComponentView extends ComponentView {
 
                 //load the layout
                 //read the input data (checking for non-normal state)
-                let member = this.getComponent().getMember();
-                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(member);
-                if(abnormalWrappedData) {
-                    return abnormalWrappedData;
-                }
+                let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member");
 
                 //use the parent folder as the context base
-                let contextMemberId = component.getMember().getParentId();
-                let commandMessenger = new UiCommandMessenger(this,contextMemberId);
-                try {
-                    let layout = formLayoutFunction(commandMessenger,inputData);
-                    wrappedData.data = layout;
-                    return wrappedData;
+                if(wrappedData.data != apogeeutil.INVALID_VALUE) {
+                    let inputData = wrappedData.data;
+                    let contextMemberId = component.getMember().getParentId();
+                    let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+                    try {
+                        let layout = formLayoutFunction(commandMessenger,inputData);
+                        wrappedData.data = layout;
+                    }
+                    catch(error) {
+                        let errorWrappedData = {};
+                        errorWrappedData.hideDisplay = true;
+                        errorWrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                        errorWrappedData.message = "Error executing layout function: " + error.toString();
+                        return errorWrappedData;
+                    }
                 }
-                catch(error) {
-                    wrappedData.displayInvalid = true;
-                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                    wrappedData.message = "Error executing layout function: " + error.toString();
-                    return wrappedData;
-                }
+
+                return wrappedData;
             },
 
             //no data
@@ -84,7 +85,7 @@ const FullActionFormComponentViewConfig = {
             isActive: true,
             getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
         },
-        getAppCodeViewModeEntry("layoutCode","layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
+        getAppCodeViewModeEntry("layoutCode",null,"layout","Layout Code",{argList:"commandMessenger,inputData",isActive: true}),
         getFormulaViewModeEntry("member",{name: "input", label:"Input Data Code"}),
         getPrivateViewModeEntry("member",{name: "inputPrivate", label:"Input Data Private"})
     ],

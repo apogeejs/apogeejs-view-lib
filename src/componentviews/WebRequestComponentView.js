@@ -181,9 +181,8 @@ class WebRequestComponentView extends FormInputBaseComponentView {
             },
     
             getData: () => {
-                //Here we return just the body, converted to text if needed
-                let dataMember = this.getComponent().getField("member.data");
-                let wrappedData = this._getWrappedData(dataMember);
+                //Here we return just the body (not header), converted to text if needed
+                let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member.data");
                 if(wrappedData.data !== apogeeutil.INVALID_VALUE) {
                     let bodyAndMeta = wrappedData.data;
                     if(!bodyAndMeta) {
@@ -200,13 +199,6 @@ class WebRequestComponentView extends FormInputBaseComponentView {
                         else {
                             wrappedData.data = JSON.stringify(bodyAndMeta.body);
                         }
-                    }
-
-                    //if there is a body error, display it, along with the laoded body value
-                    if(bodyAndMeta.bodyError) {
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                        wrappedData.message = "Error loading response body: " + bodyAndMeta.bodyError;
-                        wrappedData.hideDisplay = false; 
                     }
                 }
                 return wrappedData;
@@ -225,10 +217,9 @@ class WebRequestComponentView extends FormInputBaseComponentView {
     
             getData: () => {
                 //Here we return just the meta data, as text
-                let dataMember = this.getComponent().getField("member.data");
-                let wrappedData = this._getWrappedData(dataMember);
-                let bodyAndMeta = wrappedData.data;
-                if(bodyAndMeta !== apogeeutil.INVALID_VALUE) {
+                let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member.data");
+                if(wrappedData.data !== apogeeutil.INVALID_VALUE) {
+                    let bodyAndMeta = wrappedData.data;
                     if((!bodyAndMeta)||(!bodyAndMeta.meta)) {
                         wrappedData.data = "";
                     }
@@ -241,61 +232,7 @@ class WebRequestComponentView extends FormInputBaseComponentView {
         }
     }
 
-    /** This gets the wrapped data for the member. We will split up the data for the 
-     * metadata and the body in the data source, if the data is valid. */
-    _getWrappedData(member) {
-        let wrappedData = dataDisplayHelper.getEmptyWrappedData();
-        if(member.getState() != apogeeutil.STATE_NORMAL) {
-            switch(member.getState()) {
-                case apogeeutil.STATE_ERROR: 
-                    //check if there is valueData on the error object
-                    let error = member.getError();
-                    if((error)&&(error.valueData)) {
-                        //there is a substitute value
-                        //only process json, which is what we expect this to hold
-                        if(error.valueData.nominalType == MIME_TYPE_JSON) {
-                            wrappedData.data = error.valueData.value
-                        }
-                    }
-                    //if no value was set, which is most times
-                    if(wrappedData.data === undefined) {
-                        //normal error with not substitue value
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                        wrappedData.message = "Error in value: " + member.getErrorMsg();
-                        wrappedData.hideDisplay = true;
-                        wrappedData.data = apogeeutil.INVALID_VALUE;
-                    }
-                    break;
-
-                case apogeeutil.STATE_PENDING:
-                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                    wrappedData.message = "Value pending!";
-                    wrappedData.hideDisplay = true;
-                    wrappedData.data = apogeeutil.INVALID_VALUE;
-                    break;
-
-                case apogeeutil.STATE_INVALID:
-                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                    wrappedData.message = "Value invalid!";
-                    wrappedData.hideDisplay = true;
-                    wrappedData.data = apogeeutil.INVALID_VALUE;
-                    break;
-
-                default:
-                    throw new Error("Unknown display data value state!")
-            }
-        }
-        else {
-            //just return the json data
-            wrappedData.data = member.getData();
-        }
-
-        return wrappedData;
-    }
-
 }
-
-const MIME_TYPE_JSON = "application/json"
 
 //===============================
 // config
