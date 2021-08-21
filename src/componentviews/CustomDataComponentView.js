@@ -117,7 +117,7 @@ class CustomDataComponentView extends ComponentView {
 
 const CustomDataComponentViewConfig = {
     componentType: "apogeeapp.CustomDataCell",
-    componentClass: CustomDataComponentView,
+    viewClass: CustomDataComponentView,
     hasTabEntry: false,
     hasChildEntry: true,
     iconResPath: "/icons3/genericCellIcon.png",
