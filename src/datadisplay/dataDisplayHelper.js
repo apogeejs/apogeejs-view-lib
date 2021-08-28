@@ -55,8 +55,11 @@ function _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,o
                     if(text === "undefined") {
                         data = undefined;
                     }
+                    else if(text == "NaN") {
+                        data = NaN;
+                    }
                     else {
-                        //this call adds spogee specific error information if the parse fails
+                        //here we add apogee specific error information if the parse fails
                         try {
                             data = JSON.parse(text);
                         }
@@ -284,6 +287,8 @@ dataDisplayHelper.getWrappedMemberData = function(componentView,memberFieldName,
 }
 
 function _stringifyJsonData(data) {
-    if(data == apogeeutil.INVALID_VALUE) return apogeeutilINVALID_VALUE;
+    if(data == apogeeutil.INVALID_VALUE) return apogeeutil.INVALID_VALUE;
+    else if(data === undefined) return "undefined";
+    else if(isNaN(data)) return "NaN";
     else return JSON.stringify(data,null,SPACING_FORMAT_STRING);
 }
