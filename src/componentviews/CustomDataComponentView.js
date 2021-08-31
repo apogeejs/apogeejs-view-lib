@@ -112,7 +112,7 @@ class CustomDataComponentView extends ComponentView {
 
 
 //======================================
-// This is the control generator, to register the control
+// This is the control config, to register the control
 //======================================
 
 const CustomDataComponentViewConfig = {

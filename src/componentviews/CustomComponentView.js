@@ -103,7 +103,7 @@ CustomComponentView.GENERATOR_FUNCTION_FORMAT_TEXT = [
        ].join("\n");
 
 //======================================
-// This is the control generator, to register the control
+// This is the control config, to register the control
 //======================================
 
 const CustomComponentViewConfig = {
