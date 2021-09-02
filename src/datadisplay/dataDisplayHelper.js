@@ -289,6 +289,6 @@ dataDisplayHelper.getWrappedMemberData = function(componentView,memberFieldName,
 function _stringifyJsonData(data) {
     if(data == apogeeutil.INVALID_VALUE) return apogeeutil.INVALID_VALUE;
     else if(data === undefined) return "undefined";
-    else if(isNaN(data)) return "NaN";
+    else if(Number.isNaN(data)) return "NaN";
     else return JSON.stringify(data,null,SPACING_FORMAT_STRING);
 }
