@@ -144,8 +144,6 @@ const DesignerActionFormComponentViewConfig = {
         getAppCodeViewModeEntry("onSubmitCode",null,"On Save","onSubmit",{argList:"cmdMsngr,formValue,formObject"}),
         getAppCodeViewModeEntry("onCancelCode",null,"On Cancel", "onCancel",{argList: "cmdMsngr,formObject"}),
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/formCellIcon.png",
     propertyDialogEntries: [
         {

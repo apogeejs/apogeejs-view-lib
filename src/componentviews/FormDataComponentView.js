@@ -133,8 +133,6 @@ const FormDataComponentViewConfig = {
         getPrivateViewModeEntry("member.isInputValid",{name:"isInputValid Private",label:"isInputValid Private"}),
         getMemberDataTextViewModeEntry("member.data",{name: "Form Value",label: "Form Value"})
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/formCellIcon.png"
 }
 export default FormDataComponentViewConfig;

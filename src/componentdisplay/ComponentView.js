@@ -137,7 +137,7 @@ export default class ComponentView {
         else {
             var resPath = this.viewConfig.iconResPath;
             if(!resPath) {
-                if(this.usesTabDisplay()) {
+                if(this.viewConfig.isParentOfChildEntries) {
                     resPath = ComponentView.DEFAULT_PAGE_ICON;
                 }
                 else {
@@ -147,6 +147,10 @@ export default class ComponentView {
             //cell/page icons are in the app domain/repo
             return uiutil.getResourcePath(resPath,"app");
         }
+    }
+
+    isChildEntry() {
+        return (this.viewConfig.viewModes !== undefined);
     }
 
     /** The appViewInterface connects the component with the rest of the UI. THis is a base class
@@ -343,8 +347,8 @@ export default class ComponentView {
         }
         
         //default sort order within parent
-        let treeEntrySortOrder = this.viewConfig.treeEntrySortOrder;
-        if(treeEntrySortOrder == undefined) treeEntrySortOrder = ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
+        let treeEntrySortOrder = this.viewConfig.isParentOfChildEntries ? 
+            ComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER : ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER;
         treeDisplay.setComponentTypeSortOrder(treeEntrySortOrder);
         
         return treeDisplay;
@@ -392,16 +396,12 @@ export default class ComponentView {
     // tab display methods - this is the tab element, only used for parent members
     //-------------------
 
-    /** This indicates if the component has a tab display. */
-    usesTabDisplay() {
-        return this.viewConfig.hasTabEntry;
-    }
     //Implement in extending class:
     ///** This creates the tab display for the component. */
     //instantiateTabDisplay();
 
     createTabDisplay(makeActive) {
-        if((this.usesTabDisplay())&&(!this.tabDisplay)) {
+        if((this.viewConfig.isParentOfChildEntries)&&(!this.tabDisplay)) {
             var tabFrame = this.appViewInterface.getTabFrame();
             if(tabFrame) {
 
@@ -557,7 +557,7 @@ export default class ComponentView {
             }
         }
         
-        if(this.usesTabDisplay()) {
+        if(this.viewConfig.isParentOfChildEntries) {
             openCallback = () => {
                 makeTabActive(this);
 
@@ -575,7 +575,7 @@ export default class ComponentView {
             //remove the tree from the parent
             openCallback = () => {
                 var parentComponentView = this.getParentComponentView();
-                if((parentComponentView)&&(parentComponentView.viewConfig.hasTabEntry)) {
+                if((parentComponentView)&&(parentComponentView.isParentOfChildEntries())) {
 
                     //execute command to select child
                     let command = parentComponentView.getSelectApogeeNodeCommand(this.getName());

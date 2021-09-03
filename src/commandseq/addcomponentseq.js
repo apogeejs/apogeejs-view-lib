@@ -38,7 +38,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
         var displayName = componentConfig.displayName;
         
         //get the folder list
-        let includeRootFolder = componentViewConfig.hasTabEntry;
+        let includeRootFolder = ((componentViewConfig.isParentOfChildEntries)&&(componentViewConfig.viewModes === undefined));
         var parentList = modelManager.getParentList(includeRootFolder);
         
         //create the dialog layout - do on the fly because folder list changes
@@ -86,7 +86,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
             //editor related commands
             let additionalCommandInfo;
             let parentComponentView;
-            if(componentViewConfig.hasChildEntry) {
+            if(componentViewConfig.viewModes !== undefined) {
                 let parentComponentId = modelManager.getComponentIdByMemberId(parentMemberId);
                 if((parentComponentId)&&(appViewInterface.hasParentDisplays())) {
                     parentComponentView = appViewInterface.getComponentViewByComponentId(parentComponentId);

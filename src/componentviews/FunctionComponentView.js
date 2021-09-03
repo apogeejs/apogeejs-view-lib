@@ -9,8 +9,6 @@ const FunctionComponentViewConfig = {
         getFormulaViewModeEntry("member",{name: "Code", label: "Function Body", isActive: true}),
         getPrivateViewModeEntry("member")  
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/functionCellIcon.png",
     propertyDialogEntries: [
         {

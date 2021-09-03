@@ -83,8 +83,6 @@ const DynamicFormViewConfig = {
         getFormulaViewModeEntry("member",{name:"Input Code",label:"Layout Code",argList:"admin"}),
         getPrivateViewModeEntry("member",{name:"Input Private",label:"Layout Private"}),
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/formCellIcon.png"
 }
 export default DynamicFormViewConfig;

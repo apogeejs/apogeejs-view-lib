@@ -133,8 +133,6 @@ const FullDataFormComponentViewConfig = {
         getPrivateViewModeEntry("member.input",{name: "inputPrivate", label:"Input Data Private"}),
         getMemberDataTextViewModeEntry("member.value")
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/formCellIcon.png"
 }
 export default FullDataFormComponentViewConfig;

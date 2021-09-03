@@ -89,8 +89,6 @@ const FullActionFormComponentViewConfig = {
         getFormulaViewModeEntry("member",{name: "input", label:"Input Data Code"}),
         getPrivateViewModeEntry("member",{name: "inputPrivate", label:"Input Data Private"})
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/formCellIcon.png"
 }
 export default FullActionFormComponentViewConfig;

@@ -1,6 +1,7 @@
-import {TreeEntry,getIconOverlay} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+import {TreeEntry} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
 import {addComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
+import {getComponentViewConfig} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 /** This component represents a json table object. */
 export default class TreeComponentDisplay {
@@ -77,17 +78,20 @@ export default class TreeComponentDisplay {
             var component = this.componentView.getComponent();
 
             //add child folder menu item
-            if(this.componentView.usesTabDisplay()) {
+            if(this.componentView.getViewConfig().isParentOfChildEntries) {
                 let app = this.componentView.getApp();
                 var appViewInterface = this.componentView.getAppViewInterface();
                 let initialValues = {parentId: component.getMemberId()};
                 let pageComponents = componentInfo.getPageComponentTypes();
                 pageComponents.forEach(pageComponentType => {
-                    let childMenuItem = {};
-                    let pageComponentConfig = componentInfo.getComponentConfig(pageComponentType);
-                    childMenuItem.title = "Add Child " + pageComponentConfig.displayName;
-                    childMenuItem.callback = () => addComponent(appViewInterface,app,pageComponentType,initialValues);
-                    menuItemList.push(childMenuItem);
+                    let componentViewConfig = getComponentViewConfig(pageComponentType);
+                    if(componentViewConfig.isParentOfChildEntries) {
+                        let childMenuItem = {};
+                        let pageComponentConfig = componentInfo.getComponentConfig(pageComponentType);
+                        childMenuItem.title = "Add Child " + pageComponentConfig.displayName;
+                        childMenuItem.callback = () => addComponent(appViewInterface,app,pageComponentType,initialValues);
+                        menuItemList.push(childMenuItem);
+                    }
                 })
             }
 

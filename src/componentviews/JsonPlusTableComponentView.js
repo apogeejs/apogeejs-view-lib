@@ -112,8 +112,6 @@ const JsonPlusTableComponentViewConfig = {
         getFormulaViewModeEntry("member"),
         getPrivateViewModeEntry("member")
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/jsonCellIcon.png"
 }
 export default JsonPlusTableComponentViewConfig;

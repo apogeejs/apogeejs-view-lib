@@ -28,8 +28,8 @@ export function updateComponentProperties(componentView) {
         }); 
     }
 
-    // add the folders to which we can move this (it can move to root only if it is a parent)
-    let includeRootFolder = componentViewConfig.hasTabEntry;
+    // add the folders to which we can move this (only allow parents without being a child entry in the root))
+    let includeRootFolder = ((componentViewConfig.isParentOfChildEntries)&&(componentViewConfig.viewModes === undefined));
     var parentList = modelManager.getParentList(includeRootFolder);
 
     //create the dialog layout - do on the fly because folder list changes
@@ -86,7 +86,7 @@ export function updateComponentProperties(componentView) {
             let renameEditorCommands;
 
             //do the first stage of editor commands
-            if(componentViewConfig.hasChildEntry) {
+            if(componentView.isChildEntry()) {
                 //load model view, will be used for old parent and new parent
                 let appViewInterface = componentView.getAppViewInterface();
 
@@ -127,7 +127,7 @@ export function updateComponentProperties(componentView) {
             commands.push(moveCommand);
 
             //do the second stage of editor commands
-            if(componentViewConfig.hasChildEntry) {
+            if(componentView.isChildEntry()) {
 
                 //-----------------------------------
                 // move case
@@ -166,7 +166,7 @@ export function updateComponentProperties(componentView) {
                         }
                     }
                     else {
-                        if(!componentViewConfig.hasTabEntry) {
+                        if(!componentViewConfig.isParentOfChildEntries) {
                             //TBR if we want to enforce this condition...
                             throw new Error("This component can not be placed in the root folder.");
                         }

@@ -264,8 +264,6 @@ const WebRequestComponentViewConfig = {
         },
         FormInputBaseComponentView.getConfigViewModeEntry(),
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/mapCellIcon.png"
 }
 export default WebRequestComponentViewConfig;

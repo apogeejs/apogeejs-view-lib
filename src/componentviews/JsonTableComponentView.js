@@ -96,8 +96,6 @@ const JsonTableComponentViewConfig = {
         getFormulaViewModeEntry("member"),
         getPrivateViewModeEntry("member")  
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/jsonCellIcon.png",
     propertyDialogEntries: [
         {

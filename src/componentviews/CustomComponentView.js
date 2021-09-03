@@ -123,8 +123,6 @@ const CustomComponentViewConfig = {
         getFormulaViewModeEntry("member","Input Code","Input Code"),
         getPrivateViewModeEntry("member","Input Private","Input Private")  
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/genericCellIcon.png",
     propertyDialogEntries: [
         {

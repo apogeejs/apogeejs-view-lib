@@ -12,8 +12,6 @@ const ErrorComponentViewConfig = {
             getDataDisplay: (componentView,displayContainer) => new ErrorDisplay(displayContainer,false)
         }
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/errorCellIcon.png"
 }
 export default ErrorComponentViewConfig;

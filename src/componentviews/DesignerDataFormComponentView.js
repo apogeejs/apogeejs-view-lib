@@ -104,8 +104,6 @@ const DesignerDataFormComponentViewConfig = {
         getAppCodeViewModeEntry("validatorCode",null,"On Save","isValid",{argList: "formValue,formLayout"}),
         getMemberDataTextViewModeEntry("member.value")
     ],
-    hasTabEntry: false,
-    hasChildEntry: true,
     iconResPath: "/icons3/formCellIcon.png",
     propertyDialogEntries: [
         {
