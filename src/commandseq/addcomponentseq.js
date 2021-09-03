@@ -177,10 +177,14 @@ export function addAdditionalComponent(appViewInterface,app,optionalInitialPrope
         addComponent(appViewInterface,app,componentType,optionalInitialProperties);
     }
     //get the display names
-    let additionalComponents = componentInfo.getAdditionalComponentTypes();
-    let componentInfoList = additionalComponents.map( componentType => {
-        let displayName = componentInfo.getComponentDisplayName(componentType); 
-        return {displayName, componentType};
+    let componentTypes = componentInfo.getComponentTypes();
+    let componentInfoList = [];
+    componentTypes.forEach( componentType => {
+        let componentViewConfig = getComponentViewConfig(componentType);
+        if(componentViewConfig.viewModes !== undefined) {
+            let displayName = componentInfo.getComponentDisplayName(componentType); 
+            componentInfoList.push({displayName, componentType});
+        }
     });
     //open select component dialog
     showSelectComponentDialog(componentInfoList,onSelect);
