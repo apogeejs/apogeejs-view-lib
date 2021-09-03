@@ -35,9 +35,6 @@ class DesignerDataFormComponentView extends FormInputBaseComponentView {
     //==========================
  
     _getOutputFormDataSource() {
-        //load this when the form is updated, to be used when form submitted
-        //we will update the form if this value changes
-        let isDataValidFunction;
 
         return {
             //This method reloads the component and checks if there is a DATA update. UI update is checked later.
@@ -45,28 +42,11 @@ class DesignerDataFormComponentView extends FormInputBaseComponentView {
                 //return value is whether or not the data display needs to be udpated
                 let component = this.getComponent();
                 let reloadData = component.isMemberDataUpdated("member.value");
-                let reloadDataDisplay = component.isFieldUpdated("validatorCode") || component.isMemberFieldUpdated("member.data","data");
+                let reloadDataDisplay = component.isMemberFieldUpdated("member.data","data");
                 return {reloadData,reloadDataDisplay};
             },
 
-            getDisplayData: () => {       
-                //get the layout function
-                let component = this.getComponent();
-                let {validatorFunction,errorMessage} = component.createValidatorFunction();
-                if(errorMessage) {
-                    let wrappedData = {};
-                    wrappedData.hideDisplay = true;
-                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                    wrappedData.message = errorMessage;
-                    return wrappedData;
-                }
-
-                //save this for use on submit
-                isDataValidFunction = validatorFunction;
-
-                //load the layout
-                return dataDisplayHelper.getWrappedMemberData(this,"member.data");
-            },
+            getDisplayData: () =>  dataDisplayHelper.getWrappedMemberData(this,"member.data"),
 
             getData: () => dataDisplayHelper.getWrappedMemberData(this,"member.value"),
 
@@ -78,6 +58,13 @@ class DesignerDataFormComponentView extends FormInputBaseComponentView {
                 let formLayout = component.getField("member.data").getData();
 
                 try {
+                    let isDataValidFunction = component.getField("validatorFunction");
+                    if(isDataValidFunction instanceof Error) {
+                        //this is clumsy - we need to show the user somewhere that there is an error
+                        //maybe in the code?
+                        apogeeUserAlert("Error in validator function! Input could not be processed!");
+                        return false;
+                    }
                     let isValidResult = isDataValidFunction(formValue,formLayout);
                     if(isValidResult === true) {
                         //save data

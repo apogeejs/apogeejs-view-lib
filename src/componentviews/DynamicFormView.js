@@ -61,7 +61,7 @@ class DynamicFormView extends ComponentView {
                 }
             },
 
-            getData: () => null,
+            getData: () => { return {"data": null}; },
         }
 
         return dataDisplaySource;

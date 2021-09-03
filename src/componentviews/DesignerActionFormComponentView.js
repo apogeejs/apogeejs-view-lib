@@ -39,7 +39,7 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
                 //return value is whether or not the data display needs to be udpated
                 let component = this.getComponent();
                 let reloadData = false;
-                let reloadDataDisplay = component.areAnyFieldsUpdated(["onSubmitCode","onCancelCode"]) || component.isMemberFieldUpdated("member.data","data");
+                let reloadDataDisplay = component.areAnyFieldsUpdated(["onSubmitFunction","onCancelFunction"]) || component.isMemberFieldUpdated("member.data","data");
                 return {reloadData,reloadDataDisplay};
             },
 
@@ -54,13 +54,15 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
                 return wrappedData;
             },
 
-            getData: () => null,
+            getData: () => { return {"data": null}; },
 
             getEditOk: () => false
         }
     }
 
     _getFullLayout(inputLayout) {
+        let component = this.getComponent();
+
         //remove the submit element and make a layout we can write into
         let fullLayout = [];
         let inputSubmitConfig;
@@ -80,15 +82,31 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
             useCancel = inputSubmitConfig.useCancel;
         }
 
-        let {onSubmitFunction,onCancelFunction,errorMessage} = this.component.createActionFunctions(useSubmit,useCancel);
-        if(errorMessage) {
-            //add the error message onto the layout
-            fullLayout.push = [{
-                type: "htmlDisplay",
-                html: "errorMessage"
-            }]
+        let onSubmitFunction;
+        if(useSubmit) {
+            onSubmitFunction = component.getField("onSubmitFunction");
+            if(onSubmitFunction instanceof Error) {
+                let wrappedData = {};
+                wrappedData.displayInvalid = true;
+                wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                wrappedData.message = "Error in save function: " + onSubmitFunction.toString();
+                return wrappedData;
+            }
         }
-        else if(inputSubmitConfig) {
+
+        let onCancelFunction;
+        if(useCancel) {
+            onCancelFunction = component.getField("onCancelFunction");
+            if(onCancelFunction instanceof Error) {
+                let wrappedData = {};
+                wrappedData.displayInvalid = true;
+                wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                wrappedData.message = "Error in cancel function: " + onCancelFunction.toString();
+                return wrappedData;
+            }
+        }
+
+        if(inputSubmitConfig) {
             //create the submit config
             let submitConfig = {};
             Object.assign(submitConfig,inputSubmitConfig)
@@ -98,6 +116,7 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
             if(useCancel) submitConfig.onCancel = (formObject) => onCancelFunction(commandMessenger,formObject);
             fullLayout.push(submitConfig);
         }
+
         return fullLayout;
     }
 

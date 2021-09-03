@@ -27,19 +27,19 @@ class FullActionFormComponentView extends ComponentView {
             //This method reloads the component and checks if there is a DATA update. UI update is checked later.
             doUpdate: () => {
                 let reloadData = false;
-                let reloadDataDisplay = this.getComponent().isFieldUpdated("layoutCode") || this.getComponent().isMemberDataUpdated("member");
+                let reloadDataDisplay = this.getComponent().isFieldUpdated("layoutFunction") || this.getComponent().isMemberDataUpdated("member");
                 return {reloadData,reloadDataDisplay};
             },
 
             getDisplayData: () => {       
                 //get the layout function
                 let component = this.getComponent();
-                let {formLayoutFunction,errorMessage} = component.createFormLayoutFunction();
-                if(errorMessage) {
+                let layoutFunction = component.getField("layoutFunction");
+                if(layoutFunction instanceof Error) {
                     let wrappedData = {};
-                    wrappedData.hideDisplay = true;
+                    wrappedData.displayInvalid = true;
                     wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                    wrappedData.message = errorMessage;
+                    wrappedData.message = "Error in layout function: " + layoutFunction.toString();
                     return wrappedData;
                 }
 
@@ -53,7 +53,7 @@ class FullActionFormComponentView extends ComponentView {
                     let contextMemberId = component.getMember().getParentId();
                     let commandMessenger = new UiCommandMessenger(this,contextMemberId);
                     try {
-                        let layout = formLayoutFunction(commandMessenger,inputData);
+                        let layout = layoutFunction(commandMessenger,inputData);
                         wrappedData.data = layout;
                     }
                     catch(error) {
@@ -69,7 +69,7 @@ class FullActionFormComponentView extends ComponentView {
             },
 
             //no data
-            getData: () => null
+            getData: () => { return {"data": null}; }
         }
     }
 }

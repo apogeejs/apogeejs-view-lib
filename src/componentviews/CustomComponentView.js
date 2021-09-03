@@ -60,7 +60,7 @@ class CustomComponentView extends ComponentView {
             doUpdate: () => {
                 //return value is whether or not the data display needs to be udpated
                 let reloadData = this.getComponent().isMemberDataUpdated("member");
-                let reloadDataDisplay = this.getComponent().areAnyFieldsUpdated(["html","uiCode"]);
+                let reloadDataDisplay = this.getComponent().areAnyFieldsUpdated(["html","resource"]);
                 return {reloadData,reloadDataDisplay};
             },
 
@@ -75,7 +75,7 @@ class CustomComponentView extends ComponentView {
 
             //returns the resource for the data display
             getResource: () => {
-                return this.getComponent().createResource();
+                return this.getComponent().getField("resource");
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 

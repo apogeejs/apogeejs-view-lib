@@ -96,7 +96,7 @@ class CustomDataComponentView extends ComponentView {
 
             //returns the resource for the data display
             getResource: () => {
-                return this.getComponent().createResource();
+                return this.getComponent().getField("resource");
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 

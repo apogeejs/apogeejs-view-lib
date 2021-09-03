@@ -30,7 +30,7 @@ class FullDataFormComponentView extends ComponentView {
                 //return value is whether or not the data display needs to be udpated
                 let component = this.getComponent();
                 let reloadData = component.isMemberDataUpdated("member.value");
-                let reloadDataDisplay = component.areAnyFieldsUpdated(["layoutFunction"]) || component.isMemberFieldUpdated("member.input","data");
+                let reloadDataDisplay = component.isFieldUpdated("layoutFunction") || component.isMemberFieldUpdated("member.input","data");
                 return {reloadData,reloadDataDisplay};
             },
 
@@ -54,7 +54,7 @@ class FullDataFormComponentView extends ComponentView {
                     let contextMemberId = component.getMember().getParentId();
                     let commandMessenger = new UiCommandMessenger(this,contextMemberId);
                     try {
-                        let layout = layoutFunction(commandMessenger,inputData);
+                        let layout = layoutFunction(commandMessenger,wrappedData.data);
                         wrappedData.data = layout;
                     }
                     catch(error) {
