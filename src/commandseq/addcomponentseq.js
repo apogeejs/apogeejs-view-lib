@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
-import {validateTableName} from "/apogeejs-model-lib/src/apogeeModelLib.js"; 
+import {validateMemberName} from "/apogeejs-model-lib/src/apogeeModelLib.js"; 
 
 import {getPropertiesDialogLayout,getPropertyJsons} from "/apogeejs-view-lib/src/commandseq/updatecomponentseq.js";
 import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
@@ -59,7 +59,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
         var onSubmitFunction = function(userInputFormValues) {
             
             //validate the name
-            var nameResult = validateTableName(userInputFormValues.name);
+            var nameResult = validateMemberName(userInputFormValues.name);
             if(!nameResult.valid) {
                 apogeeUserAlert(nameResult.errorMessage);
                 return false;

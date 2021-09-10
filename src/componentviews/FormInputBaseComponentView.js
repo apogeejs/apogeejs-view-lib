@@ -3,7 +3,7 @@ import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/Configura
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import { FormResultFunctionGenerator } from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
-/** This is a graphing component using ChartJS. It consists of a single data table that is set to
+/** This is a graphing component using ChartJS. It consists of a single data member that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
 export default class FormInputBaseComponentView extends ComponentView {

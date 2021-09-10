@@ -4,7 +4,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
-class JsonPlusTableComponentView extends ComponentView {
+class JsonPlusComponentView extends ComponentView {
 
     //==============================
     // Protected and Private Instance Methods
@@ -96,9 +96,9 @@ function replaceFunctionsInArray(jsonPlus) {
     return copiedJson;
 }
 
-const JsonPlusTableComponentViewConfig = {
+const JsonPlusComponentViewConfig = {
     componentType: "apogeeapp.ExtendedJsonCell",
-    viewClass: JsonPlusTableComponentView,
+    viewClass: JsonPlusComponentView,
     viewModes: [
         getErrorViewModeEntry(),
         {
@@ -114,4 +114,4 @@ const JsonPlusTableComponentViewConfig = {
     ],
     iconResPath: "/icons3/jsonCellIcon.png"
 }
-export default JsonPlusTableComponentViewConfig;
+export default JsonPlusComponentViewConfig;

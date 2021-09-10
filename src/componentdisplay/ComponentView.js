@@ -181,7 +181,7 @@ export default class ComponentView {
         //I had used. 
     }
 
-    /**  This method retrieves the table edit settings for this component instance
+    /**  This method retrieves the member edit settings for this component instance
      * @deprecated */
     getTableEditSettings() {
         return {

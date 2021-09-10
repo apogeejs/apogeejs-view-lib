@@ -5,7 +5,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
-class JsonTableComponentView extends ComponentView {
+class JsonComponentView extends ComponentView {
     
     //==============================
     // Protected and Private Instance Methods
@@ -79,9 +79,9 @@ VIEW_DISPLAY_NAMES[GRID_DATA_VEW] = "Grid";
 // External Settings
 //===============================
 
-const JsonTableComponentViewConfig = {
+const JsonComponentViewConfig = {
     componentType: "apogeeapp.JsonCell",
-    viewClass: JsonTableComponentView,
+    viewClass: JsonComponentView,
     viewModes: [
         getErrorViewModeEntry(),
         {
@@ -113,6 +113,6 @@ const JsonTableComponentViewConfig = {
         }
     ]
 }
-export default JsonTableComponentViewConfig;
+export default JsonComponentViewConfig;
 
 

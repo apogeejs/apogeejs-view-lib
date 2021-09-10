@@ -7,7 +7,7 @@ import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMesse
 import {getAppCodeViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
-/** This is a graphing component using ChartJS. It consists of a single data table that is set to
+/** This is a graphing component using ChartJS. It consists of a single data member that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
 class DesignerActionFormComponentView extends FormInputBaseComponentView {

@@ -5,7 +5,7 @@ import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} f
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
-/** This component represents a table object. */
+/** This component represents a member object. */
 class DynamicFormView extends ComponentView {
         
     //==============================

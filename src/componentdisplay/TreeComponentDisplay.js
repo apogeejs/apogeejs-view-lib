@@ -3,7 +3,6 @@ import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
 import {addComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
 import {getComponentViewConfig} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
-/** This component represents a json table object. */
 export default class TreeComponentDisplay {
 
     constructor(componentView) {

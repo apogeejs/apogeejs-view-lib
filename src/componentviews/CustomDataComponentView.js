@@ -79,7 +79,7 @@ class CustomDataComponentView extends ComponentView {
             },
 
             saveData: (formValue) => {
-                //send value to the table whose variable name is "data"
+                //send value to the member whose variable name is "data"
                 //the context reference is the member called "input" 
                 let inputMember = this.getComponent().getField("member.input");
                 let commandMessenger = new UiCommandMessenger(this,inputMember.getId());

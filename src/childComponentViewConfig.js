@@ -1,4 +1,4 @@
-import JsonTableComponentViewConfig from "/apogeejs-view-lib/src/componentviews/JsonTableComponentView.js";
+import JsonComponentViewConfig from "/apogeejs-view-lib/src/componentviews/JsonComponentView.js";
 import FunctionComponentViewConfig from "/apogeejs-view-lib/src/componentviews/FunctionComponentView.js";
 import DynamicFormViewConfig from "/apogeejs-view-lib/src/componentviews/DynamicFormView.js";
 import FormDataComponentViewConfig from "/apogeejs-view-lib/src/componentviews/FormDataComponentView.js";
@@ -11,7 +11,7 @@ import {registerComponentView,setErrorComponentView} from "/apogeejs-view-lib/sr
 
 //registration of the child component views
 
-registerComponentView(JsonTableComponentViewConfig);
+registerComponentView(JsonComponentViewConfig);
 registerComponentView(FunctionComponentViewConfig);
 registerComponentView(ErrorComponentViewConfig);
 registerComponentView(DynamicFormViewConfig);
@@ -34,5 +34,5 @@ import DesignerActionFormComponentViewConfig from "/apogeejs-view-lib/src/compon
 registerComponentView(DesignerActionFormComponentViewConfig);
 
 //JSON PLUS COMPONENT
-import JsonPlusTableComponentViewConfig from "/apogeejs-view-lib/src/componentviews/JsonPlusTableComponentView.js";
-registerComponentView(JsonPlusTableComponentViewConfig);
+import JsonPlusComponentViewConfig from "/apogeejs-view-lib/src/componentviews/JsonPlusComponentView.js";
+registerComponentView(JsonPlusComponentViewConfig);

@@ -6,7 +6,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
 import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
 
-/** This is a graphing component using ChartJS. It consists of a single data table that is set to
+/** This is a graphing component using ChartJS. It consists of a single data member that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
 class DesignerDataFormComponentView extends FormInputBaseComponentView {
