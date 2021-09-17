@@ -91,7 +91,7 @@ function replaceFunctionsInArray(jsonPlus) {
     var copiedJson = [];
     for(var i = 0; i < jsonPlus.length; i++) {
         var element = jsonPlus[i];
-        copiedJson.push(apogeeutil.getNormalizedCopy(element));
+        copiedJson.push(replaceFunctions(element));
     }
     return copiedJson;
 }

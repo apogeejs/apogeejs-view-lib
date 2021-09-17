@@ -47,7 +47,7 @@ export default class UiCommandMessenger {
      * as defined from the source object context. */
     _getLocalMemberId(localMemberName) { 
         let model = this.app.getModel();
-        let fromMember = model.lookupMemberById(this.fromMemberId);
+        let fromMember = model.lookupObjectById(this.fromMemberId);
         let contextManager = fromMember.getContextManager();
 
         var pathArray = localMemberName.split(".");
