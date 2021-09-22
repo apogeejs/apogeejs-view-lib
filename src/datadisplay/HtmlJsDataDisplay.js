@@ -1,8 +1,7 @@
 import DataDisplay from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
-import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -13,7 +12,7 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
  * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display (This is similar to
  *              getDisplayData listed below in that it is used during the construction of the display, however this returns an 
  *              object generated at the app layer for constructing the UI.)
- * - member = dataSource.getContextMember(); REQUIRED - This retrieves a member to use as a context reference
+ * - member = dataSource.getScopeMember(); REQUIRED - This retrieves a member to use as a scope reference
  * - displayData = dataSource.getDisplayData(); OPTIONAL - This returns model data to _construct_ the form
  *              whereas the standard getData() method returns data to _populate_ the form. If the display data is
  *              not valid then the value INVALID_VALUE should be passed.
@@ -66,8 +65,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         let displayValid;
         try {
             let componentView = this.getComponentView();
-            let contextMember = dataSource.getContextMember ? dataSource.getContextMember() : componentView.getComponent().getMember();
-            let contextMemberId = contextMember.getId();
+            let scopeMember = dataSource.getScopeMember ? dataSource.getScopeMember() : componentView.getComponent().getMember();
+            let scopeMemberId = scopeMember.getId();
 
             //get html
             let html = dataSource.getHtml ? dataSource.getHtml() : "";
@@ -107,8 +106,10 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             }
             
             //this gives the ui code access to some data display functions
+            let messenger = new Messenger(componentView.getApp(),scopeMemberId);
             var admin = {
-                getCommandMessenger: () => new UiCommandMessenger(componentView,contextMemberId),
+                getMessenger: () => messenger,
+                getCommandMessenger: () => messenger, //deprecated. legacy accessor
                 startEditMode: () => this.startEditMode(),
                 endEditMode: () => this.endEditMode()
             }

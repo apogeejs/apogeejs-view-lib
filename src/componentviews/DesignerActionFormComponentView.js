@@ -3,7 +3,7 @@ import FormInputBaseComponentView from "/apogeejs-view-lib/src/componentviews/Fo
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {getAppCodeViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
@@ -110,8 +110,8 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
             //create the submit config
             let submitConfig = {};
             Object.assign(submitConfig,inputSubmitConfig)
-            let contextMemberId = this.component.getMember().getParentId();
-            let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+            let scopeMemberId = this.component.getMember().getParentId();
+            let commandMessenger = new Messenger(this.getApp(),scopeMemberId);
             if(useSubmit) submitConfig.onSubmit = (formValue,formObject) => onSubmitFunction(commandMessenger,formValue,formObject);
             if(useCancel) submitConfig.onCancel = (formObject) => onCancelFunction(commandMessenger,formObject);
             fullLayout.push(submitConfig);

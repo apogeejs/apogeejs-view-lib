@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
 
@@ -106,7 +106,7 @@ class FormDataComponentView extends ComponentView {
 
             //save the data - send via messenger to the variable named "data" in code, which is the field 
             //named "member.data", NOT the field named "data"
-            let commandMessenger = new UiCommandMessenger(this,layoutFunctionMember.getId());
+            let commandMessenger = new Messenger(this.getApp(),layoutFunctionMember.getId());
             commandMessenger.dataCommand("data",formValue);
             return true;
         }

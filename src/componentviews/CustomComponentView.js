@@ -79,7 +79,7 @@ class CustomComponentView extends ComponentView {
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
-            getContextMember: () => {
+            getScopeMember: () => {
                 return this.getComponent().getMember();
             }
         }

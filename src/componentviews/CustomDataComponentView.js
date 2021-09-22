@@ -2,7 +2,7 @@ import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView
 import {getErrorViewModeEntry,getAppCodeViewModeEntry,getMemberDataTextViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import HtmlJsDataDisplay from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 
@@ -80,9 +80,9 @@ class CustomDataComponentView extends ComponentView {
 
             saveData: (formValue) => {
                 //send value to the member whose variable name is "data"
-                //the context reference is the member called "input" 
+                //the scope reference is the member called "input" 
                 let inputMember = this.getComponent().getField("member.input");
-                let commandMessenger = new UiCommandMessenger(this,inputMember.getId());
+                let commandMessenger = new Messenger(this.getApp(),inputMember.getId());
                 commandMessenger.dataCommand("data",formValue);
                 return true;
             },
@@ -100,7 +100,7 @@ class CustomDataComponentView extends ComponentView {
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
-            getContextMember: () => {
+            getScopeMember: () => {
                 let inputMember = this.getComponent().getField("member.input");
                 return inputMember;
             }

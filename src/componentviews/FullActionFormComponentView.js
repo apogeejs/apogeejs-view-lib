@@ -2,7 +2,7 @@ import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
@@ -47,11 +47,11 @@ class FullActionFormComponentView extends ComponentView {
                 //read the input data (checking for non-normal state)
                 let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member");
 
-                //use the parent folder as the context base
+                //use the parent folder as the scope base
                 if(wrappedData.data != apogeeutil.INVALID_VALUE) {
                     let inputData = wrappedData.data;
-                    let contextMemberId = component.getMember().getParentId();
-                    let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+                    let scopeMemberId = component.getMember().getParentId();
+                    let commandMessenger = new Messenger(this.getApp(),scopeMemberId);
                     try {
                         let layout = layoutFunction(commandMessenger,inputData);
                         wrappedData.data = layout;

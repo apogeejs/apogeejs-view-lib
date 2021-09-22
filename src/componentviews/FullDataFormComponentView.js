@@ -2,7 +2,7 @@ import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 
@@ -49,10 +49,10 @@ class FullDataFormComponentView extends ComponentView {
                 //load the layout
                 let wrappedData = dataDisplayHelper.getWrappedMemberData(this,"member.input");
 
-                //use the parent folder as the context base
+                //use the parent folder as the scope base
                 if(wrappedData.data != apogeeutil.INVALID_VALUE) {
-                    let contextMemberId = component.getMember().getParentId();
-                    let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+                    let scopeMemberId = component.getMember().getParentId();
+                    let commandMessenger = new Messenger(this.getApp(),scopeMemberId);
                     try {
                         let layout = layoutFunction(commandMessenger,wrappedData.data);
                         wrappedData.data = layout;
@@ -91,7 +91,7 @@ class FullDataFormComponentView extends ComponentView {
                     if(isValidResult === true) {
                         //save data
                         let memberId = component.getMemberId();
-                        let commandMessenger = new UiCommandMessenger(this,memberId);
+                        let commandMessenger = new Messenger(this.getApp(),memberId);
                         commandMessenger.dataCommand("value",formValue);
                         return true;
                     }

@@ -44,14 +44,14 @@ export default class UiCommandMessenger {
     //=============================
 
     /** This method returns the member instance for a given local member name,
-     * as defined from the source object context. */
+     * as defined from the source object scope. */
     _getLocalMemberId(localMemberName) { 
         let model = this.app.getModel();
         let fromMember = model.lookupObjectById(this.fromMemberId);
-        let contextManager = fromMember.getContextManager();
+        let scopeManager = fromMember.getScopeManager();
 
         var pathArray = localMemberName.split(".");
-        var member = contextManager.getMember(model,pathArray);
+        var member = scopeManager.getMember(model,pathArray);
         if(member) {
             return member.getId();
         }

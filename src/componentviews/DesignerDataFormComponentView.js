@@ -4,7 +4,7 @@ import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/Configura
 import {getAppCodeViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
-import UiCommandMessenger from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
+import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 
 /** This is a graphing component using ChartJS. It consists of a single data member that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
@@ -69,7 +69,7 @@ class DesignerDataFormComponentView extends FormInputBaseComponentView {
                     if(isValidResult === true) {
                         //save data
                         let memberId = component.getMemberId();
-                        let commandMessenger = new UiCommandMessenger(this,memberId);
+                        let commandMessenger = new Messenger(this.getApp(),memberId);
                         commandMessenger.dataCommand("value",formValue);
                         return true;
                     }
