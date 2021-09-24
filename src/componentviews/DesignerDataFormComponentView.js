@@ -1,7 +1,7 @@
 //These are in lieue of the import statements
 import FormInputBaseComponentView from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
-import {getAppCodeViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import {getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
 import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
@@ -54,36 +54,55 @@ class DesignerDataFormComponentView extends FormInputBaseComponentView {
 
             saveData: (formValue) => {
                 let component = this.getComponent();
-                //below this data is valid only for normal state input. That should be ok since this is save.
-                let formLayout = component.getField("member.data").getData();
 
-                try {
-                    let isDataValidFunction = component.getField("validatorFunction");
-                    if(isDataValidFunction instanceof Error) {
-                        //this is clumsy - we need to show the user somewhere that there is an error
-                        //maybe in the code?
-                        apogeeUserAlert("Error in validator function! Input could not be processed!");
-                        return false;
+                let isValidMember = component.getField("member.isValid");
+                let isValidFunction;
+                let issueMessage;
+                switch(isValidMember.getState()) {
+                    case apogeeutil.STATE_NORMAL:
+                        isValidFunction = isValidMember.getData();
+                        break;
+
+                    case apogeeutil.STATE_PENDING:
+                        issueMessage = "Validator function pending! Can not process submit button.";
+                        break;
+
+                    case apogeeutil.STATE_INVALID:
+                        issueMessage = "Validator function invalid! Can not process submit button.";
+                        break;
+
+                    case apogeeutil.STATE_ERROR:
+                        issueMessage = "Validator function error: " + isValidMember.getErrorMsg();
+                        break;
+                }
+
+                if(isValidFunction) {
+                    try {
+                        let isValidResult = isValidFunction(formValue);
+                        if(isValidResult === true) {
+                            //save data
+                            let memberId = component.getMemberId();
+                            let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
+                            let messenger = new Messenger(runContextLink,memberId);
+                            messenger.dataUpdate("value",formValue);
+                            return true;
+                        }
+                        else {
+                            //isValidResult should be the error message. Check to make sure if it is string, 
+                            //since the user may return false. (If so, give a generic error message)
+                            let msg = ((typeof isValidResult) == "string") ? isValidResult : "Invalid form value!";
+                            apogeeUserAlert(msg);
+                            return false;
+                        }
                     }
-                    let isValidResult = isDataValidFunction(formValue,formLayout);
-                    if(isValidResult === true) {
-                        //save data
-                        let memberId = component.getMemberId();
-                        let commandMessenger = new Messenger(this.getApp(),memberId);
-                        commandMessenger.dataCommand("value",formValue);
-                        return true;
-                    }
-                    else {
-                        //isValidResult should be the error message. Check to make sure if it is string, 
-                        //since the user may return false. (If so, give a generic error message)
-                        let msg = ((typeof isValidResult) == "string") ? isValidResult : "Invalid form value!";
-                        apogeeUserAlert(msg);
-                        return false;
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        apogeeUserAlert("Error validating input: " + error.toString());
                     }
                 }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    apogeeUserAlert("Error validating input: " + error.toString());
+                else {
+                    apogeeeUserAlert(issueMessage);
+                    return false;
                 }
             }
         }
@@ -101,7 +120,8 @@ const DesignerDataFormComponentViewConfig = {
             getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
         },
         FormInputBaseComponentView.getConfigViewModeEntry("Form Designer"),
-        getAppCodeViewModeEntry("validatorCode",null,"On Save","isValid",{argList: "formValue,formLayout"}),
+        getFormulaViewModeEntry("member.isValid",{name:"IsValidFunction",label:"IsValid Function",argList:"formValue"}),
+        getPrivateViewModeEntry("member.isValid",{name:"IsValidPrivate",label:"IsValid Private"}),
         getMemberDataTextViewModeEntry("member.value")
     ],
     iconResPath: "/icons3/formCellIcon.png",

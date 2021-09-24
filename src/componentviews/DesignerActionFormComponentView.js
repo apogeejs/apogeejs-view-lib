@@ -61,6 +61,8 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
     }
 
     _getFullLayout(inputLayout) {
+        return inputLayout;
+        
         let component = this.getComponent();
 
         //remove the submit element and make a layout we can write into
