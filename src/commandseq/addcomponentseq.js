@@ -68,7 +68,8 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
             //other validation of inputs?
 
 //we should do this cleaner - by storing parent id in the submit input
-            let parentMemberId = userInputFormValues.parentId;
+            let parentId = userInputFormValues.parentId;
+            let modelIsParent = (modelManager.getModel().getId() == parentId);
 
             let commandsDeleteComponent = false;
             let deleteMsg;
@@ -79,15 +80,15 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
 
             let createCommandData = {};
             createCommandData.type = "addComponent";
-            createCommandData.parentId = parentMemberId;
+            createCommandData.parentId = parentId;
             createCommandData.memberJson = memberJson
             createCommandData.componentJson = componentJson;
 
             //editor related commands
             let additionalCommandInfo;
             let parentComponentView;
-            if(componentViewConfig.viewModes !== undefined) {
-                let parentComponentId = modelManager.getComponentIdByMemberId(parentMemberId);
+            if((componentViewConfig.viewModes !== undefined)&&(!modelIsParent)) {
+                let parentComponentId = modelManager.getComponentIdByMemberId(parentId);
                 if((parentComponentId)&&(appViewInterface.hasParentDisplays())) {
                     parentComponentView = appViewInterface.getComponentViewByComponentId(parentComponentId);
                     if(!parentComponentView) throw new Error("Parent component not found!");
