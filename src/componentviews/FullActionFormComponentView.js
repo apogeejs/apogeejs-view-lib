@@ -49,9 +49,10 @@ class FullActionFormComponentView extends ComponentView {
 
                 //use the parent folder as the scope base
                 if(wrappedData.data != apogeeutil.INVALID_VALUE) {
+                    let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                     let inputData = wrappedData.data;
                     let scopeMemberId = component.getMember().getParentId();
-                    let commandMessenger = new Messenger(this.getApp(),scopeMemberId);
+                    let commandMessenger = new Messenger(runContextLink,scopeMemberId);
                     try {
                         let layout = layoutFunction(commandMessenger,inputData);
                         wrappedData.data = layout;

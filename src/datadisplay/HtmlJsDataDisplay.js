@@ -106,7 +106,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             }
             
             //this gives the ui code access to some data display functions
-            let messenger = new Messenger(componentView.getApp(),scopeMemberId);
+            let runContextLink = componentView.getApp().getWorkspaceManager().getRunContextLink();
+            let messenger = new Messenger(runContextLink,scopeMemberId);
             var admin = {
                 getMessenger: () => messenger,
                 getCommandMessenger: () => messenger, //deprecated. legacy accessor

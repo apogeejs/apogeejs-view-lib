@@ -51,8 +51,9 @@ class FullDataFormComponentView extends ComponentView {
 
                 //use the parent folder as the scope base
                 if(wrappedData.data != apogeeutil.INVALID_VALUE) {
+                    let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                     let scopeMemberId = component.getMember().getParentId();
-                    let commandMessenger = new Messenger(this.getApp(),scopeMemberId);
+                    let commandMessenger = new Messenger(runContextLink,scopeMemberId);
                     try {
                         let layout = layoutFunction(commandMessenger,wrappedData.data);
                         wrappedData.data = layout;
@@ -90,8 +91,9 @@ class FullDataFormComponentView extends ComponentView {
                     let isValidResult = isDataValidFunction(formValue,inputData);
                     if(isValidResult === true) {
                         //save data
+                        let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                         let memberId = component.getMemberId();
-                        let commandMessenger = new Messenger(this.getApp(),memberId);
+                        let commandMessenger = new Messenger(runContextLink,memberId);
                         commandMessenger.dataCommand("value",formValue);
                         return true;
                     }

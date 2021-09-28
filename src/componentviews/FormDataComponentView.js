@@ -1,9 +1,8 @@
-import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js";
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import {getErrorViewModeEntry,getFormulaViewModeEntry,getPrivateViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeejs-view-lib/src/datadisplay/dataDisplayConstants.js";
+import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -36,36 +35,7 @@ class FormDataComponentView extends ComponentView {
         },
 
         //return form layout
-        dataDisplaySource.getDisplayData = () => { 
-            let layoutFunctionMember = this.getComponent().getField("member.layout");
-            if(layoutFunctionMember.getState() == apogeeutil.STATE_NORMAL) {
-                let layoutFunction = layoutFunctionMember.getData();   
-                if(layoutFunction instanceof Function) {
-                    let layout;
-                    try { 
-                        layout = layoutFunction();
-                        if(!layout) layout = ConfigurableFormEditor.getEmptyLayout();
-                    }
-                    catch(error) {
-                        console.error("Error reading form layout " + this.getName() + ": " + error.toString());
-                        if(error.stack) console.error(error.stack);
-                        layout = ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString());
-                    }
-                    return {
-                        data: layout
-                    }
-                }
-            }
-            else {
-                return {
-                    data: apogeeutil.INVALID_VALUE,
-                    hideDisplay: true,
-                    messageType: DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,
-                    message: "Form layout not available"
-                }
-            }
-            
-        }
+        dataDisplaySource.getDisplayData = () => dataDisplayHelper.getWrappedMemberData(this,"member.layout"),
         
         //return desired form value
         dataDisplaySource.getData = () => dataDisplayHelper.getWrappedMemberData(this,"member.data");
@@ -76,9 +46,7 @@ class FormDataComponentView extends ComponentView {
         }
         
         //save data - just form value here
-        
         dataDisplaySource.saveData = (formValue) => {
-            let layoutFunctionMember = this.getComponent().getField("member.layout");
             let isInputValidFunctionMember = this.getComponent().getField("member.isInputValid");
             //validate input
             var isInputValid = isInputValidFunctionMember.getData();
@@ -106,8 +74,10 @@ class FormDataComponentView extends ComponentView {
 
             //save the data - send via messenger to the variable named "data" in code, which is the field 
             //named "member.data", NOT the field named "data"
-            let commandMessenger = new Messenger(this.getApp(),layoutFunctionMember.getId());
-            commandMessenger.dataCommand("data",formValue);
+            let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
+            let layoutMember = this.getComponent().getField("member.layout");
+            let messenger = new Messenger(runContextLink,layoutMember.getId());
+            messenger.dataUpdate("data",formValue);
             return true;
         }
         
