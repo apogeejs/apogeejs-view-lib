@@ -83,8 +83,8 @@ class CustomDataComponentView extends ComponentView {
                 //the scope reference is the member called "input" 
                 let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                 let inputMember = this.getComponent().getField("member.input");
-                let commandMessenger = new Messenger(runContextLink,inputMember.getId());
-                commandMessenger.dataCommand("data",formValue);
+                let messenger = new Messenger(runContextLink,inputMember.getId());
+                messenger.dataUpdate("data",formValue);
                 return true;
             },
 

@@ -53,9 +53,9 @@ class FullDataFormComponentView extends ComponentView {
                 if(wrappedData.data != apogeeutil.INVALID_VALUE) {
                     let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                     let scopeMemberId = component.getMember().getParentId();
-                    let commandMessenger = new Messenger(runContextLink,scopeMemberId);
+                    let messenger = new Messenger(runContextLink,scopeMemberId);
                     try {
-                        let layout = layoutFunction(commandMessenger,wrappedData.data);
+                        let layout = layoutFunction(messenger,wrappedData.data);
                         wrappedData.data = layout;
                     }
                     catch(error) {
@@ -93,8 +93,8 @@ class FullDataFormComponentView extends ComponentView {
                         //save data
                         let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                         let memberId = component.getMemberId();
-                        let commandMessenger = new Messenger(runContextLink,memberId);
-                        commandMessenger.dataCommand("value",formValue);
+                        let messenger = new Messenger(runContextLink,memberId);
+                        messenger.dataUpdate("value",formValue);
                         return true;
                     }
                     else {

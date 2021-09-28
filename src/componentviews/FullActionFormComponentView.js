@@ -52,9 +52,9 @@ class FullActionFormComponentView extends ComponentView {
                     let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
                     let inputData = wrappedData.data;
                     let scopeMemberId = component.getMember().getParentId();
-                    let commandMessenger = new Messenger(runContextLink,scopeMemberId);
+                    let messenger = new Messenger(runContextLink,scopeMemberId);
                     try {
-                        let layout = layoutFunction(commandMessenger,inputData);
+                        let layout = layoutFunction(messenger,inputData);
                         wrappedData.data = layout;
                     }
                     catch(error) {
