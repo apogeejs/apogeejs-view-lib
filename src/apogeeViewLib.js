@@ -22,8 +22,6 @@ export {getSaveBar} from "/apogeejs-view-lib/src/componentdisplay/toolbar.js";
 
 export {registerComponentView,unregisterComponentView,getComponentViewConfig,getComponentViewInstance} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
-export {default as UiCommandMessenger} from "/apogeejs-view-lib/src/commandseq/UiCommandMessenger.js";
-
 export {closeWorkspace} from "/apogeejs-view-lib/src/commandseq/closeworkspaceseq.js";
 export {createWorkspace} from "/apogeejs-view-lib/src/commandseq/createworkspaceseq.js";
 export {openWorkspace} from "/apogeejs-view-lib/src/commandseq/openworkspaceseq.js";
