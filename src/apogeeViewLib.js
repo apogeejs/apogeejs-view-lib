@@ -28,7 +28,7 @@ export {openWorkspace} from "/apogeejs-view-lib/src/commandseq/openworkspaceseq.
 export {saveWorkspace} from "/apogeejs-view-lib/src/commandseq/saveworkspaceseq.js";
 export {updateWorkspaceProperties} from "/apogeejs-view-lib/src/commandseq/updateworkspaceseq.js";
 export {addComponent, addAdditionalComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
-export {addLink, updateLink, removeLink} from "/apogeejs-view-lib/src/commandseq/updatelinkseq.js";
+export {addLinkSeq, updateLinkSeq, removeLinkSeq} from "/apogeejs-view-lib/src/commandseq/updatelinkseq.js";
 
 export {default as ace} from "/apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js";
 

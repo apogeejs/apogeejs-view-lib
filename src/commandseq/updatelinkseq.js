@@ -6,17 +6,17 @@ import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 //=====================================
 
 /** This method adds a link to the workspace. */
-export function addLink(app,displayInfo) {
+export function addLinkSeq(app,referenceType,commandConfig) {
         
-    let dialogLayout = getDialogLayout(displayInfo);
+    let dialogLayout = getDialogLayout(referenceType,commandConfig);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
 
-        if((displayInfo.isDataValid)&&(!displayInfo.isDataValid(newValues))) return false;
+        if((commandConfig.isDataValid)&&(!commandConfig.isDataValid(newValues))) return false;
 
-        if(displayInfo.processData) {
-            newValues = displayInfo.processData(newValues);
+        if(commandConfig.processData) {
+            newValues = commandConfig.processData(newValues);
         }
 
         //create command json
@@ -36,18 +36,18 @@ export function addLink(app,displayInfo) {
 }
 
 /** This method updates a link in the workspace. */
-export function updateLink(app,referenceEntry,displayInfo) {
+export function updateLinkSeq(app,referenceEntry,referenceType,commandConfig) {
         
     let initialData = referenceEntry.getData();
-    let dialogLayout = getDialogLayout(displayInfo,initialData);
+    let dialogLayout = getDialogLayout(referenceType,commandConfig,initialData);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
 
-        if((displayInfo.isDataValid)&&(!displayInfo.isDataValid(newValues))) return false;
+        if((commandConfig.isDataValid)&&(!commandConfig.isDataValid(newValues))) return false;
 
-        if(displayInfo.processData) {
-            newValues = displayInfo.processData(newValues);
+        if(commandConfig.processData) {
+            newValues = commandConfig.processData(newValues);
         }
 
         //run command
@@ -68,7 +68,7 @@ export function updateLink(app,referenceEntry,displayInfo) {
 
 
 /** This method deletes a link in the workspace. */
-export function removeLink(app,referenceEntry,displayInfo) {
+export function removeLinkSeq(app,referenceEntry,deleteMsg) {
 
     var commandData = {};
         commandData.type = "deleteLink";
@@ -79,21 +79,20 @@ export function removeLink(app,referenceEntry,displayInfo) {
     let cancelAction = () => true;
 
     //verify the delete
-    let deleteMsg = "Are you sure you want to delete this link?"
     apogeeUserConfirm(deleteMsg,"Delete","Cancel",doAction,cancelAction);
 }
 
 
-function getDialogLayout(displayInfo,initialData) { 
+function getDialogLayout(referenceType,commandConfig,initialData) { 
 
     //create base dialog entries
     let headingLine = {
         type: "heading",
-        text: displayInfo.DISPLAY_NAME
+        text: commandConfig.dialogTitle
     }
     let typeLine = {
 		"type": "invisible",
-		"value": displayInfo.REFERENCE_TYPE,
+		"value": referenceType,
 		"key": "entryType"
 	}
     let dialogLayout = [
@@ -101,7 +100,7 @@ function getDialogLayout(displayInfo,initialData) {
         typeLine
     ]
     //append a writable copy of the property layout lines
-    dialogLayout.push(...apogeeutil.jsonCopy(displayInfo.PROPERTY_FORM_LAYOUT));
+    dialogLayout.push(...apogeeutil.jsonCopy(commandConfig.dialogLayout));
 
     //add initial values for the properties
     if(initialData) {
