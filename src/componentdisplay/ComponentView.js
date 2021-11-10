@@ -575,7 +575,7 @@ export default class ComponentView {
             //remove the tree from the parent
             openCallback = () => {
                 var parentComponentView = this.getParentComponentView();
-                if((parentComponentView)&&(parentComponentView.isParentOfChildEntries())) {
+                if((parentComponentView)&&(parentComponentView.getViewConfig().isParentOfChildEntries)) {
 
                     //execute command to select child
                     let command = parentComponentView.getSelectApogeeNodeCommand(this.getName());

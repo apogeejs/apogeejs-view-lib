@@ -7,6 +7,10 @@ import CustomDataComponentViewConfig from "/apogeejs-view-lib/src/componentviews
 import WebRequestComponentViewConfig from "/apogeejs-view-lib/src/componentviews/WebRequestComponentView.js";
 import ErrorComponentViewConfig from "/apogeejs-view-lib/src/componentviews/ErrorComponentView.js";
 
+//TESTING
+import ReactElementCellViewConfig from "/apogeejs-admin/dev/jsxModule/src/ReactElementCellView.js";
+import ReactDisplayCellViewConfig from "/apogeejs-admin/dev/jsxModule/src/ReactDisplayCellView.js";
+
 import {registerComponentView,setErrorComponentView} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 //registration of the child component views
@@ -19,6 +23,10 @@ registerComponentView(FormDataComponentViewConfig);
 registerComponentView(CustomComponentViewConfig);
 registerComponentView(CustomDataComponentViewConfig);
 registerComponentView(WebRequestComponentViewConfig);
+
+//TESTING
+registerComponentView(ReactElementCellViewConfig);
+registerComponentView(ReactDisplayCellViewConfig);
 
 setErrorComponentView(ErrorComponentViewConfig);
 
