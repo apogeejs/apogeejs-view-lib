@@ -8,7 +8,7 @@ import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 /** This method adds a link to the workspace. */
 export function addLinkSeq(app,referenceType,commandConfig) {
         
-    let dialogLayout = getDialogLayout(referenceType,commandConfig);
+    let dialogLayout = getDialogLayout(commandConfig);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -21,8 +21,9 @@ export function addLinkSeq(app,referenceType,commandConfig) {
 
         //create command json
         var commandData = {};
-        commandData.type = "addLink";
-        commandData.data = newValues;
+        commandData.type = "addLink"
+        commandData.entryType = referenceType
+        commandData.data = newValues
 
         //run command
         app.executeCommand(commandData);
@@ -39,7 +40,7 @@ export function addLinkSeq(app,referenceType,commandConfig) {
 export function updateLinkSeq(app,referenceEntry,referenceType,commandConfig) {
         
     let initialData = referenceEntry.getData();
-    let dialogLayout = getDialogLayout(referenceType,commandConfig,initialData);
+    let dialogLayout = getDialogLayout(commandConfig,initialData);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -83,24 +84,18 @@ export function removeLinkSeq(app,referenceEntry,deleteMsg) {
 }
 
 
-function getDialogLayout(referenceType,commandConfig,initialData) { 
+function getDialogLayout(commandConfig,initialData) { 
 
     //create base dialog entries
     let headingLine = {
         type: "heading",
         text: commandConfig.dialogTitle
     }
-    let typeLine = {
-		"type": "invisible",
-		"value": referenceType,
-		"key": "entryType"
-	}
     let dialogLayout = [
-        headingLine,
-        typeLine
+        headingLine
     ]
-    //append a writable copy of the property layout lines
-    dialogLayout.push(...apogeeutil.jsonCopy(commandConfig.dialogLayout));
+    //append a writable copy of the property layout lines inside a child panel
+    dialogLayout.push(...commandConfig.dialogLayout);
 
     //add initial values for the properties
     if(initialData) {
