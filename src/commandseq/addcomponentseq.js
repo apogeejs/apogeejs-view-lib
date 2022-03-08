@@ -5,7 +5,6 @@ import {getPropertiesDialogLayout,getPropertyJsons} from "/apogeejs-view-lib/src
 import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import {showSelectComponentDialog} from "/apogeejs-view-lib/src/dialogs/SelectControlDialog.js";
-import {getComponentViewConfig} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 //=====================================
 // UI Entry Point
@@ -13,10 +12,7 @@ import {getComponentViewConfig} from "/apogeejs-view-lib/src/componentViewInfo.j
 
 /** This functions initiates the add component action. It will create a dialog for the user to enter the relevent 
  * properties, with the values optionalInitialProperties preset.  */   
-export function addComponent(appViewInterface,app,componentType,optionalInitialProperties) {
-
-        let componentConfig = componentInfo.getComponentConfig(componentType);
-        let componentViewConfig = getComponentViewConfig(componentType);
+export function addComponent(appViewInterface,app,componentConfig,optionalInitialProperties) {
 
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
@@ -38,14 +34,14 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
         var displayName = componentConfig.displayName;
         
         //get the folder list
-        let includeRootFolder = ((componentViewConfig.isParentOfChildEntries)&&(componentViewConfig.viewModes === undefined));
+        let includeRootFolder = ((componentConfig.isParentOfChildEntries)&&(componentConfig.viewModes === undefined));
         var parentList = modelManager.getParentList(includeRootFolder);
         
         //create the dialog layout - do on the fly because folder list changes
         var additionalLines = [];
         //var initialFormValues = _getBasePropertyValues(component);
-        if(componentViewConfig.propertyDialogEntries) {
-            componentViewConfig.propertyDialogEntries.forEach(entry => {
+        if(componentConfig.propertyDialogEntries) {
+            componentConfig.propertyDialogEntries.forEach(entry => {
                 let entryCopy = apogeeutil.jsonCopy(entry.dialogElement);
                 additionalLines.push(entryCopy);
             }); 
@@ -76,7 +72,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
             let commands = [];
             
             //create the command
-            let {memberJson, componentJson} = getPropertyJsons(componentConfig,null,componentViewConfig.propertyDialogEntries,userInputFormValues);
+            let {memberJson, componentJson} = getPropertyJsons(componentConfig,null,componentConfig.propertyDialogEntries,userInputFormValues);
 
             let createCommandData = {};
             createCommandData.type = "addComponent";
@@ -87,7 +83,7 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
             //editor related commands
             let additionalCommandInfo;
             let parentComponentView;
-            if((componentViewConfig.viewModes !== undefined)&&(!modelIsParent)) {
+            if((componentConfig.viewModes !== undefined)&&(!modelIsParent)) {
                 let parentComponentId = modelManager.getComponentIdByMemberId(parentId);
                 if((parentComponentId)&&(appViewInterface.hasParentDisplays())) {
                     parentComponentView = appViewInterface.getComponentViewByComponentId(parentComponentId);
@@ -174,21 +170,19 @@ export function addComponent(appViewInterface,app,componentType,optionalInitialP
  * in the main component menu. */
 export function addAdditionalComponent(appViewInterface,app,optionalInitialProperties) {
         
-    var onSelect = function(componentType) {
-        addComponent(appViewInterface,app,componentType,optionalInitialProperties);
+    var onSelect = function(componentConfig) {
+        addComponent(appViewInterface,app,componentConfig,optionalInitialProperties);
     }
     //get the display names
-    let componentTypes = componentInfo.getComponentTypes();
-    let componentInfoList = [];
-    componentTypes.forEach( componentType => {
-        let componentViewConfig = getComponentViewConfig(componentType);
-        if(componentViewConfig.viewModes !== undefined) {
-            let displayName = componentInfo.getComponentDisplayName(componentType); 
-            componentInfoList.push({displayName, componentType});
+    let componentConfigs = componentInfo.getComponentConfigs();
+    let childComponentConfigs = [];
+    componentConfigs.forEach( componentConfig => {
+        if(componentConfig.viewModes !== undefined) {
+            childComponentConfigs.push(componentConfig);
         }
     });
     //open select component dialog
-    showSelectComponentDialog(componentInfoList,onSelect);
+    showSelectComponentDialog(childComponentConfigs,onSelect);
 }
 
 /** This is to get an commands needed to add the a child node onto a parent page. */

@@ -7,47 +7,53 @@ export {dataDisplayHelper as default}
 const MIME_TYPE_JSON = "application/json"
 const SPACING_FORMAT_STRING = "\t";
 
+// ComponentHolder - A class that holds the current component, accessible with the function getComponent()
+
 
 /** This function creates the data display data source  for the data of the given member. The
  * member field should be the field name used to access the data source from the associated component. */
-dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,memberFieldName,doReadOnly) {
-    return _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly);
+dataDisplayHelper.getMemberDataJsonDataSource = function(componentHolder,memberFieldName,doReadOnly) {
+    return _getMemberDataDataSource(componentHolder,memberFieldName,doReadOnly);
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. 
  * This data source sets error valueData (a substitue value) when the user tries to save an improperly 
  * formatted JSON. */
- dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName,doReadOnly) {
-    return _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,{stringify: true});
+ dataDisplayHelper.getMemberDataTextDataSource = function(componentHolder,memberFieldName,doReadOnly) {
+    return _getMemberDataDataSource(componentHolder,memberFieldName,doReadOnly,{stringify: true});
  }
 
  /** This gets a data source for JSON or stringified JSON data from a member. */
-function _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,options) {
+function _getMemberDataDataSource(componentHolder,memberFieldName,doReadOnly,options) {
     if(!options) options = {};
     
     return {
 
         doUpdate: function() {
+            let component = componentHolder.getComponent()
             //return value is whether or not the data display needs to be udpated
-            let component = componentView.getComponent();
             let reloadData = component.isMemberDataUpdated(memberFieldName);
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
-            return dataDisplayHelper.getWrappedMemberData(componentView,memberFieldName,options);
+            let component = componentHolder.getComponent()
+            return dataDisplayHelper.getWrappedMemberData(component,memberFieldName,options);
         },
 
         getEditOk: doReadOnly ? 
             function () { return false; }  : 
             function () {
-                let member = componentView.getComponent().getField(memberFieldName);
+                let component = componentHolder.getComponent()
+                let member = component.getField(memberFieldName);
                 return !member.hasCode();
             },
 
         saveData: doReadOnly ? undefined :
             function(data) {
+                let component = componentHolder.getComponent()
+                let app = component.getApp()
 
                 //is the display data is stringified, parse it into a json
                 if(options.stringify) {
@@ -78,7 +84,7 @@ function _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,o
                     }
                 }
 
-                let member = componentView.getComponent().getField(memberFieldName);
+                let member = component.getField(memberFieldName);
                 var commandData = {};
                 commandData.type = "saveMemberData";
                 commandData.memberId = member.getId();
@@ -95,20 +101,21 @@ function _getMemberDataDataSource(app,componentView,memberFieldName,doReadOnly,o
  * set with this value if the function body and supplemental code are empty. 
  * The optionalDefaultDataValue will be used to clear the function and save the data value if the formula and
  * private code are empty strings. */
-dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,memberFieldName) {
+dataDisplayHelper.getMemberFunctionBodyDataSource = function(componentHolder,memberFieldName) {
 
     return {
 
         doUpdate: function() {
+            let component = componentHolder.getComponent()
             //return value is whether or not the data display needs to be udpated
-            let component = componentView.getComponent();
             let reloadData = component.isMemberFieldUpdated(memberFieldName,"functionBody");
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
-            let functionMember = componentView.getComponent().getField(memberFieldName);
+            let component = componentHolder.getComponent()
+            let functionMember = component.getField(memberFieldName);
             return { 
                 data: functionMember.getFunctionBody()
             }
@@ -119,7 +126,9 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
         },
 
         saveData: function(text) {
-            let functionMember = componentView.getComponent().getField(memberFieldName);
+            let component = componentHolder.getComponent()
+            let app = component.getApp()
+            let functionMember = component.getField(memberFieldName);
 
             var commandData = {};
             commandData.type = "saveMemberCode";
@@ -135,20 +144,21 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,m
 }
 
 /** This function creates editor callbacks or the member supplemental code. */
-dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,memberFieldName) {
+dataDisplayHelper.getMemberSupplementalDataSource = function(componentHolder,memberFieldName) {
 
     return {
 
         doUpdate: function() {
+            let component = componentHolder.getComponent()
             //return value is whether or not the data display needs to be udpated
-            let component = componentView.getComponent();
             let reloadData = component.isMemberFieldUpdated(memberFieldName,"supplementalCode");
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
-            let functionMember = componentView.getComponent().getField(memberFieldName);
+            let component = componentHolder.getComponent()
+            let functionMember = component.getField(memberFieldName);
             return {
                 data: functionMember.getSupplementalCode()
             }
@@ -159,7 +169,10 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
         },
 
         saveData: function(text) {
-            let functionMember = componentView.getComponent().getField(memberFieldName);
+            let component = componentHolder.getComponent()
+            let app = component.getApp()
+
+            let functionMember = component.getField(memberFieldName);
 
             var commandData = {};
             commandData.type = "saveMemberCode";
@@ -177,15 +190,18 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
 
 /** This function creates the data display data source  for the data of the given member. The
  * member field should be the field name used to access the data source from the associated component. */
-dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
+dataDisplayHelper.getStandardErrorDataSource = function(componentHolder) {
     
     return {
         doUpdate: function() {
+            let component = componentHolder.getComponent()
             //remove the view if here is an error and error info
-            let component = componentView.getComponent();
             let removeView;
-            if(componentView.getBannerState() == apogeeutil.STATE_ERROR) {
-                let errorInfoList = componentView.getErrorInfoList();
+            ////////////////////////////////
+            // NEED TO MOVE THESE FUNCTIONS TO COMPONENT FROM COMPONENT VIEW!
+            ////////////////////////////////
+            if(component.getState() == apogeeutil.STATE_ERROR) {
+                let errorInfoList = component.getErrorInfoList();
                 removeView = !((errorInfoList)&&(errorInfoList.length > 0));
             }
             else {
@@ -198,8 +214,12 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
         },
 
         getData: function() {
-            if(componentView.getBannerState() == apogeeutil.STATE_ERROR) {
-                let errorInfoList = componentView.getErrorInfoList()
+            let component = componentHolder.getComponent()
+            ////////////////////////////////
+            // NEED TO MOVE THESE FUNCTIONS TO COMPONENT FROM COMPONENT VIEW!
+            ////////////////////////////////
+            if(component.getState() == apogeeutil.STATE_ERROR) {
+                let errorInfoList = component.getErrorInfoList()
                 if((errorInfoList)&&(errorInfoList.length > 0)) {
                     //show data view, this is our data
                     return {
@@ -221,9 +241,9 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
  * options:
  * - stringify - Stringifies the data. Otherwise it is returned as is (JSON data assumed).
 */
-dataDisplayHelper.getWrappedMemberData = function(componentView,memberFieldName,options) {
+dataDisplayHelper.getWrappedMemberData = function(component,memberFieldName,options) {
     if(!options) options = {};
-    let member = componentView.getComponent().getField(memberFieldName);
+    let member = component.getField(memberFieldName);
     let wrappedData = {};
     if(member.getState() != apogeeutil.STATE_NORMAL) {
         

@@ -1,51 +1,44 @@
 //These are in lieue of the import statements
-import FormInputBaseComponentView from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
+import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import {getConfigViewModeEntry} from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
 import ConfigurableFormEditor from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import {ConfigurablePanel} from "/apogeejs-ui-lib/src/apogeeUiLib.js"
-import {getAppCodeViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
-/** This is a graphing component using ChartJS. It consists of a single data member that is set to
- * hold the generated chart data. The input is configured with a form, which gives multiple options
- * for how to set the data. */
-class DesignerActionFormComponentView extends FormInputBaseComponentView {
-
-    /** This method returns the form layout.
-     * @protected. */
-    getFormLayout() {
-        let flags = {
-            "inputExpressions": this.getComponent().getField("allowInputExpressions")
-        }
-        return ConfigurablePanel.getFormDesignerLayout(flags);
+/** This method returns the form layout.
+ * @protected. */
+function getFormLayout(component) {
+    let flags = {
+        "inputExpressions": component.getField("allowInputExpressions")
     }
+    return ConfigurablePanel.getFormDesignerLayout(flags);
+}
 
-    getFormViewDataDisplay(displayContainer) {
-        let dataDisplaySource = this._getOutputFormDataSource();
-        return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-    }
+function getFormViewDataDisplay(displayContainer) {
+    let dataDisplaySource = _getOutputFormDataSource(component);
+    return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
+}
 
-    //==========================
-    // Private Methods
-    //==========================
-    
-    _getOutputFormDataSource() {
+//==========================
+// Private Methods
+//==========================
 
-        return {
-            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let component = this.getComponent();
-                let reloadData = false;
-                let reloadDataDisplay = component.isMemberFieldUpdated("member.data","data");
-                return {reloadData,reloadDataDisplay};
-            },
+function _getOutputFormDataSource(component) {
 
-            getDisplayData: () => dataDisplayHelper.getWrappedMemberData(this,"member.data"),
+    return {
+        //This method reloads the component and checks if there is a DATA update. UI update is checked later.
+        doUpdate: () => {
+            //return value is whether or not the data display needs to be udpated
+            let reloadData = false;
+            let reloadDataDisplay = component.isMemberFieldUpdated("member.data","data");
+            return {reloadData,reloadDataDisplay};
+        },
 
-            getData: () => { return {"data": null}; },
+        getDisplayData: () => dataDisplayHelper.getWrappedMemberData(component,"member.data"),
 
-            getEditOk: () => false
-        }
+        getData: () => { return {"data": null}; },
+
+        getEditOk: () => false
     }
 }
 
@@ -59,15 +52,15 @@ class DesignerActionFormComponentView extends FormInputBaseComponentView {
 /** This is the component name with which this view is associated. */
 const DesignerActionFormComponentViewConfig = {
     componentType: "apogeeapp.DesignerActionFormCell",
-    viewClass: DesignerActionFormComponentView,
+    viewClass: ComponentView,
     viewModes: [
         {
             name: "Form",
             label: "Form", 
             isActive: true,
-            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
+            getDataDisplay: (component,displayContainer) => getFormViewDataDisplay(component,displayContainer)
         },
-        FormInputBaseComponentView.getConfigViewModeEntry("Form Designer")
+        getConfigViewModeEntry(getFormLayout,"Form Designer")
     ],
     iconResPath: "/icons3/formCellIcon.png",
     propertyDialogEntries: [

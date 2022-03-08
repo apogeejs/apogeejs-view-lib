@@ -15,9 +15,9 @@ export default class ComponentView {
      * In the full UI the appViewInterface is nominally the modelView. However, this 
      * abstraction was added to allow use embedded in a web page as an alternate UI. 
      */
-    constructor(appViewInterface,component,viewConfig) { 
+    constructor(appViewInterface,component) { 
     
-        this.viewConfig = viewConfig;
+        this.viewConfig = component.getComponentConfig();
         
         this.app = appViewInterface.getApp();
         this.appViewInterface = appViewInterface;

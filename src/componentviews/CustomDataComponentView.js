@@ -3,111 +3,98 @@ import {getErrorViewModeEntry,getAppCodeViewModeEntry,getMemberDataTextViewModeE
 import HtmlJsDataDisplay from "/apogeejs-view-lib/src/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHelper.js";
 import {Messenger} from "/apogeejs-model-lib/src/apogeeModelLib.js";
-import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
+//import {uiutil} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 
-/** This attempt has a single form edit page which returns an object. */
-// To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
-//than making the user do that.
+//========================
+// CSS CODE - needs to be fixed
+//========================
+// constructor(appViewInterface,component,viewConfig) {
+//     //extend edit component
+//     super(appViewInterface,component,viewConfig);
 
-/** This is a custom resource component. 
- * To implement it, the resource script must have the methods "run()" which will
- * be called when the component is updated. It also must have any methods that are
- * confugred with initialization data from the model. */
-class CustomDataComponentView extends ComponentView {
+//     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//     //add css to page! I think this should go in a separate on create event, but until I 
+//     //make this, I iwll put this here.
+//     let css = component.getField("css");
+//     if((css)&&(css != "")) {
+//         uiutil.setObjectCssData(component.getId(),css);
+//     }
+//     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// };
 
-    constructor(appViewInterface,component,viewConfig) {
-        //extend edit component
-        super(appViewInterface,component,viewConfig);
+// /** This component overrides the componentupdated to process the css data, which is managed directly in the view. */
+// componentUpdated(component) {
+//     super.componentUpdated(component);
 
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        //add css to page! I think this should go in a separate on create event, but until I 
-        //make this, I iwll put this here.
-        let css = component.getField("css");
-        if((css)&&(css != "")) {
-            uiutil.setObjectCssData(component.getId(),css);
-        }
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    };
+//     //if this is the css field, set it immediately
+//     if(component.isFieldUpdated("css")) {
+//         uiutil.setObjectCssData(component.getId(),component.getField("css"));
+//     }
+// }
 
-    /** This component overrides the componentupdated to process the css data, which is managed directly in the view. */
-    componentUpdated(component) {
-        super.componentUpdated(component);
+// /** This component extends the on delete method to get rid of any css data for this component. */
+// onDelete() {
+//     //remove the css data for this component
+//     uiutil.setObjectCssData(this.component.getId(),"");
+    
+//     super.onDelete();
+// }
 
-        //if this is the css field, set it immediately
-        if(component.isFieldUpdated("css")) {
-            uiutil.setObjectCssData(component.getId(),component.getField("css"));
-        }
-    }
+function getOutputDataDisplay(component, displayContainer) {
+    displayContainer.setDestroyViewOnInactive(component.getField("destroyOnInactive"));
+    var dataDisplaySource = getOutputDataDisplaySource(component);
+    return new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
+}
 
-    //==============================
-    // Protected and Private Instance Methods
-    //==============================
+function getOutputDataDisplaySource(component) {
+    return {
 
-    /** This component extends the on delete method to get rid of any css data for this component. */
-    onDelete() {
-        //remove the css data for this component
-        uiutil.setObjectCssData(this.component.getId(),"");
-        
-        super.onDelete();
-    }
+        //This method reloads the component and checks if there is a DATA update. UI update is checked later.
+        doUpdate: () => {
+            //return value is whether or not the data display needs to be udpated
+            let reloadData = component.isMemberDataUpdated("member.data");
+            let reloadDataDisplay = component.areAnyFieldsUpdated(["html","uiCode","member.input"]);
+            return {reloadData,reloadDataDisplay};
+        },
 
-    getOutputDataDisplay(displayContainer) {
-        displayContainer.setDestroyViewOnInactive(this.getComponent().getField("destroyOnInactive"));
-        var dataDisplaySource = this.getOutputDataDisplaySource();
-        return new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
-    }
+        getDisplayData: () => dataDisplayHelper.getWrappedMemberData(component,"member.input"),
 
-    getOutputDataDisplaySource() {
-        return {
+        getData: () => dataDisplayHelper.getWrappedMemberData(component,"member.data"),
 
-            //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isMemberDataUpdated("member.data");
-                let reloadDataDisplay = this.getComponent().areAnyFieldsUpdated(["html","uiCode","member.input"]);
-                return {reloadData,reloadDataDisplay};
-            },
+        //edit ok - always true
+        getEditOk: () => {
+            return true;
+        },
 
-            getDisplayData: () => dataDisplayHelper.getWrappedMemberData(this,"member.input"),
+        saveData: (formValue) => {
+            //send value to the member whose variable name is "data"
+            //the scope reference is the member called "input" 
+            let runContextLink = component.getApp().getWorkspaceManager().getRunContextLink();
+            let inputMember = component.getField("member.input");
+            let messenger = new Messenger(runContextLink,inputMember.getId());
+            messenger.dataUpdate("data",formValue);
+            return true;
+        },
 
-            getData: () => dataDisplayHelper.getWrappedMemberData(this,"member.data"),
+        //below - custom methods for HtmlJsDataDisplay
 
-            //edit ok - always true
-            getEditOk: () => {
-                return true;
-            },
+        //returns the HTML for the data display
+        getHtml: () => {
+            return component.getField("html");
+        },
 
-            saveData: (formValue) => {
-                //send value to the member whose variable name is "data"
-                //the scope reference is the member called "input" 
-                let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
-                let inputMember = this.getComponent().getField("member.input");
-                let messenger = new Messenger(runContextLink,inputMember.getId());
-                messenger.dataUpdate("data",formValue);
-                return true;
-            },
+        //returns the resource for the data display
+        getResource: () => {
+            return component.getField("resource");
+        },
 
-            //below - custom methods for HtmlJsDataDisplay
-
-            //returns the HTML for the data display
-            getHtml: () => {
-                return this.getComponent().getField("html");
-            },
-
-            //returns the resource for the data display
-            getResource: () => {
-                return this.getComponent().getField("resource");
-            },
-
-            //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
-            getScopeMember: () => {
-                let inputMember = this.getComponent().getField("member.input");
-                return inputMember;
-            }
+        //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
+        getScopeMember: () => {
+            let inputMember = component.getField("member.input");
+            return inputMember;
         }
     }
-
 }
 
 
@@ -118,7 +105,7 @@ class CustomDataComponentView extends ComponentView {
 
 const CustomDataComponentViewConfig = {
     componentType: "apogeeapp.CustomDataCell",
-    viewClass: CustomDataComponentView,
+    viewClass: ComponentView,
     iconResPath: "/icons3/genericCellIcon.png",
     propertyDialogEntries: [
         {
@@ -136,7 +123,7 @@ const CustomDataComponentViewConfig = {
             name: "Display", 
             label: "Display", 
             isActive: true,
-            getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
+            getDataDisplay: (component,displayContainer) => getOutputDataDisplay(component,displayContainer)
         },
         getAppCodeViewModeEntry("html",null,"HTML","HTML",{sourceType: "data", textDisplayMode: "ace/mode/html"}),
         getAppCodeViewModeEntry("css",null,"CSS", "CSS",{sourceType: "data", textDisplayMode: "ace/mode/css"}),

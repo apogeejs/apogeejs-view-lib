@@ -5,8 +5,6 @@ import ace from "/apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js";
 
 export {default as ComponentView} from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 
-export {default as FormInputBaseComponentView} from "/apogeejs-view-lib/src/componentviews/FormInputBaseComponentView.js";
-
 export {default as AceTextEditor} from "/apogeejs-view-lib/src/datadisplay/AceTextEditor.js";
 export {default as ConfigurableFormEditor} from "/apogeejs-view-lib/src/datadisplay/ConfigurableFormEditor.js";
 export {default as DataDisplay} from "/apogeejs-view-lib/src/datadisplay/DataDisplay.js";
@@ -20,8 +18,6 @@ export {default as HtmlJsDataDisplay} from "/apogeejs-view-lib/src/datadisplay/H
 export {default as StandardErrorDisplay} from "/apogeejs-view-lib/src/datadisplay/StandardErrorDisplay.js";
 export {getSaveBar} from "/apogeejs-view-lib/src/componentdisplay/toolbar.js";
 
-export {registerComponentView,unregisterComponentView,getComponentViewConfig,getComponentViewInstance} from "/apogeejs-view-lib/src/componentViewInfo.js";
-
 export {closeWorkspace} from "/apogeejs-view-lib/src/commandseq/closeworkspaceseq.js";
 export {createWorkspace} from "/apogeejs-view-lib/src/commandseq/createworkspaceseq.js";
 export {openWorkspace} from "/apogeejs-view-lib/src/commandseq/openworkspaceseq.js";
@@ -31,9 +27,6 @@ export {addComponent, addAdditionalComponent} from "/apogeejs-view-lib/src/comma
 export {addLinkSeq, updateLinkSeq, removeLinkSeq} from "/apogeejs-view-lib/src/commandseq/updatelinkseq.js";
 
 export {default as ace} from "/apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js";
-
-//import the default child component views
-import "/apogeejs-view-lib/src/childComponentViewConfig.js";
 
 /** This function initializes the resources paths. Thuis covers the following paths
  * - "resources" folder - where the resource images are held

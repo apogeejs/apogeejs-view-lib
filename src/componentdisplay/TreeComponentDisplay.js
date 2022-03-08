@@ -1,7 +1,6 @@
 import {TreeEntry} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 import {componentInfo} from "/apogeejs-app-lib/src/apogeeAppLib.js";
 import {addComponent} from "/apogeejs-view-lib/src/commandseq/addcomponentseq.js";
-import {getComponentViewConfig} from "/apogeejs-view-lib/src/componentViewInfo.js";
 
 export default class TreeComponentDisplay {
 
@@ -81,14 +80,13 @@ export default class TreeComponentDisplay {
                 let app = this.componentView.getApp();
                 var appViewInterface = this.componentView.getAppViewInterface();
                 let initialValues = {parentId: component.getMemberId()};
-                let components = componentInfo.getComponentTypes();
-                components.forEach(componentType => {
-                    let componentViewConfig = getComponentViewConfig(componentType);
-                    if(componentViewConfig.isParentOfChildEntries) {
+                let componentConfigs = componentInfo.getComponentConfigs();
+                componentConfigs.forEach(componentConfig => {
+                    if(componentConfig.isParentOfChildEntries) {
                         let childMenuItem = {};
                         let pageComponentConfig = componentInfo.getComponentConfig(componentType);
                         childMenuItem.title = "Add Child " + pageComponentConfig.displayName;
-                        childMenuItem.callback = () => addComponent(appViewInterface,app,componentType,initialValues);
+                        childMenuItem.callback = () => addComponent(appViewInterface,app,componentConfig,initialValues);
                         menuItemList.push(childMenuItem);
                     }
                 })

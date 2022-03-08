@@ -11,91 +11,84 @@ import dataDisplayHelper from "/apogeejs-view-lib/src/datadisplay/dataDisplayHel
  * to validate form input.
  * If you want a form to take an action on submit rather than create and edit a 
  * data value, you can use the dynmaic form. */
-class FormDataComponentView extends ComponentView {
 
-    //==============================
-    // Protected and Private Instance Methods
-    //==============================
-
-    getFormViewDisplay(displayContainer) {
-        let dataDisplaySource = this.getFormEditorCallbacks();
-        return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-    }
-
-    getFormEditorCallbacks() {
-
-        var dataDisplaySource = {};
-        dataDisplaySource.doUpdate = () => {
-            //update depends on multiplefields
-            let component = this.getComponent();
-            let reloadData = component.isMemberDataUpdated("member.data");
-            let reloadDataDisplay = ( (component.isMemberDataUpdated("member.layout")) ||
-                (component.isMemberDataUpdated("member.isInputValid")) );
-            return {reloadData,reloadDataDisplay};
-        },
-
-        //return form layout
-        dataDisplaySource.getDisplayData = () => dataDisplayHelper.getWrappedMemberData(this,"member.layout"),
-        
-        //return desired form value
-        dataDisplaySource.getData = () => dataDisplayHelper.getWrappedMemberData(this,"member.data");
-        
-        //edit ok - always true
-        dataDisplaySource.getEditOk = () => {
-            return true;
-        }
-        
-        //save data - just form value here
-        dataDisplaySource.saveData = (formValue) => {
-            let isInputValidFunctionMember = this.getComponent().getField("member.isInputValid");
-            //validate input
-            var isInputValid = isInputValidFunctionMember.getData();
-            let validateResult;
-            if(isInputValid instanceof Function) {
-                try {
-                    validateResult = isInputValid(formValue);
-                }
-                catch(error) {
-                    validateResult = "Error running input validation function.";
-                    console.error("Error reading form layout: " + this.getName());
-                }
-            }
-            else {
-                validateResult = "Input validate function not valid";
-            }
-
-            if(validateResult !== true) {
-                if(typeof validateResult != 'string') {
-                    validateResult = "Improper format for isInputValid function. It should return true or an error message";
-                }
-                apogeeUserAlert(validateResult);
-                return false;
-            }
-
-            //save the data - send via messenger to the variable named "data" in code, which is the field 
-            //named "member.data", NOT the field named "data"
-            let runContextLink = this.getApp().getWorkspaceManager().getRunContextLink();
-            let layoutMember = this.getComponent().getField("member.layout");
-            let messenger = new Messenger(runContextLink,layoutMember.getId());
-            messenger.dataUpdate("data",formValue);
-            return true;
-        }
-        
-        return dataDisplaySource;
-    }
-
+function getFormViewDisplay(component, displayContainer) {
+    let dataDisplaySource = getFormEditorCallbacks(component);
+    return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 }
+
+function getFormEditorCallbacks(component) {
+
+    var dataDisplaySource = {};
+    dataDisplaySource.doUpdate = () => {
+        //update depends on multiplefields
+        let reloadData = component.isMemberDataUpdated("member.data");
+        let reloadDataDisplay = ( (component.isMemberDataUpdated("member.layout")) ||
+            (component.isMemberDataUpdated("member.isInputValid")) );
+        return {reloadData,reloadDataDisplay};
+    },
+
+    //return form layout
+    dataDisplaySource.getDisplayData = () => dataDisplayHelper.getWrappedMemberData(component,"member.layout"),
+    
+    //return desired form value
+    dataDisplaySource.getData = () => dataDisplayHelper.getWrappedMemberData(component,"member.data");
+    
+    //edit ok - always true
+    dataDisplaySource.getEditOk = () => {
+        return true;
+    }
+    
+    //save data - just form value here
+    dataDisplaySource.saveData = (formValue) => {
+        let isInputValidFunctionMember = component.getField("member.isInputValid");
+        //validate input
+        var isInputValid = isInputValidFunctionMember.getData();
+        let validateResult;
+        if(isInputValid instanceof Function) {
+            try {
+                validateResult = isInputValid(formValue);
+            }
+            catch(error) {
+                validateResult = "Error running input validation function.";
+                console.error("Error reading form layout: " + component.getName());
+            }
+        }
+        else {
+            validateResult = "Input validate function not valid";
+        }
+
+        if(validateResult !== true) {
+            if(typeof validateResult != 'string') {
+                validateResult = "Improper format for isInputValid function. It should return true or an error message";
+            }
+            apogeeUserAlert(validateResult);
+            return false;
+        }
+
+        //save the data - send via messenger to the variable named "data" in code, which is the field 
+        //named "member.data", NOT the field named "data"
+        let runContextLink = component.getApp().getWorkspaceManager().getRunContextLink();
+        let layoutMember = component.getField("member.layout");
+        let messenger = new Messenger(runContextLink,layoutMember.getId());
+        messenger.dataUpdate("data",formValue);
+        return true;
+    }
+    
+    return dataDisplaySource;
+}
+
 
 const FormDataComponentViewConfig = {
     componentType: "apogeeapp.DataFormCell",
-    viewClass: FormDataComponentView,
+    viewClass: ComponentView,
     viewModes: [
         getErrorViewModeEntry(),
         {
             name: "Form",
             label: "Form",
             isActive: true,
-            getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDisplay(displayContainer)
+            getDataDisplay: (component,displayContainer) => getFormViewDisplay(component, displayContainer)
         },
         getFormulaViewModeEntry("member.layout",{name:"Layout Code",label:"Layout Code"}),
         getPrivateViewModeEntry("member.layout",{name:"Layout Private",label:"Layout Private"}),

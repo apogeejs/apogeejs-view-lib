@@ -1,7 +1,7 @@
 import {uiutil,dialogMgr} from "/apogeejs-ui-lib/src/apogeeUiLib.js";
 
 /** This method shows a dialog to select from additional components. */
-export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
+export function showSelectComponentDialog(componentConfigs,onSelectFunction) {
 
     var dialog = dialogMgr.createDialog({"movable":true});
     
@@ -37,8 +37,8 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     line.appendChild(document.createTextNode("Component:"));
     var select = uiutil.createElement("select");
     line.appendChild(select);
-    componentInfoList.forEach( componentData => {
-		select.add(uiutil.createElement("option",{"text":componentData.displayName,"value":componentData.componentType}));
+    componentConfigs.forEach( componentConfig => {
+		select.add(uiutil.createElement("option",{"text":componentConfig.displayName,"value":componentConfig.displayName}));
     });
     content.appendChild(line);
     
@@ -49,9 +49,16 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     }
     
     var onCreate = function() {
-		var componentClass = select.value;
-        onSelectFunction(componentClass);
-        dialogMgr.closeDialog(dialog);
+		var displayName = select.value;
+        componentConfig = componentConfigs.find(componentConfig => componentConfig.displayName == displayName)
+        if(componentConfig) {
+            onSelectFunction(componentConfig);
+            dialogMgr.closeDialog(dialog);
+        }
+        else {
+            // add error handling - this shouldn't happen though
+            apogeeUserAlert("Unknown error selecting component type: " + displayName)
+        }
     }
     line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
     line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));

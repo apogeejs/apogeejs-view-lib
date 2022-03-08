@@ -13,8 +13,8 @@ export function getErrorViewModeEntry() {
         isActive: false,
         isTransient: true,
         isErrorView: true,
-        getDataDisplay: (componentView,displayContainer) => {
-            let dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(componentView.getApp(),componentView);
+        getDataDisplay: (componentHolder,displayContainer) => {
+            let dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(componentHolder);
             return new StandardErrorDisplay(displayContainer,dataDisplaySource);
         }
     }
@@ -24,11 +24,11 @@ export function getErrorViewModeEntry() {
 // Member Data View Modes
 //=============================
 
-export function getMemberDataTextDisplay(componentView,displayContainer,memberFieldName,options) {
+export function getMemberDataTextDisplay(componentHolder,displayContainer,memberFieldName,options) {
     let textDisplayMode = ((options)&&(options.textDisplayMode)) ? options.textDisplayMode : "ace/mode/json";
     let editorOptions = ((options)&&(options.editorOptions)) ? options.editorOptions : AceTextEditor.OPTION_SET_DISPLAY_SOME;
     let doReadOnly = ((options)&&(options.editorOptions)) ? options.editorOptions.doReadOnly : false;
-    let dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(componentView.getApp(),componentView,memberFieldName,doReadOnly);
+    let dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(componentHolder,memberFieldName,doReadOnly);
     return new AceTextEditor(displayContainer,dataDisplaySource,textDisplayMode,editorOptions);        
 }
 
@@ -55,7 +55,7 @@ export function getMemberDataTextViewModeEntry(memberFieldName,options) {
         sourceType: "data",
         suffix: suffix, //default value comes from member field name 
         isActive: ((options)&&(options.suffix)) ? options.suffix : false,
-        getDataDisplay: (componentView,displayContainer) => getMemberDataTextDisplay(componentView,displayContainer,memberFieldName,options),
+        getDataDisplay: (componentHolder,displayContainer) => getMemberDataTextDisplay(componentHolder,displayContainer,memberFieldName,options),
         childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
@@ -63,9 +63,9 @@ export function getMemberDataTextViewModeEntry(memberFieldName,options) {
 //==============================
 // Member Code View Modes
 //==============================
-export function getFormulaDataDisplay(componentView,displayContainer,memberFieldName,options) {
+export function getFormulaDataDisplay(componentHolder,displayContainer,memberFieldName,options) {
     let editorOptions = ((options)&&(options.editorOptions)) ? options.editorOptions : AceTextEditor.OPTION_SET_DISPLAY_MAX;
-    let dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(componentView.getApp(),componentView,memberFieldName);
+    let dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(componentHolder,memberFieldName);
     return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",editorOptions);
 }
 
@@ -77,14 +77,14 @@ export function getFormulaViewModeEntry(memberFieldName,options) {
         sourceType: "function",
         argList: ((options)&&(options.argList !== undefined)) ? options.argList : "",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getFormulaDataDisplay(componentView,displayContainer,memberFieldName,options),
+        getDataDisplay: (componentHolder,displayContainer) => getFormulaDataDisplay(componentHolder,displayContainer,memberFieldName,options),
         childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
 
-export function getPrivateDataDisplay(componentView,displayContainer,memberFieldName,options) {
+export function getPrivateDataDisplay(componentHolder,displayContainer,memberFieldName,options) {
     let editorOptions = ((options)&&(options.editorOptions)) ? options.editorOptions : AceTextEditor.OPTION_SET_DISPLAY_MAX;
-    let dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(componentView.getApp(),componentView,memberFieldName);
+    let dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(componentHolder,memberFieldName);
     return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",editorOptions);
 }
 
@@ -95,7 +95,7 @@ export function getPrivateViewModeEntry(memberFieldName,options) {
         sourceLayer: "model",
         sourceType: "private code",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getPrivateDataDisplay(componentView,displayContainer,memberFieldName,options),
+        getDataDisplay: (componentHolder,displayContainer) => getPrivateDataDisplay(componentHolder,displayContainer,memberFieldName,options),
         childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 } 
@@ -104,10 +104,10 @@ export function getPrivateViewModeEntry(memberFieldName,options) {
 // App Code/Text Field
 //=============================================
 
-export function getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,componentCompiledFieldName,options) {
+export function getAppCodeDataDisplay(componentHolder,displayContainer,componentFieldName,componentCompiledFieldName,options) {
     let textDisplayMode = ((options)&&(options.textDisplayMode)) ? options.textDisplayMode : "ace/mode/javascript";
     let editorOptions = ((options)&&(options.editorOptions)) ? options.editorOptions : AceTextEditor.OPTION_SET_DISPLAY_MAX;
-    let dataSource = getComponentFieldDisplaySource(componentView,componentFieldName,componentCompiledFieldName);
+    let dataSource = getComponentFieldDisplaySource(componentHolder,componentFieldName,componentCompiledFieldName);
     return new AceTextEditor(displayContainer,dataSource,textDisplayMode,editorOptions);
 }
 
@@ -123,24 +123,26 @@ export function getAppCodeViewModeEntry(componentFieldName,componentCompiledFiel
         sourceType: ((options)&&(options.sourceType)) ? options.sourceType : "function",
         argList: ((options)&&(options.argList !== undefined)) ? options.argList : "",
         isActive: ((options)&&(options.isActive)) ? options.isActive : false,
-        getDataDisplay: (componentView,displayContainer) => getAppCodeDataDisplay(componentView,displayContainer,componentFieldName,componentCompiledFieldName,options),
+        getDataDisplay: (componentHolder,displayContainer) => getAppCodeDataDisplay(componentHolder,displayContainer,componentFieldName,componentCompiledFieldName,options),
         childPath: ((options)&&(options.childPath)) ? options.childPath : "."
     }
 }
 
 /** This method returns the data dispklay data source for the code field data displays. */
-function getComponentFieldDisplaySource(componentView,componentCodeFieldName,componentCompiledFieldName) {
+function getComponentFieldDisplaySource(componentHolder,componentCodeFieldName,componentCompiledFieldName) {
 
     return {
         doUpdate: () => {
             //return value is whether or not the data display needs to be udpated
-            let reloadData = componentView.getComponent().isFieldUpdated(componentCodeFieldName);
+            let component = componentHolder.getComponent()
+            let reloadData = component.isFieldUpdated(componentCodeFieldName);
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: () => {
-            let componentCodeField = componentView.getComponent().getField(componentCodeFieldName);
+            let component = componentHolder.getComponent()
+            let componentCodeField = component.getField(componentCodeFieldName);
             if((componentCodeField === undefined)||(componentCodeField === null)) componentCodeField = "";
 
             let wrappedData = {};
@@ -148,7 +150,7 @@ function getComponentFieldDisplaySource(componentView,componentCodeFieldName,com
 
             //append compiled error info if applicable
             if(componentCompiledFieldName) {
-                let componentCompiledField = componentView.getComponent().getField(componentCompiledFieldName);
+                let componentCompiledField = component.getField(componentCompiledFieldName);
                 if(componentCompiledField instanceof Error) {
                     wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
                     wrappedData.message = "Error compiling code: " + componentCompiledField.toString();
@@ -163,12 +165,13 @@ function getComponentFieldDisplaySource(componentView,componentCodeFieldName,com
         },
         
         saveData: (text) => {
-            let app = componentView.getApp();
+            let component = componentHolder.getComponent()
+            let app = component.getApp();
 
-            var initialValue = componentView.getComponent().getField(componentCodeFieldName);
+            var initialValue = component.getField(componentCodeFieldName);
             var command = {};
             command.type = "updateComponentField";
-            command.memberId = componentView.getComponent().getMemberId();
+            command.memberId = component.getMemberId();
             command.fieldName = componentCodeFieldName;
             command.initialValue = initialValue;
             command.targetValue = text;
